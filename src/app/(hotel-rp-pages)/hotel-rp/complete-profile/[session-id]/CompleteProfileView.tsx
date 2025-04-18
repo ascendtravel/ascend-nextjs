@@ -24,7 +24,7 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-interface ApprovalInfo {
+export interface ApprovalInfoProp {
     first_name?: string;
     last_name?: string;
     bday?: string;
@@ -33,7 +33,7 @@ interface ApprovalInfo {
 }
 
 interface CompleteProfileViewProps {
-    initialData: ApprovalInfo | null;
+    initialData: ApprovalInfoProp | null;
     sessionId: string;
 }
 
@@ -68,15 +68,17 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
     async function onSubmit(data: ProfileFormValues) {
         setIsSubmitting(true);
         try {
-            const response = await fetch('/api/hotel-rp/complete-profile', {
+            const response = await fetch('/api/hotel-rp/submit-approval-info', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    session_id: sessionId,
-                    ...data,
-                    bday: formatDateForAPI(data.bday)
+                    repricing_session_id: sessionId,
+                    first_name: data.firstName,
+                    last_name: data.lastName,
+                    birthday: formatDateForAPI(data.bday),
+                    citizenship: data.citizenship
                 })
             });
 
@@ -85,9 +87,16 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
                 throw new Error(errorData.error || 'Failed to save profile');
             }
 
+            const responseData = await response.json();
+
+            if (!responseData.stripe_link_url) {
+                throw new Error('No payment link received');
+            }
+
             toast.success('Profile completed successfully');
-            // Redirect to next page
-            router.push('/hotel-rp/confirmation');
+
+            // Redirect to Stripe
+            window.location.href = responseData.stripe_link_url;
         } catch (error) {
             console.error('Error saving profile:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to save profile');
@@ -97,7 +106,7 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
     }
 
     return (
-        <div className='w-full max-w-md rounded-xl bg-white p-8 shadow-lg'>
+        <div className='w-full max-w-[323px] rounded-xl bg-white p-8 shadow-lg'>
             <h1 className='mb-6 text-center text-2xl font-bold text-neutral-900'>Complete Your Profile</h1>
             <p className='mb-6 text-center text-neutral-600'>
                 Please verify your information to complete your registration.
@@ -141,7 +150,7 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
                             <FormItem>
                                 <FormLabel>Date of Birth</FormLabel>
                                 <FormControl>
-                                    <div className='flex flex-col items-center gap-2'>
+                                    <div className='-ml-0.5 flex flex-col items-center gap-2'>
                                         <InputOTP
                                             maxLength={10}
                                             value={field.value}
@@ -158,14 +167,14 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
                                             }}
                                             containerClassName='gap-2'>
                                             <InputOTPGroup>
-                                                <InputOTPSlot index={0} />
-                                                <InputOTPSlot index={1} className='mr-3 rounded-r-md' />
-                                                <InputOTPSlot index={3} className='rounded-l-md' />
-                                                <InputOTPSlot index={4} className='mr-3 rounded-r-md' />
-                                                <InputOTPSlot index={6} className='rounded-l-md' />
-                                                <InputOTPSlot index={7} />
-                                                <InputOTPSlot index={8} />
-                                                <InputOTPSlot index={9} />
+                                                <InputOTPSlot index={0} className='w-7.5' />
+                                                <InputOTPSlot index={1} className='mr-3 w-7.5 rounded-r-md' />
+                                                <InputOTPSlot index={3} className='w-7.5 rounded-l-md' />
+                                                <InputOTPSlot index={4} className='mr-3 w-7.5 rounded-r-md' />
+                                                <InputOTPSlot index={6} className='w-7.5 rounded-l-md' />
+                                                <InputOTPSlot index={7} className='w-7.5' />
+                                                <InputOTPSlot index={8} className='w-7.5' />
+                                                <InputOTPSlot index={9} className='w-7.5' />
                                             </InputOTPGroup>
                                         </InputOTP>
                                     </div>
@@ -182,8 +191,11 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
                         defaultCountry={initialData?.citizenship || 'US'}
                     />
 
-                    <Button type='submit' disabled={isSubmitting} className='w-full bg-[#1DC167] hover:bg-[#1DC167]/90'>
-                        {isSubmitting ? 'Saving...' : 'Complete Registration'}
+                    <Button
+                        type='submit'
+                        disabled={isSubmitting}
+                        className='w-full rounded-full bg-[#1DC167] hover:bg-[#1DC167]/90'>
+                        {isSubmitting ? 'Saving...' : 'Complete'}
                     </Button>
                 </form>
             </Form>
