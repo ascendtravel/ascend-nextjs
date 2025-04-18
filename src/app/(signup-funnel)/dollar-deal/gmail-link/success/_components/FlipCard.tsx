@@ -39,20 +39,11 @@ const cardVariants = {
 
 interface FlipCardProps {
     onSubmit: (data: FormData) => void;
-    frontContent:
-        | React.ReactNode
-        | (({
-              confirmStep,
-              onButtonClick
-          }: {
-              confirmStep: boolean;
-              onButtonClick: (e: React.MouseEvent) => void;
-          }) => React.ReactElement);
+    frontContent: React.ReactNode;
 }
 
 export function FlipCard({ onSubmit, frontContent }: FlipCardProps) {
     const [isFlipped, setIsFlipped] = useState(false);
-    const [confirmStep, setConfirmStep] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const [selectedCountry, setSelectedCountry] = useState('US');
 
@@ -78,20 +69,8 @@ export function FlipCard({ onSubmit, frontContent }: FlipCardProps) {
         form.setValue('citizenship', countryCode);
     };
 
-    const handleButtonClick = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent card flip when clicking button
-
-        if (!confirmStep) {
-            setConfirmStep(true);
-        } else {
-            setIsFlipped(true);
-        }
-    };
-
     return (
-        <div
-            ref={cardRef}
-            className={cn('perspective-1000 relative w-full', isFlipped ? 'h-[460px]' : 'h-[230px] md:h-[290px]')}>
+        <div ref={cardRef} className={cn('perspective-1000 relative w-full', isFlipped ? 'h-[460px]' : 'h-[240px]')}>
             <AnimatePresence>
                 {!isFlipped ? (
                     <motion.div
@@ -105,10 +84,9 @@ export function FlipCard({ onSubmit, frontContent }: FlipCardProps) {
                             backfaceVisibility: 'hidden',
                             transformStyle: 'preserve-3d'
                         }}
-                        onClick={() => !confirmStep && setConfirmStep(true)}>
-                        {typeof frontContent === 'function'
-                            ? frontContent({ confirmStep, onButtonClick: handleButtonClick })
-                            : frontContent}
+                        whileHover={{ scale: 1.02 }}
+                        onClick={() => setIsFlipped(true)}>
+                        {frontContent}
                     </motion.div>
                 ) : (
                     <motion.div
