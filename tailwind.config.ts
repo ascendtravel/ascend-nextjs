@@ -112,6 +112,15 @@ const config: Config = {
                 xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
             },
             utilities: {
+                '.backface-hidden': {
+                    backfaceVisibility: 'hidden'
+                },
+                '.rotate-y-180': {
+                    transform: 'rotateY(180deg)'
+                },
+                '.rotate-y-0': {
+                    transform: 'rotateY(0deg)'
+                },
                 '.perspective-1000': {
                     perspective: '1000px'
                 }

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
@@ -12,7 +11,7 @@ import { FlipCard } from './FlipCard';
 import { ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
-export function SuccessViewB() {
+export function SuccessView() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const stateId = searchParams.get('state_id');
@@ -20,8 +19,6 @@ export function SuccessViewB() {
     const [isLoading, setIsLoading] = useState(true);
     const [stripeUrl, setStripeUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [showPromo, setShowPromo] = useState(false);
-    const [confirmStepActive, setConfirmStepActive] = useState(false);
 
     useEffect(() => {
         async function getStripeUrl() {
@@ -56,12 +53,6 @@ export function SuccessViewB() {
 
         getStripeUrl();
     }, [stateId]);
-
-    useEffect(() => {
-        if (confirmStepActive && !showPromo) {
-            setShowPromo(true);
-        }
-    }, [confirmStepActive, showPromo]);
 
     const handleStripeSignup = () => {
         if (stripeUrl) {
@@ -133,13 +124,12 @@ export function SuccessViewB() {
                                         <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
                                             $
                                         </span>
-                                        <span className='text-3xl font-bold'>2.</span>
-                                        <span className='-ml-1 pt-2 text-xl font-bold'>09</span>
+                                        <span className='text-3xl font-bold'>1</span>
+                                        <span className='pt-3.5 text-sm font-bold'>for the firtst month</span>
                                     </div>
                                 </div>
-                                <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-sm'>
-                                    <span className='font-semibold'>Per month, </span>
-                                    billed yearly
+                                <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-xs'>
+                                    Then $4.99 per month, and cancel anytime
                                 </div>
 
                                 <button
@@ -163,64 +153,25 @@ export function SuccessViewB() {
                     {/* Monthly Plan Card */}
                     <FlipCard
                         onSubmit={handleFreePlan}
-                        frontContent={({ confirmStep, onButtonClick }) => {
-                            if (confirmStep !== confirmStepActive) {
-                                setConfirmStepActive(confirmStep);
-                            }
-
-                            return (
-                                <div className='flex h-full flex-col gap-4'>
-                                    <h2 className='font-figtree text-[22px] leading-[100%] font-bold'>
-                                        You do the work yourself
-                                    </h2>
-                                    <p className='text-neutral-1000 text-sm'>
-                                        You sit on hold on the phone with airlines to get the price difference back if
-                                        the prices drop.
-                                    </p>
-                                    <div className='hidden h-5 w-full md:block' />
-
-                                    {/* Button with flip animation */}
-                                    <div className='perspective-1000 relative h-11 w-full'>
-                                        <div
-                                            className={`absolute inset-0 h-full w-full transition-all duration-500 ${
-                                                confirmStep ? 'rotate-y-180' : 'rotate-y-0'
-                                            }`}
-                                            style={{ transformStyle: 'preserve-3d' }}>
-                                            {/* Front of button */}
-                                            <button
-                                                onClick={onButtonClick}
-                                                className='absolute inset-0 h-full w-full rounded-full border border-[#1DC167] bg-white pt-2.5 pb-4 font-semibold text-[#1DC167] backface-hidden'
-                                                style={{ backfaceVisibility: 'hidden' }}>
-                                                Choose Option
-                                            </button>
-
-                                            {/* Back of button (confirmation) */}
-                                            <button
-                                                onClick={onButtonClick}
-                                                className='absolute inset-0 h-full w-full rotate-y-180 rounded-full border border-[#1DC167] bg-white pt-2.5 pb-4 font-semibold text-[#1DC167] backface-hidden'
-                                                style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                                                Are you sure?
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }}
+                        frontContent={
+                            <div className='flex h-full flex-col gap-4'>
+                                <h2 className='font-figtree text-[22px] leading-[100%] font-bold'>
+                                    You do the work yourself
+                                </h2>
+                                <p className='text-neutral-1000 text-sm'>
+                                    You sit on hold on the phone with airlines to get the price difference back if the
+                                    prices drop.
+                                </p>
+                                <div className='flex items-start justify-start gap-1 text-2xl font-bold md:h-7'></div>
+                                <div className='hidden h-5 w-full md:block' />
+                                <button className='w-full rounded-full border border-[#1DC167] bg-white py-2.5 font-semibold text-[#1DC167] transition-all'>
+                                    Choose Option
+                                </button>
+                            </div>
+                        }
                     />
                 </div>
             </div>
-
-            {showPromo && (
-                <div className='text-enter mt-4 flex flex-col items-center gap-2 text-sm text-neutral-50'>
-                    <span>
-                        <Link className='underline' href='/new-member'>
-                            Click here
-                        </Link>{' '}
-                        to get the pro version for
-                    </span>
-                    <span className='-mt-2'>just $5 on your first year (80% OFF)</span>
-                </div>
-            )}
         </div>
     );
 }

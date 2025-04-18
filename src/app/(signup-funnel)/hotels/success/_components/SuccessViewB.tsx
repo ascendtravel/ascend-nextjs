@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 
-import GradientShadowHeading from '../../../../_components/GradientShadowHeading/GradientShadowHeading';
+import GradientShadowHeading from '../../../_components/GradientShadowHeading/GradientShadowHeading';
 import { FlipCard } from './FlipCard';
 import { ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
@@ -173,11 +173,14 @@ export function SuccessViewB() {
                                     <h2 className='font-figtree text-[22px] leading-[100%] font-bold'>
                                         You do the work yourself
                                     </h2>
-                                    <p className='text-neutral-1000 text-sm'>
-                                        You sit on hold on the phone with airlines to get the price difference back if
-                                        the prices drop.
-                                    </p>
-                                    <div className='hidden h-5 w-full md:block' />
+                                    <ul className='list-disc px-7'>
+                                        <li>Limited access to hotel deals</li>
+                                        <li>
+                                            You sit on hold on the phone with airlines to get the price difference back
+                                            if the prices drop
+                                        </li>
+                                    </ul>
+                                    <div className='ml-1 w-full text-xl font-bold'>Free</div>
 
                                     {/* Button with flip animation */}
                                     <div className='perspective-1000 relative h-11 w-full'>
