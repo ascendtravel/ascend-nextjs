@@ -119,8 +119,8 @@ export default function HotelRpAuthOtpView({ sessionId, initialData, initialErro
 
             toast.success('Verification successful');
 
-            // Redirect to the complete profile page
-            router.push('/hotel-rp/complete-profile');
+            // Redirect to the complete profile page with session ID
+            router.push(`/hotel-rp/complete-profile?session_id=${sessionId}`);
         } catch (error) {
             console.error('Error verifying OTP:', error);
             setError(error instanceof Error ? error.message : 'Failed to verify OTP');
