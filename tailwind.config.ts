@@ -100,13 +100,18 @@ const config: Config = {
                 'fade-out': {
                     from: { opacity: '1' },
                     to: { opacity: '0' }
+                },
+                'rotate-right': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(15deg)' }
                 }
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
                 'fade-in': 'fade-in 0.2s ease-out',
-                'fade-out': 'fade-out 0.2s ease-out'
+                'fade-out': 'fade-out 0.2s ease-out',
+                'rotate-right': 'rotate-right 0.2s ease-out forwards'
             },
             boxShadow: {
                 xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
