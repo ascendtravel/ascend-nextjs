@@ -39,9 +39,10 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
     return (
         <div className='w-full px-4'>
             <ReactConfetti
-                className='fixed inset-0 z-50'
+                className='fixed inset-0 z-50 max-w-md'
                 numberOfPieces={100}
                 recycle={showConfetti}
+                height={400}
                 gravity={0.1}
                 colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
                 tweenDuration={200}

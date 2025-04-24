@@ -1,18 +1,59 @@
+import { useState } from 'react';
+
 import Image from 'next/image';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
 
 import UserRpHotelDetailsList from './UserRpHotelDetailsList';
+import { toast } from 'sonner';
 
 interface UserRpHotelConfirmationSectionProps {
     trip: Booking & { type: 'hotel' };
 }
 
 export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConfirmationSectionProps) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const hotelPayload = trip.payload as HotelPayload;
 
-    function handleConfirmBooking() {
-        throw new Error('Function not implemented.');
+    async function handleConfirmBooking() {
+        setIsSubmitting(true);
+        try {
+            const response = await fetch('/api/hotel-rp/submit-approval-info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    repricing_session_id: trip.payload.repricing_session_id,
+                    // Mock user data
+                    first_name: 'John',
+                    last_name: 'Doe',
+                    birthday: '1990-01-01',
+                    citizenship: 'US'
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to confirm booking');
+            }
+
+            const responseData = await response.json();
+
+            if (!responseData.stripe_link_url) {
+                throw new Error('No payment link received');
+            }
+
+            toast.success('Booking confirmed!');
+
+            // Redirect to Stripe
+            window.location.href = responseData.stripe_link_url;
+        } catch (error) {
+            console.error('Error confirming booking:', error);
+            toast.error(error instanceof Error ? error.message : 'Failed to confirm booking');
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -59,11 +100,13 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
             />
             <div className='mt-4 flex w-full flex-col items-center justify-center px-8'>
                 <div
-                    className='mt-4 w-full cursor-pointer rounded-full bg-[#1DC167] py-2 text-center text-sm font-bold text-white'
+                    className={`mt-4 w-full cursor-pointer rounded-full bg-[#1DC167] py-2 text-center text-sm font-bold text-white ${
+                        isSubmitting ? 'opacity-50' : ''
+                    }`}
                     onClick={() => {
-                        handleConfirmBooking();
+                        if (!isSubmitting) handleConfirmBooking();
                     }}>
-                    My booking details are correct
+                    {isSubmitting ? 'Processing...' : 'My booking details are correct'}
                 </div>
                 <div className='mt-4 mb-8 flex flex-row items-center justify-center gap-2 text-xs text-neutral-700'>
                     Need Help?{' '}

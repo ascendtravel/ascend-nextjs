@@ -2,6 +2,7 @@
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import UserAvatar from '@/components/UserAvatar';
+import UserDropdownMenu from '@/components/UserDropdownMenu';
 import { useUser } from '@/contexts/UserContext';
 
 export default function RpSuccessLayout({ children }: { children: React.ReactNode }) {
@@ -29,9 +30,7 @@ export default function RpSuccessLayout({ children }: { children: React.ReactNod
                     <div className='flex max-w-[90px] flex-row items-center justify-center'>
                         <IconNewWhite />
                     </div>
-                    <div className='flex flex-row items-center justify-center'>
-                        <UserAvatar variant='md' showName={true} darkMode={true} />
-                    </div>
+                    <UserDropdownMenu />
                 </div>
             </header>
 

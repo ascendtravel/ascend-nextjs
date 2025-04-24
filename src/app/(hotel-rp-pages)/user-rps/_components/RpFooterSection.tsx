@@ -28,7 +28,7 @@ export default function RpFooterSection({ email }: RpFooterSectionProps) {
     ];
 
     return (
-        <div className='mt-6 w-full'>
+        <div className='mt-6 w-full pb-12'>
             <div className='mb-2 pl-4 text-sm font-bold'>More</div>
             <Separator />
             <div className='ml-6 flex flex-col items-center justify-center gap-2 py-2'>
@@ -44,7 +44,7 @@ export default function RpFooterSection({ email }: RpFooterSectionProps) {
                     </React.Fragment>
                 ))}
             </div>
-            <div className='mt-3 mb-12 ml-4 flex flex-col items-start justify-center text-xs'>
+            <div className='mt-3 mb-16 ml-4 flex flex-col items-start justify-center text-xs'>
                 Your Unique email for forwarding missing trips is:
                 <div className='font-bold underline'>{email}</div>
             </div>
