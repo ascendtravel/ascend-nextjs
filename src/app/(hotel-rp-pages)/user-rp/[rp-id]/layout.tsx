@@ -1,8 +1,7 @@
 'use client';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
-import UserAvatar from '@/components/UserAvatar';
-import UserDropdownMenu from '@/components/UserDropdownMenu';
+import UserDetailsMenu from '@/components/UserDetailsMenu';
 import { useUser } from '@/contexts/UserContext';
 
 export default function UserRpsLayout({ children }: { children: React.ReactNode }) {
@@ -28,7 +27,7 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
                     <div className='flex max-w-[90px] flex-row items-center justify-center'>
                         <IconNewWhite />
                     </div>
-                    <UserDropdownMenu />
+                    <UserDetailsMenu />
                 </div>
             </header>
 

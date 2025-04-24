@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
 
         if (!response.ok) {
             console.log('response', response);
-            console.log('response.body', await response.json());
             throw new Error('Failed to fetch approval info');
         }
 

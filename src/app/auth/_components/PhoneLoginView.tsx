@@ -59,7 +59,7 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
     const [cooldown, setCooldown] = useState(0);
     const [impersonateId, setImpersonateId] = useState('');
 
-    const { isImpersonating, stopImpersonating, startImpersonating } = useUser();
+    const { startImpersonating, login } = useUser();
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -154,19 +154,18 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
             }
 
             if (data.success) {
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('customerId', data.customer_id);
+                login(data.token, data.customer_id);
 
                 if (impersonateId) {
                     startImpersonating(impersonateId);
                 }
 
-                // Set cookie for server-side
-                document.cookie = `authToken=${data.token}; path=/`;
-
                 toast.success('Login successful');
-                console.log('Redirecting to:', redirectUrl);
-                router.push(redirectUrl);
+                if (redirectUrl) {
+                    router.push(redirectUrl);
+                } else {
+                    router.push('/user-rps');
+                }
             } else {
                 throw new Error(data.message || 'Verification failed');
             }

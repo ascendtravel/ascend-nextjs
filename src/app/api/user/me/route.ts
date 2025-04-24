@@ -18,11 +18,16 @@ export async function GET(request: NextRequest) {
         const token = request.headers.get('Authorization')?.split(' ')[1];
         const impersonationId = request.nextUrl.searchParams.get('impersonationId');
 
-        const response = await UserRelatedFetch('/me', {
-            token,
-            impersonationId: impersonationId || undefined,
-            method: 'GET'
-        });
+        const response = await UserRelatedFetch(
+            '/me',
+            {
+                method: 'GET'
+            },
+            {
+                token,
+                impersonationId: impersonationId || undefined
+            }
+        );
 
         if (response.status === 401) {
             return NextResponse.json(
@@ -39,6 +44,7 @@ export async function GET(request: NextRequest) {
         }
 
         const data = (await response.json()) as UserResponse;
+        console.log('USER data', data);
 
         return NextResponse.json(data);
     } catch (error: any) {

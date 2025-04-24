@@ -17,7 +17,7 @@ interface UserRpFlightConfirmationSectionProps {
 
 export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightConfirmationSectionProps) {
     const router = useRouter();
-    const { getToken, user } = useUser();
+    const { getToken, user, getImpersonateUserId } = useUser();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const flightPayload = trip.payload as FlightPayload;
     const [airports, setAirports] = useState<Airport[]>([]);
@@ -56,6 +56,9 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
         setIsSubmitting(true);
 
         console.log('[/api/flight-rp/approval_info] Token:', getToken());
+
+        const impersonationId = getImpersonateUserId();
+
         try {
             const response = await fetch('/api/flight-rp/approval_info', {
                 method: 'POST',
@@ -65,7 +68,9 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
                 },
                 body: JSON.stringify({
                     repricing_session_id: flightPayload.repricing_session_id,
-                    citizenship: 'US' // Mock citizenship for demo
+                    // citizenship: user?.citizenship || 'US' // TODO: Get from user
+                    citizenship: 'US', // Mock citizenship for demo
+                    impersonate_user_id: impersonationId
                 })
             });
 
@@ -75,7 +80,7 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
             }
 
             toast.success('Booking confirmed!');
-            router.push(`/rp-success/${flightPayload.import_session_id}`);
+            router.push(`/rp-success/${trip.import_session_id}`);
         } catch (error) {
             console.error('Error confirming booking:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to confirm booking');

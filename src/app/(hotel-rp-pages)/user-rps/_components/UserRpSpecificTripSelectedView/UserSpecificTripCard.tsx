@@ -11,6 +11,7 @@ import IconPlaneCircleTilt from '@/components/Icon/IconPlaneCircleTilt';
 import { Button } from '@/components/ui/button';
 import { getTripSavingsString } from '@/lib/money';
 
+import { motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
 
 interface UserSpecificTripCardProps {
@@ -37,7 +38,14 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
     const pastSavings = (trip.payload.past_savings_cents?.amount ?? 0) / 100;
 
     return (
-        <div className='w-full px-4'>
+        <motion.div
+            className='w-full px-4'
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+                duration: 0.5,
+                ease: 'easeOut'
+            }}>
             <ReactConfetti
                 className='fixed inset-0 z-50 max-w-md'
                 numberOfPieces={100}
@@ -48,10 +56,9 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                 tweenDuration={200}
             />
             <div className='flex flex-row gap-4 py-4'>
-                <div className='relative h-[84px] w-[140px] overflow-hidden rounded-lg'>
+                <div className='relative h-[84px] w-[140px] overflow-hidden rounded-lg bg-neutral-200'>
                     <Image
-                        // src={trip.payload.image_url || 'https://cataas.com/cat'}
-                        src={'https://cataas.com/cat'} // TODO: remove this
+                        src={trip.payload.image_url || ''}
                         alt={`Repricing Card for ${trip.type}`}
                         width={140}
                         height={84}
@@ -96,6 +103,6 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                     Reprice now to save {getTripSavingsString(trip, true)}
                 </Button>
             )}
-        </div>
+        </motion.div>
     );
 }

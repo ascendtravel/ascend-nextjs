@@ -95,7 +95,7 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         if (segments.length === 0) {
             // US center 39.8283° N, 98.5795° W
             map.current.setCenter([-98.5795, 39.8283]);
-            map.current.setZoom(2);
+            map.current.setZoom(1);
 
             return;
         }

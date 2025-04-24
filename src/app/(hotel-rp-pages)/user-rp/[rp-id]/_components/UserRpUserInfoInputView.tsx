@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import { Booking } from '@/app/api/rp-trips/route';
@@ -11,10 +13,12 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { Separator } from '@/components/ui/separator';
 import { CitizenshipSelector } from '@/components/ui/updated-citizenship-selector';
 import { useTripsRp } from '@/contexts/TripsRpContext';
+import { useUser } from '@/contexts/UserContext';
 import { getTripSavingsString } from '@/lib/money';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 const userInfoSchema = z.object({
@@ -25,6 +29,22 @@ const userInfoSchema = z.object({
 });
 
 type UserInfoFormValues = z.infer<typeof userInfoSchema>;
+
+interface ApprovalInfo {
+    first_name: string;
+    last_name: string;
+    birthday: string;
+    citizenship: string;
+    hotel_name?: string;
+    hotel_address?: string;
+    room_type?: string;
+    prior_price?: number;
+    new_price?: number;
+    expected_returned_to_customer_amount?: number;
+    cancelled_before?: string;
+    is_expired?: boolean;
+    faq_url?: string;
+}
 
 interface UserRpUserInfoInputViewProps {
     initialData?: {
@@ -39,24 +59,68 @@ interface UserRpUserInfoInputViewProps {
 export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUserInfoInputViewProps) {
     const router = useRouter();
     const { getTrip } = useTripsRp();
-
+    const { updateUser } = useUser();
+    const [approvalInfo, setApprovalInfo] = useState<ApprovalInfo | null>(null);
     const trip = getTrip(rpId);
+
+    useEffect(() => {
+        const fetchApprovalInfo = async () => {
+            try {
+                console.log('\n\nfetching approval info session id', trip?.payload.repricing_session_id);
+
+                const response = await fetch('/api/hotel-rp/ask-approval-info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: trip?.payload.repricing_session_id
+                    }),
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch approval info');
+                }
+
+                const data = await response.json();
+                setApprovalInfo(data);
+            } catch (error) {
+                console.error('Error fetching approval info:', error);
+                toast.error('Failed to fetch user information');
+            }
+        };
+
+        if (trip?.payload.repricing_session_id) {
+            console.log('fetching approval info');
+            fetchApprovalInfo();
+        }
+    }, [trip?.payload.repricing_session_id]);
 
     const form = useForm<UserInfoFormValues>({
         resolver: zodResolver(userInfoSchema),
         defaultValues: {
-            firstName: initialData?.first_name || '',
-            lastName: initialData?.last_name || '',
-            bday: initialData?.bday || '',
-            citizenship: initialData?.citizenship || 'US'
+            firstName: approvalInfo?.first_name || '',
+            lastName: approvalInfo?.last_name || '',
+            bday: approvalInfo?.birthday || '',
+            citizenship: approvalInfo?.citizenship || 'US'
         }
     });
 
     const handleSubmit = async (data: UserInfoFormValues) => {
-        // Mock submit to delay 2 secs and then redirect
-        setTimeout(() => {
+        try {
+            await updateUser({
+                first_name: data.firstName,
+                last_name: data.lastName,
+                citizenship: data.citizenship ? data.citizenship : 'US',
+                date_of_birth: data.bday
+            });
+
             router.push(`/user-rp/${rpId}?view-state=ConfirmRepricing`);
-        }, 2000);
+        } catch (error) {
+            console.error('Error updating user info:', error);
+            toast.error('Failed to update user information');
+        }
     };
 
     return (

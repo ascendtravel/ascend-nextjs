@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Separator } from '@/components/ui/separator';
 
+import { motion } from 'framer-motion';
 import { DockIcon, InfoIcon, LockIcon } from 'lucide-react';
 
 type RpFooterSectionProps = {
@@ -28,7 +29,15 @@ export default function RpFooterSection({ email }: RpFooterSectionProps) {
     ];
 
     return (
-        <div className='mt-6 w-full pb-12'>
+        <motion.div
+            className='mt-6 w-full pb-12'
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+                duration: 0.4,
+                delay: 0.2,
+                ease: 'easeOut'
+            }}>
             <div className='mb-2 pl-4 text-sm font-bold'>More</div>
             <Separator />
             <div className='ml-6 flex flex-col items-center justify-center gap-2 py-2'>
@@ -48,6 +57,6 @@ export default function RpFooterSection({ email }: RpFooterSectionProps) {
                 Your Unique email for forwarding missing trips is:
                 <div className='font-bold underline'>{email}</div>
             </div>
-        </div>
+        </motion.div>
     );
 }

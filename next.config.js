@@ -8,43 +8,7 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'email.ascend.travel',
-                port: '',
-                pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'cataas.com',
-                port: '',
-                pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'images.unsplash.com',
-                port: '',
-                pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'example.com',
-                port: '',
-                pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'cdn.worldota.net',
-                port: '',
-                pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'pixabay.com',
-                port: '',
-                pathname: '/**'
-            },
-            {
-                protocol: 'https',
-                hostname: 'lh3.googleusercontent.com',
+                hostname: '**',
                 port: '',
                 pathname: '/**'
             }
