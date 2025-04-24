@@ -12,6 +12,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import NavigationBar from '@/components/NavigationBar';
 import { Analytics } from '@/components/analytics/analytics';
 import { Toaster } from '@/components/ui/sooner';
+import { UserProvider } from '@/contexts/UserContext';
 import { cn } from '@/lib/utils';
 
 const geistSans = localFont({
@@ -124,11 +125,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </head>
             <body>
                 <ThemeProvider attribute='class' defaultTheme='light' enableSystem={false} disableTransitionOnChange>
-                    <NavigationBar />
-                    {children}
-                    <Toaster />
-                    <Analytics />
-                    <CookiesBanner />
+                    <UserProvider>
+                        <NavigationBar />
+                        {children}
+                        <Toaster />
+                        <Analytics />
+                        <CookiesBanner />
+                    </UserProvider>
                 </ThemeProvider>
             </body>
         </html>

@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
         }
 
         console.log('Validating OTP for phone number:', phone_number);
+        console.log('OTP code:', otp_code);
 
         const baseUrl = process.env.DECISION_ENGINE_BASE_URL || 'https://decision-engine.onrender.com';
         const response = await fetch(`${baseUrl}/verify-otp`, {
@@ -23,8 +24,8 @@ export async function POST(request: NextRequest) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                phone_number,
-                otp_code
+                phone_number: `+${phone_number}`,
+                token: otp_code
             })
         });
 

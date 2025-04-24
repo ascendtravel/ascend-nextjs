@@ -4,6 +4,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 import type { Trip } from '@/app/api/rp-trips/route';
 
+import { useUser } from './UserContext';
+
 interface TripsRpContextType {
     trips: Trip[];
     isLoading: boolean;
@@ -18,10 +20,16 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     const [trips, setTrips] = useState<Trip[]>(initialTrips || []);
     const [isLoading, setIsLoading] = useState(!initialTrips);
     const [error, setError] = useState<string | null>(null);
+    const { getToken } = useUser();
 
     const fetchTrips = async () => {
         try {
-            const response = await fetch('/api/rp-trips');
+            const token = await getToken();
+            const response = await fetch('/api/rp-trips', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             if (!response.ok) throw new Error('Failed to fetch trips');
             const data = await response.json();
             setTrips(data);

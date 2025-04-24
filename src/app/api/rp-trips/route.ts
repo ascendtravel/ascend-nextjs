@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { UserRelatedFetch } from '@/lib/UserRelatedFetch';
+
 export interface BaseTripInfo {
     id: string;
     status: 'confirmed' | 'pending' | 'cancelled';
@@ -148,17 +150,35 @@ const MOCKED_USER_STATS = {
 
 export async function GET(request: NextRequest) {
     try {
-        // Get the type from query params
-        const { searchParams } = new URL(request.url);
-        const type = searchParams.get('type');
+        const token = request.headers.get('Authorization')?.split(' ')[1];
 
-        // If type is stats, return stats
-        if (type === 'stats') {
-            return NextResponse.json(MOCKED_USER_STATS);
+        const response = await UserRelatedFetch('/me/bookings', {
+            token,
+            impersonationId: '818f0cbf-0f7b-4de3-93da-2343844b2caa',
+            method: 'GET'
+        });
+
+        if (response.status === 401) {
+            return NextResponse.json(
+                {
+                    error: 'Unauthorized',
+                    redirect: '/auth/phone-login?redirect=/user-rps'
+                },
+                { status: 401 }
+            );
         }
 
-        // Return all trips
-        return NextResponse.json(MOCKED_TRIPS);
+        if (!response.ok) {
+            return NextResponse.json({ error: 'Failed to fetch trips' }, { status: response.status });
+        }
+
+        const data = await response.json();
+        console.log('data', data);
+
+        return NextResponse.json(data);
+
+        // Comment out mocked data for now
+        // return NextResponse.json(MOCKED_TRIPS);
     } catch (error: any) {
         return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
     }

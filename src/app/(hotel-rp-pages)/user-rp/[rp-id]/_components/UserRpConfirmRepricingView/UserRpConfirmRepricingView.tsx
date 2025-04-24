@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { FlightTrip, HotelTrip } from '@/app/api/rp-trips/route';
 import BackGreenButton from '@/components/BackGreenButton';
 import { useTripsRp } from '@/contexts/TripsRpContext';
@@ -12,6 +14,7 @@ interface UserRpConfirmRepricingViewProps {
 }
 
 export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepricingViewProps) {
+    const router = useRouter();
     const { getTrip } = useTripsRp();
 
     // const trip = getTrip(rpId);
@@ -24,7 +27,7 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
             <div className='px-6 pt-10'>
                 <BackGreenButton
                     onClick={() => {
-                        window.location.href = `/user-rp/${rpId}?view-state=ConfirmUserInfo`;
+                        router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`);
                     }}
                 />
             </div>

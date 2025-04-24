@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { Separator } from '@/components/ui/separator';
 import { CitizenshipSelector } from '@/components/ui/updated-citizenship-selector';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -95,7 +96,7 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
 
             toast.success('Profile completed successfully');
 
-            // Redirect to Stripe
+            // For Stripe redirect we use window.location since it's an external URL
             window.location.href = responseData.stripe_link_url;
         } catch (error) {
             console.error('Error saving profile:', error);

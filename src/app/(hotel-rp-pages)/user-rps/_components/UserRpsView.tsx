@@ -10,6 +10,7 @@ import FlightTripRpGridCard from './FlightTripRpGridCard';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
 import RpFooterSection from './RpFooterSection';
 import RpGridCardWrapper from './RpGridCardWrapper';
+import UserRpNoTripsCard from './UserRpNoTripsCard';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -89,6 +90,7 @@ export default function UserRpsView() {
                 ))}
             </div>
             <div className='relative -mt-2 h-full w-full rounded-t-xl bg-neutral-50'>
+                {trips.length === 0 && <UserRpNoTripsCard totalSavings='more than $500' />}
                 <div className='grid w-full grid-cols-2 gap-2 pt-8'>
                     {!showSpecificTrip ? (
                         <AnimatePresence>

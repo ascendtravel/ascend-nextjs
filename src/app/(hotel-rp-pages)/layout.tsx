@@ -1,38 +1,60 @@
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 import type { Trip } from '@/app/api/rp-trips/route';
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { TripsRpProvider } from '@/contexts/TripsRpContext';
-import { UserProvider } from '@/contexts/UserContext';
 
-async function getInitialTrips(): Promise<Trip[]> {
+// Move data fetching to a separate server function
+async function getInitialTrips(token: string | null): Promise<{ trips: Trip[] | null; redirect?: string }> {
     const headersList = await headers();
     const host = headersList.get('host');
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
 
-    const response = await fetch(`${protocol}://${host}/api/rp-trips`, {
-        cache: 'no-store'
-    });
+    try {
+        const response = await fetch(`${protocol}://${host}/api/rp-trips`, {
+            cache: 'no-store',
+            headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {})
+            }
+        });
 
-    if (!response.ok) {
-        console.error('Error fetching initial trips');
+        const data = await response.json();
 
-        return [];
+        if (response.status === 401) {
+            return { trips: null, redirect: data.redirect };
+        }
+
+        if (!response.ok) {
+            console.error('Error fetching initial trips');
+
+            return { trips: [] };
+        }
+
+        return { trips: data };
+    } catch (error) {
+        console.error('Error fetching initial trips:', error);
+
+        return { trips: [] };
     }
-
-    return response.json();
 }
 
+// Make the layout component server-side
 export default async function HotelRpPagesLayout({ children }: { children: React.ReactNode }) {
-    const initialTrips = await getInitialTrips();
+    // Get token from cookies on server side
+    const cookieStore = await cookies();
+    const token = cookieStore.get('authToken')?.value || null;
+    const { trips, redirect: redirectUrl } = await getInitialTrips(token);
+
+    if (redirectUrl) {
+        redirect(redirectUrl);
+    }
 
     return (
-        <UserProvider>
-            <TripsRpProvider initialTrips={initialTrips}>
-                <div className='flex min-h-screen flex-col bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC]'>
-                    {children}
-                </div>
-            </TripsRpProvider>
-        </UserProvider>
+        <TripsRpProvider initialTrips={trips || []}>
+            <div className='flex min-h-screen flex-col bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC]'>
+                {children}
+            </div>
+        </TripsRpProvider>
     );
 }

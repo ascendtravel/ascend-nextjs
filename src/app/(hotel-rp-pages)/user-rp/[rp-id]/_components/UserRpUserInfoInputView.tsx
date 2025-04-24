@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import BackGreenButton from '@/components/BackGreenButton';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -32,6 +34,7 @@ interface UserRpUserInfoInputViewProps {
 }
 
 export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUserInfoInputViewProps) {
+    const router = useRouter();
     const form = useForm<UserInfoFormValues>({
         resolver: zodResolver(userInfoSchema),
         defaultValues: {
@@ -43,9 +46,9 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
     });
 
     const handleSubmit = async (data: UserInfoFormValues) => {
-        // Mock submit to delay 2 secs and then redirect to /user-rp/[rp-id]?type=ConfitmRepricing
+        // Mock submit to delay 2 secs and then redirect
         setTimeout(() => {
-            window.location.href = `/user-rp/${rpId}?view-state=ConfirmRepricing`;
+            router.push(`/user-rp/${rpId}?view-state=ConfirmRepricing`);
         }, 2000);
     };
 
@@ -54,7 +57,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
             <div className='flex-1 px-6 pt-10'>
                 <BackGreenButton
                     onClick={() => {
-                        window.location.href = `/user-rps/`;
+                        router.push('/user-rps/');
                     }}
                 />
                 <div className='text-xl font-bold'>How to get {'XAmount'} back:</div>
