@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                phone_number
+                phone_number: `+${phone_number}`
             })
         });
 
