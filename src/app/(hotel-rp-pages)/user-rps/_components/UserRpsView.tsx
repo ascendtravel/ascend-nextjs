@@ -74,7 +74,7 @@ export default function UserRpsView() {
     const years = ['Upcoming', 2025, 2024, 2023];
 
     return (
-        <div className='mt-4 h-full w-full max-w-md rounded-t-xl bg-neutral-50'>
+        <div className='mt-4 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
             {/* <UserRpsView /> */}
             <div className='relative -mt-2 h-[400px] w-full overflow-hidden rounded-t-xl'>
                 <FlightMap segments={flightSegments} showResetBtn={false} />

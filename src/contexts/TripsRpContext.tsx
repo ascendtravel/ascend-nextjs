@@ -20,12 +20,12 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     const [trips, setTrips] = useState<Booking[]>(initialTrips || []);
     const [isLoading, setIsLoading] = useState(!initialTrips);
     const [error, setError] = useState<string | null>(null);
-    const { getToken } = useUser();
+    const { getToken, getImpersonateUserId } = useUser();
 
     const fetchTrips = async () => {
         try {
             const token = await getToken();
-            const impersonationId = localStorage.getItem('impersonateUserId');
+            const impersonationId = getImpersonateUserId();
 
             // Add impersonation ID to URL if present
             const url = new URL('/api/rp-trips', window.location.origin);

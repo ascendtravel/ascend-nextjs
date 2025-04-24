@@ -102,14 +102,16 @@ export async function GET(request: NextRequest) {
 
         console.log('impersonationId', impersonationId);
 
-        const response = await UserRelatedFetch('/me/bookings', {
-            token,
-            // impersonationId: 'ec4b8067-2b59-4b95-bf02-9f9498519ce4', //Hotels
-            // impersonationId: '9709c900-5faa-49bb-896f-ab75f2d3c3de', //Hotels
-            // impersonationId: ' 818f0cbf-0f7b-4de3-93da-2343844b2caa', //Flights
-            impersonationId: impersonationId || undefined,
-            method: 'GET'
-        });
+        const response = await UserRelatedFetch(
+            '/me/bookings',
+            {
+                method: 'GET'
+            },
+            {
+                token,
+                impersonationId: impersonationId || undefined
+            }
+        );
 
         if (response.status === 401) {
             return NextResponse.json(

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-interface UserProfile {
+export interface UserProfile {
     main_phone: string;
     main_email: string;
     emails: string[];
@@ -24,6 +24,13 @@ interface UserContextType {
     stopImpersonating: () => void;
     startImpersonating: (userId: string) => void;
     reloadUser: () => void;
+    updateUser: (user: {
+        first_name: string;
+        last_name: string;
+        citizenship: string;
+        date_of_birth: string;
+    }) => Promise<void>;
+    getImpersonateUserId: () => string | null;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -38,18 +45,49 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const token = localStorage.getItem('authToken');
         const customer_id = localStorage.getItem('customerId');
 
-        if (token && customer_id) {
-            fetchUser(token, customer_id);
+        if (token) {
+            fetchUser(token);
         } else {
             setIsLoading(false);
         }
     }, []);
 
-    const reloadUser = () => {
-        fetchUser(getToken() || '', localStorage.getItem('customerId') || '');
+    /*
+     *    ------------------------------------------------------------
+     *    Impersonation functions
+     *    ------------------------------------------------------------
+     */
+    const isImpersonating = () => {
+        const impersonateUserId = localStorage.getItem('impersonateUserId');
+
+        return impersonateUserId !== null;
     };
 
-    const fetchUser = async (token: string, customer_id: string) => {
+    const stopImpersonating = () => {
+        localStorage.removeItem('impersonateUserId');
+
+        document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+    };
+
+    const startImpersonating = (userId: string) => {
+        localStorage.setItem('impersonateUserId', userId);
+
+        document.cookie = `impersonateUserId=${userId}; path=/`;
+    };
+
+    const getImpersonateUserId = () => localStorage.getItem('impersonateUserId');
+
+    /*
+     *    ------------------------------------------------------------
+     *    User functions
+     *    ------------------------------------------------------------
+     */
+
+    const reloadUser = () => {
+        fetchUser(getToken() || '');
+    };
+
+    const fetchUser = async (token: string) => {
         try {
             const impersonateUserId = localStorage.getItem('impersonateUserId');
 
@@ -84,25 +122,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const login = (token: string, customer_id: string) => {
         localStorage.setItem('authToken', token);
         localStorage.setItem('customerId', customer_id);
-        fetchUser(token, customer_id);
-    };
-
-    const isImpersonating = () => {
-        const impersonateUserId = localStorage.getItem('impersonateUserId');
-
-        return impersonateUserId !== null;
-    };
-
-    const stopImpersonating = () => {
-        localStorage.removeItem('impersonateUserId');
-        // Remove cookie
-        document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-    };
-
-    const startImpersonating = (userId: string) => {
-        localStorage.setItem('impersonateUserId', userId);
-        // Also set cookie for server-side requests
-        document.cookie = `impersonateUserId=${userId}; path=/`;
+        fetchUser(token);
     };
 
     const logout = () => {
@@ -112,9 +132,51 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         // Clear cookie
         document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+        // clear impersonations cookies
+        document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
 
         setUser(null);
     };
+
+    const updateUser = async (user: {
+        first_name: string;
+        last_name: string;
+        citizenship: string;
+        date_of_birth: string;
+    }) => {
+        const impersonateUserId = localStorage.getItem('impersonateUserId');
+
+        const url = new URL('/api/user/update-me', window.location.origin);
+        if (impersonateUserId) {
+            url.searchParams.set('impersonationId', impersonateUserId);
+        }
+
+        const response = await fetch(url.toString(), {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+                first_name: user.first_name,
+                last_name: user.last_name,
+                citizenship: user.citizenship,
+                date_of_birth: user.date_of_birth
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update user');
+        }
+
+        // re fetch user
+        reloadUser();
+    };
+
+    /*
+     *    ------------------------------------------------------------
+     *    Helper functions
+     *    ------------------------------------------------------------
+     */
 
     const getToken = () => localStorage.getItem('authToken');
 
@@ -130,7 +192,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 isImpersonating,
                 stopImpersonating,
                 startImpersonating,
-                reloadUser
+                getImpersonateUserId,
+                reloadUser,
+                updateUser
             }}>
             {children}
         </UserContext.Provider>
