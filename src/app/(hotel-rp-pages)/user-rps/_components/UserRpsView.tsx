@@ -76,11 +76,11 @@ export default function UserRpsView() {
     return (
         <div className='mt-4 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
             {/* <UserRpsView /> */}
-            <div className='relative -mt-2 h-[400px] w-full overflow-hidden rounded-t-xl'>
-                <FlightMap segments={flightSegments} showResetBtn={false} />
+            <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl'>
+                <FlightMap segments={[]} showResetBtn={false} />
             </div>
-            <div className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'>
-                {years.map((year) => (
+            {/* <div className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'> */}
+            {/* {years.map((year) => (
                     <React.Fragment key={year}>
                         {year === 'Upcoming' ? (
                             <div key={year} className='flex w-full rounded-full bg-[#1DC167] px-2 text-neutral-50'>
@@ -92,8 +92,8 @@ export default function UserRpsView() {
                             </div>
                         )}
                     </React.Fragment>
-                ))}
-            </div>
+                ))} */}
+            {/* </div> */}
             <div className='relative -mt-2 w-full rounded-t-xl bg-neutral-50'>
                 {trips.length === 0 && <UserRpNoTripsCard totalSavings='more than $500' />}
                 <div className='grid w-full grid-cols-2 gap-2 pt-8'>
