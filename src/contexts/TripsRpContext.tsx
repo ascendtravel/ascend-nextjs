@@ -33,8 +33,6 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
                 url.searchParams.set('impersonationId', impersonationId);
             }
 
-            console.log('url', url.toString());
-
             const response = await fetch(url.toString(), {
                 headers: {
                     Authorization: `Bearer ${token}`

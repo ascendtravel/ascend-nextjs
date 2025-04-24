@@ -80,7 +80,7 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
             }
 
             toast.success('Booking confirmed!');
-            router.push(`/rp-success/${flightPayload.import_session_id}`);
+            router.push(`/rp-success/${trip.import_session_id}`);
         } catch (error) {
             console.error('Error confirming booking:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to confirm booking');

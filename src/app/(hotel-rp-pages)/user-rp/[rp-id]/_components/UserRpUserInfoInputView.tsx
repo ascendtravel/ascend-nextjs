@@ -66,7 +66,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
     useEffect(() => {
         const fetchApprovalInfo = async () => {
             try {
-                console.log('fetching approval info session id', trip?.payload.repricing_session_id);
+                console.log('\n\nfetching approval info session id', trip?.payload.repricing_session_id);
 
                 const response = await fetch('/api/hotel-rp/ask-approval-info', {
                     method: 'POST',
@@ -112,7 +112,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
             await updateUser({
                 first_name: data.firstName,
                 last_name: data.lastName,
-                citizenship: data.citizenship,
+                citizenship: data.citizenship ? data.citizenship : 'US',
                 date_of_birth: data.bday
             });
 

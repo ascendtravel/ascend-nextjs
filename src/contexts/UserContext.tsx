@@ -11,6 +11,8 @@ export interface UserProfile {
     last_name: string | null;
     is_admin: boolean;
     stats: Record<string, unknown>;
+    citizenship: string;
+    date_of_birth: string;
 }
 
 interface UserContextType {
@@ -92,6 +94,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             const impersonateUserId = localStorage.getItem('impersonateUserId');
 
             const url = new URL('/api/user/me', window.location.origin);
+
+            console.log('\n\nFetching user from /me', {
+                token,
+                impersonateUserId
+            });
+
             if (impersonateUserId) {
                 url.searchParams.set('impersonationId', impersonateUserId);
             }
@@ -122,6 +130,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const login = (token: string, customer_id: string) => {
         localStorage.setItem('authToken', token);
         localStorage.setItem('customerId', customer_id);
+
+        // add it to cokies also, make it secure with secure: true
+        document.cookie = `authToken=${token}; path=/; secure; samesite=strict;`;
+
         fetchUser(token);
     };
 

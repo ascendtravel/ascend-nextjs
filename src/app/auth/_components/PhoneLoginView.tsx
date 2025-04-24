@@ -161,7 +161,11 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
                 }
 
                 toast.success('Login successful');
-                router.push(redirectUrl);
+                if (redirectUrl) {
+                    router.push(redirectUrl);
+                } else {
+                    router.push('/user-rps');
+                }
             } else {
                 throw new Error(data.message || 'Verification failed');
             }

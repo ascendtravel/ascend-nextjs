@@ -57,7 +57,7 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
                             toast.success('Copied to clipboard');
                         }}>
                         Confirmation Number <br />
-                        <span className='font-bold'>{'987987987987'}</span>
+                        <span className='font-bold'>{flightPayload.confirmation_number}</span>
                         <CopyIcon className='absolute top-4 right-4 size-4 cursor-pointer' />
                     </div>
 
@@ -93,7 +93,7 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
                         </div>
                     </div>
 
-                    <div
+                    {/* <div
                         className='relative flex w-[90%] flex-col items-start justify-center rounded-lg border border-neutral-700/20 p-4'
                         onClick={() => {
                             navigator.clipboard.writeText('987987987987');
@@ -102,7 +102,7 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
                         Confirmation Number <br />
                         <span className='font-bold'>{'987987987987'}</span>
                         <CopyIcon className='absolute top-4 right-4 size-4 cursor-pointer' />
-                    </div>
+                    </div> */}
                 </>
             )}
 

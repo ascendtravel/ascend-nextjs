@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
+import { useUser } from '@/contexts/UserContext';
 
 import UserRpHotelDetailsList from './UserRpHotelDetailsList';
 import { toast } from 'sonner';
@@ -16,10 +17,23 @@ interface UserRpHotelConfirmationSectionProps {
 export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConfirmationSectionProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const hotelPayload = trip.payload as HotelPayload;
+    const { user } = useUser();
 
     async function handleConfirmBooking() {
         setIsSubmitting(true);
+
+        const redirectUrl = `${window.location.origin}/rp-success/${trip.import_session_id}`;
+
         try {
+            console.log('submitting approval info', {
+                repricing_session_id: trip.payload.repricing_session_id,
+                first_name: user?.first_name || '',
+                last_name: user?.last_name || '',
+                birthday: user?.date_of_birth || '',
+                citizenship: user?.citizenship || '',
+                redirect_url: redirectUrl.toString()
+            });
+
             const response = await fetch('/api/hotel-rp/submit-approval-info', {
                 method: 'POST',
                 headers: {
@@ -27,11 +41,11 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                 },
                 body: JSON.stringify({
                     repricing_session_id: trip.payload.repricing_session_id,
-                    // Mock user data
-                    first_name: 'John',
-                    last_name: 'Doe',
-                    birthday: '1990-01-01',
-                    citizenship: 'US'
+                    first_name: user?.first_name || '',
+                    last_name: user?.last_name || '',
+                    birthday: user?.date_of_birth || '',
+                    citizenship: user?.citizenship || '',
+                    redirect_url: redirectUrl.toString()
                 })
             });
 

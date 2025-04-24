@@ -6,6 +6,7 @@ interface ApprovalInfoPayload {
     last_name: string;
     birthday: string;
     citizenship: string;
+    redirect_url?: string;
 }
 
 interface ApprovalInfoResponse {
@@ -35,7 +36,8 @@ export async function POST(request: NextRequest) {
             first_name: body.first_name,
             last_name: body.last_name,
             birthday: body.birthday,
-            citizenship: body.citizenship
+            citizenship: body.citizenship,
+            redirect_url: body.redirect_url || ''
         };
 
         console.log('Submitting approval info:', JSON.stringify(payload, null, 2));

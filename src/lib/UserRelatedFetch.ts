@@ -9,19 +9,17 @@ export async function UserRelatedFetch(
     const { token, impersonationId } = authParams;
 
     const fullUrl = `${BASE_URL}${url}`;
-    console.log('body', {
-        auth: token ? `Bearer ${token}` : undefined,
-        impersonationId
-    });
+
+    const requestHeaders = {
+        'Content-Type': 'application/json',
+        'X-API-KEY': process.env.PICKS_BACKEND_API_KEY!,
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(impersonationId ? { 'login-as': impersonationId } : {}),
+        ...headers
+    };
 
     return fetch(fullUrl, {
         ...rest,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-API-KEY': process.env.PICKS_BACKEND_API_KEY!,
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(impersonationId ? { 'login-as': impersonationId } : {}),
-            ...headers
-        }
+        headers: requestHeaders
     });
 }

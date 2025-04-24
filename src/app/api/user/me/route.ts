@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
         }
 
         const data = (await response.json()) as UserResponse;
+        console.log('USER data', data);
 
         return NextResponse.json(data);
     } catch (error: any) {
