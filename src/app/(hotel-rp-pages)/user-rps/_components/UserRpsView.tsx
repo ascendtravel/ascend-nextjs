@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { Trip } from '@/app/api/rp-trips/route';
+import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 
-import FlightMap from './FlightMap';
+import FlightMap, { FlightMapSegment } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
 import RpFooterSection from './RpFooterSection';
@@ -16,8 +16,30 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 export default function UserRpsView() {
     const { trips, isLoading, error } = useTripsRp();
-    const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+    const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
+    const [flightSegments, setFlightSegments] = useState<FlightMapSegment[]>([]);
+
+    useEffect(() => {
+        // Filter flight bookings and map to segments
+        const segments = trips
+            .filter((booking): booking is Booking & { payload: FlightPayload } => booking.type === 'flight')
+            .map((booking) => ({
+                from: {
+                    iataCode: booking.payload.departure_airport_iata_code,
+                    // You would need to add these to your booking type or fetch from a mapping
+                    latitude: 33.9416,
+                    longitude: -118.4085
+                },
+                to: {
+                    iataCode: booking.payload.arrival_airport_iata_code,
+                    latitude: 37.7749,
+                    longitude: -122.4194
+                }
+            }));
+
+        setFlightSegments(segments);
+    }, [trips]);
 
     if (isLoading) {
         return (
@@ -35,24 +57,7 @@ export default function UserRpsView() {
         );
     }
 
-    // Get flight segments from trips
-    const segments = trips
-        .filter((trip) => trip.type === 'flight')
-        .map((trip) => ({
-            from: {
-                iataCode: trip.departure_city,
-                // You would need to add these to your trip type or fetch from a mapping
-                latitude: 33.9416,
-                longitude: -118.4085
-            },
-            to: {
-                iataCode: trip.arrival_city,
-                latitude: 37.7749,
-                longitude: -122.4194
-            }
-        }));
-
-    const handleTripClick = (trip: Trip) => {
+    const handleTripClick = (trip: Booking) => {
         setSelectedTrip(trip);
         // Scroll to top smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -72,7 +77,7 @@ export default function UserRpsView() {
         <div className='h-full w-full max-w-md rounded-t-xl bg-neutral-50'>
             {/* <UserRpsView /> */}
             <div className='relative -mt-2 h-[400px] w-full overflow-hidden rounded-t-xl'>
-                <FlightMap segments={[]} showResetBtn={false} />
+                <FlightMap segments={flightSegments} showResetBtn={false} />
             </div>
             <div className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'>
                 {years.map((year) => (
@@ -89,7 +94,7 @@ export default function UserRpsView() {
                     </React.Fragment>
                 ))}
             </div>
-            <div className='relative -mt-2 h-full w-full rounded-t-xl bg-neutral-50'>
+            <div className='relative -mt-2 w-full rounded-t-xl bg-neutral-50'>
                 {trips.length === 0 && <UserRpNoTripsCard totalSavings='more than $500' />}
                 <div className='grid w-full grid-cols-2 gap-2 pt-8'>
                     {!showSpecificTrip ? (
@@ -108,10 +113,12 @@ export default function UserRpsView() {
                                     {trip.type === 'flight' ? (
                                         <div
                                             className={`w-full ${
-                                                index % 2 === 0 ? 'flex flex-row justify-end' : 'flex flex-row-reverse'
+                                                index % 2 === 0 ? 'flex flex-row justify-end' : 'flex flex-row'
                                             }`}>
                                             <RpGridCardWrapper trip={trip}>
-                                                <FlightTripRpGridCard trip={trip} />
+                                                <FlightTripRpGridCard
+                                                    trip={trip as Booking & { type: 'flight'; payload: FlightPayload }}
+                                                />
                                             </RpGridCardWrapper>
                                         </div>
                                     ) : (
@@ -122,7 +129,9 @@ export default function UserRpsView() {
                                                     : 'flex flex-row-reverse'
                                             }`}>
                                             <RpGridCardWrapper trip={trip}>
-                                                <HotelStayRPGridCard trip={trip} />
+                                                <HotelStayRPGridCard
+                                                    trip={trip as Booking & { type: 'hotel'; payload: HotelPayload }}
+                                                />
                                             </RpGridCardWrapper>
                                         </div>
                                     )}
@@ -132,7 +141,15 @@ export default function UserRpsView() {
                     ) : null}
                 </div>
 
-                {showSpecificTrip && <UserRpSpecificTripSelectedView trip={selectedTrip || undefined} />}
+                {showSpecificTrip && (
+                    <UserRpSpecificTripSelectedView
+                        handleBackClick={() => {
+                            setShowSpecificTrip(false);
+                            setSelectedTrip(null);
+                        }}
+                        trip={selectedTrip || undefined}
+                    />
+                )}
 
                 <div className='relative mt-8 h-full w-full bg-neutral-50'>
                     <RpFooterSection email='help@ascend.travel.com' />

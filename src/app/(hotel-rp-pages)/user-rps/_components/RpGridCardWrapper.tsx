@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { FlightTrip, HotelTrip, Trip } from '@/app/api/rp-trips/route';
+import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { PlusIcon } from '@radix-ui/react-icons';
 
 type RpGridCardWrapperProps = {
@@ -11,7 +11,7 @@ type RpGridCardWrapperProps = {
     loading?: boolean;
     addItem?: boolean;
     onClick?: () => void;
-    trip?: Trip;
+    trip?: Booking;
 };
 
 export default function RpGridCardWrapper({
@@ -22,21 +22,41 @@ export default function RpGridCardWrapper({
     onClick,
     trip
 }: RpGridCardWrapperProps) {
+    // Helper to get potential savings in dollars
+    const getPotentialSavings = (trip?: Booking) => {
+        if (!trip?.payload.potential_savings_cents?.amount) return 0;
+
+        return trip.payload.potential_savings_cents.amount / 100;
+    };
+
+    // Helper to get image alt text
+    const getAltText = (trip?: Booking) => {
+        if (!trip) return '';
+        if (trip.type === 'hotel') {
+            return (trip.payload as HotelPayload).hotel_name;
+        }
+        const flightPayload = trip.payload as FlightPayload;
+
+        return `${flightPayload.departure_city} to ${flightPayload.arrival_city}`;
+    };
+
+    const defaultImage = 'https://cdn.worldota.net/t/1024x768/c/76/da/76daa523375daf6deb793635b63dc245ada00b04.jpeg';
+
     return (
         <div
-            className={`relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm drop-shadow-xl transition-transform duration-300 hover:rotate-6 ${trip?.potential_savings ? 'border-3 border-[#1DC167]' : ''} ${className}`}>
-            <Image
-                src={trip?.image_url || ''}
-                alt={trip?.type === 'hotel' ? (trip as HotelTrip).hotel_name : (trip as FlightTrip).departure_city}
-                fill
-                className='object-cover'
-            />
+            className={`relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm drop-shadow-xl transition-transform duration-300 hover:rotate-6 ${
+                getPotentialSavings(trip) ? 'border-[#1DC167]' : ''
+            } ${className}`}>
+            <Image src={trip?.payload.image_url || defaultImage} alt={getAltText(trip)} fill className='object-cover' />
+            {/* TODO: remove this */}
+            {/* <Image src={'https://cataas.com/cat'} alt={getAltText(trip)} fill className='object-cover' /> */}
+
             {/* bottom up shadow to top */}
             <div className='absolute top-0 right-0 bottom-0 left-0 bg-gradient-to-t from-black from-0% via-black/60 via-25% to-transparent to-100%' />
-            {trip?.potential_savings ? (
+            {getPotentialSavings(trip) ? (
                 <div className='absolute inset-x-0 -top-1 flex h-8 flex-row bg-[#1DC167]'>
                     <div className='flex w-full items-center justify-center text-xs font-semibold text-white'>
-                        Tap to save ${trip.potential_savings}
+                        Tap to save ${getPotentialSavings(trip)}
                     </div>
                 </div>
             ) : null}

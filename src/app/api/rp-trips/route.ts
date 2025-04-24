@@ -2,159 +2,112 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { UserRelatedFetch } from '@/lib/UserRelatedFetch';
 
-export interface BaseTripInfo {
-    id: string;
-    status: 'confirmed' | 'pending' | 'cancelled';
-    potential_savings: number;
-    past_savings: number;
-    image_url: string;
+interface MoneyAmount {
+    amount: number | null;
+    currency: string | null;
 }
 
-export interface FlightTrip extends BaseTripInfo {
-    type: 'flight';
-    passenger_name: string;
-    departure_city: string;
-    arrival_city: string;
-    departure_date: string;
-    arrival_date: string;
-    flight_number: string;
-    airline: string;
-    price: number;
-    repricing_session_id?: string;
-    seat_number: string;
-    seat_class: 'economy' | 'business' | 'first';
+interface CommonBookingPayload {
+    booking_id: string;
+    created_at: string | null;
+    customer_id: string;
+    id: string | null;
+    import_session_id: string;
+    image_url?: string;
+    last_repricing_session_id?: string;
+    repricing_session_id?: string | null;
+    past_repricing_count?: number;
+    total_price_cents: MoneyAmount;
+    potential_savings_cents: MoneyAmount;
+    past_savings_cents: MoneyAmount;
 }
 
-export interface HotelTrip extends BaseTripInfo {
-    type: 'hotel';
-    guest_name: string;
+export interface HotelPayload extends CommonBookingPayload {
     hotel_name: string;
     city: string;
     check_in_date: string;
     check_out_date: string;
+    check_in_time: string | null;
+    check_out_time: string | null;
     room_type: string;
-    price_per_night: number;
-    total_price: number;
+    guest_name: string;
     nights: number;
-    repricing_session_id?: string;
+    price_per_night_cents: MoneyAmount;
+    local_tax_and_fees_cents: MoneyAmount;
 }
 
-export type Trip = FlightTrip | HotelTrip;
+export interface FlightPayload extends CommonBookingPayload {
+    airline: string;
+    airline_iata_id: string;
+    departure_airport_iata_code: string;
+    departure_airport_name: string;
+    departure_airport_terminal: string | null;
+    departure_airport_timezone: string;
+    departure_city: string;
+    arrival_airport_iata_code: string;
+    arrival_airport_name: string;
+    arrival_airport_terminal: string | null;
+    arrival_airport_timezone: string;
+    arrival_city: string;
+    departure_date: string;
+    departure_time: string | null;
+    arrival_date: string | null;
+    arrival_time: string | null;
+    confirmation_number: string;
+    outbound_flight_numbers: string[];
+    return_flight_numbers: string[];
+    passenger_name: string;
+    seat_class: string;
+    seat_number: string | null;
+    baggage: string | null;
+    current_price_cents: MoneyAmount;
+    new_market_price_cents: {
+        amount: number | null;
+        currency: string | null;
+    };
+    potential_savings_cents: {
+        amount: number | null;
+        currency: string | null;
+    };
+    past_savings_cents: {
+        amount: number | null;
+        currency: string | null;
+    };
+}
 
-const MOCKED_TRIPS: Trip[] = [
-    {
-        id: 'FL001',
-        type: 'flight',
-        status: 'confirmed',
-        passenger_name: 'Jesus Frontend Wizard',
-        departure_city: 'New York',
-        arrival_city: 'London',
-        departure_date: '2024-04-15',
-        arrival_date: '2024-04-15',
-        flight_number: 'BA112',
-        airline: 'British Airways',
-        price: 850.0,
-        potential_savings: 150.0,
-        repricing_session_id: 'RFL001',
-        past_savings: 75.0,
-        seat_number: '12A',
-        seat_class: 'business',
-        image_url: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad'
-    },
-    {
-        id: 'HT001',
-        type: 'hotel',
-        status: 'confirmed',
-        guest_name: 'Jesus Frontend Wizard',
-        hotel_name: 'Grand Plaza Hotel',
-        city: 'Paris',
-        check_in_date: '2024-05-01',
-        check_out_date: '2024-05-05',
-        room_type: 'Deluxe King',
-        price_per_night: 250.0,
-        total_price: 1000.0,
-        potential_savings: 0,
-        past_savings: 100.0,
-        nights: 4,
-        image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945'
-    },
-    {
-        id: 'FL002',
-        type: 'flight',
-        status: 'pending',
-        passenger_name: 'Jesus Frontend Wizard',
-        departure_city: 'Tokyo',
-        arrival_city: 'Sydney',
-        departure_date: '2024-06-10',
-        arrival_date: '2024-06-10',
-        flight_number: 'QF102',
-        airline: 'Qantas',
-        price: 1200.0,
-        potential_savings: 250.0,
-        repricing_session_id: 'RFL002',
-        past_savings: 0.0,
-        seat_number: '24C',
-        seat_class: 'economy',
-        image_url: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9'
-    },
-    {
-        id: 'HT002',
-        type: 'hotel',
-        status: 'cancelled',
-        guest_name: 'Jesus Frontend Wizard',
-        hotel_name: 'Ocean View Resort',
-        city: 'Barcelona',
-        check_in_date: '2024-07-15',
-        check_out_date: '2024-07-20',
-        room_type: 'Ocean Suite',
-        price_per_night: 350.0,
-        total_price: 1750.0,
-        potential_savings: 300.0,
-        past_savings: 0.0,
-        nights: 5,
-        repricing_session_id: 'RHT002',
-        image_url: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4'
-    },
-    {
-        id: 'FL003',
-        type: 'flight',
-        status: 'confirmed',
-        passenger_name: 'Jesus Frontend Wizard',
-        departure_city: 'Singapore',
-        arrival_city: 'Dubai',
-        departure_date: '2024-08-01',
-        arrival_date: '2024-08-01',
-        flight_number: 'EK353',
-        airline: 'Emirates',
-        price: 950.0,
-        potential_savings: 0,
-        past_savings: 0,
-        seat_number: '1F',
-        seat_class: 'first',
-        image_url: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c'
+export type BookingType = 'hotel' | 'flight';
+
+export interface Booking {
+    id: number;
+    customer_id: string;
+    created_at: string;
+    updated_at: string;
+    import_session_id: string;
+    type: BookingType;
+    payload: HotelPayload | FlightPayload;
+}
+
+function inferBookingType(payload: HotelPayload | FlightPayload): BookingType {
+    if ('hotel_name' in payload) {
+        return 'hotel';
     }
-] as const;
 
-const MOCKED_USER_STATS = {
-    total_bookings: 89,
-    total_savings: 192384.12,
-    total_flights: 54,
-    total_hotels: 35,
-    total_points: 19238.412,
-    tier: 4,
-    region: 'UY',
-    percentile: 99.9,
-    is_paid_member: true,
-    member_since: '2024-01-01'
-} as const;
+    return 'flight';
+}
 
 export async function GET(request: NextRequest) {
     try {
         const token = request.headers.get('Authorization')?.split(' ')[1];
+        const impersonationId = request.nextUrl.searchParams.get('impersonationId');
+
+        console.log('impersonationId', impersonationId);
 
         const response = await UserRelatedFetch('/me/bookings', {
             token,
-            impersonationId: '818f0cbf-0f7b-4de3-93da-2343844b2caa',
+            // impersonationId: 'ec4b8067-2b59-4b95-bf02-9f9498519ce4', //Hotels
+            // impersonationId: '9709c900-5faa-49bb-896f-ab75f2d3c3de', //Hotels
+            // impersonationId: ' 818f0cbf-0f7b-4de3-93da-2343844b2caa', //Flights
+            impersonationId: impersonationId || undefined,
             method: 'GET'
         });
 
@@ -172,13 +125,15 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to fetch trips' }, { status: response.status });
         }
 
-        const data = await response.json();
-        console.log('data', data);
+        const rawData = await response.json();
+
+        // Add type field to each booking
+        const data = rawData.map((booking: Omit<Booking, 'type'>) => ({
+            ...booking,
+            type: inferBookingType(booking.payload)
+        }));
 
         return NextResponse.json(data);
-
-        // Comment out mocked data for now
-        // return NextResponse.json(MOCKED_TRIPS);
     } catch (error: any) {
         return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
     }

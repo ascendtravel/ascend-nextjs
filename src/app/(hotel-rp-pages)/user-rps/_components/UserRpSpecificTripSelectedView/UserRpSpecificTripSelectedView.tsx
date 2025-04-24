@@ -2,31 +2,37 @@
 
 import { useEffect, useState } from 'react';
 
-import { Trip } from '@/app/api/rp-trips/route';
+import { useRouter } from 'next/navigation';
+
+import { Booking } from '@/app/api/rp-trips/route';
+import BackGreenButton from '@/components/BackGreenButton';
 import { Separator } from '@/components/ui/separator';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 
 import UserSpecificTripCard from './UserSpecificTripCard';
 
 interface UserRpSpecificTripSelectedViewProps {
-    trip?: Trip;
+    trip?: Booking;
+    handleBackClick: () => void;
 }
 
-export default function UserRpSpecificTripSelectedView({ trip }: UserRpSpecificTripSelectedViewProps) {
-    const { trips } = useTripsRp();
-    const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
-    const [pastTrips, setPastTrips] = useState<Trip[]>([]);
+export default function UserRpSpecificTripSelectedView({ trip, handleBackClick }: UserRpSpecificTripSelectedViewProps) {
+    // const { trips } = useTripsRp();
+    // const [upcomingTrips, setUpcomingTrips] = useState<Booking[]>([]);
+    // const [pastTrips, setPastTrips] = useState<Booking[]>([]);
 
-    useEffect(() => {
-        if (trips && trips.length > 0) {
-            setUpcomingTrips([trips[0], trips[1]]);
-            setPastTrips([trips[2], trips[3]]);
-        }
-    }, [trips]);
+    // useEffect(() => {
+    //     if (trips && trips.length > 0) {
+    //         setUpcomingTrips([trips[0], trips[1]]);
+    //         setPastTrips([trips[2], trips[3]]);
+    //     }
+    // }, [trips]);
 
     return (
-        <div className='-mt-2 flex flex-col items-center justify-center gap-4 px-2'>
-            <div className='w-full pl-4 text-left text-sm uppercase'>Upcoming Trips ({upcomingTrips.length})</div>
+        <div className='-mt-2 flex flex-col items-center justify-start px-2'>
+            <BackGreenButton onClick={handleBackClick} className='w-full px-4 py-0' />
+            <UserSpecificTripCard trip={trip} />
+            {/* <div className='w-full pl-4 text-left text-sm uppercase'>Upcoming Trips ({upcomingTrips.length})</div>
             {upcomingTrips.map((trip) => (
                 <UserSpecificTripCard key={trip.id} trip={trip} />
             ))}
@@ -34,7 +40,7 @@ export default function UserRpSpecificTripSelectedView({ trip }: UserRpSpecificT
             <Separator className='w-full' />
             {pastTrips.map((trip) => (
                 <UserSpecificTripCard key={trip.id} trip={trip} />
-            ))}
+            ))} */}
         </div>
     );
 }

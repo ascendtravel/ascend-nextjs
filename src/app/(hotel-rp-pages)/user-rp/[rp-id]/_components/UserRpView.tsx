@@ -1,7 +1,7 @@
 import UserRpConfirmRepricingView from './UserRpConfirmRepricingView/UserRpConfirmRepricingView';
 import UserRpUserInfoInputView from './UserRpUserInfoInputView';
 
-export type RpViewState = 'ConfirmUserInfo' | 'ConfirmRepricing' | 'RepricingCompleted';
+export type RpViewState = 'ConfirmUserInfo' | 'ConfirmRepricing' | 'UpdateTripInfo';
 
 type UserRpViewProps = {
     viewState: RpViewState;
@@ -21,9 +21,10 @@ export default function UserRpView({ viewState, rpId }: UserRpViewProps) {
                     <UserRpConfirmRepricingView rpId={rpId} />
                 </div>
             )}
-            {viewState === 'RepricingCompleted' && (
+
+            {viewState === 'UpdateTripInfo' && (
                 <div>
-                    <h1>Repricing Completed</h1>
+                    <h1>Update Trip Info</h1>
                 </div>
             )}
         </>

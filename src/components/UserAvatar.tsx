@@ -30,29 +30,52 @@ export default function UserAvatar({ variant = 'md', showName = false, className
     const { user } = useUser();
     const styles = VARIANT_STYLES[variant];
 
-    // Get initials from phone number if no name is available
+    // Get initials from name or email
     const getInitials = () => {
-        if (user?.name) {
-            return user.name
-                .split(' ')
-                .map((n) => n[0])
+        if (user?.first_name || user?.last_name) {
+            const nameParts = [user.first_name, user.last_name].filter(Boolean);
+
+            return nameParts
+                .map((part) => (part ? part[0] : ''))
                 .join('')
                 .toUpperCase();
         }
 
-        // Use last 2 digits of phone number
-        return user?.phone.slice(-2) || 'U';
+        // Use first letter of email name if available
+        if (user?.main_email) {
+            const emailName = user.main_email.split('@')[0];
+
+            return emailName[0].toUpperCase();
+        }
+
+        return 'U';
+    };
+
+    // Get display name
+    const getDisplayName = () => {
+        if (user?.first_name || user?.last_name) {
+            return [user.first_name, user.last_name].filter(Boolean).join(' ');
+        }
+
+        if (user?.main_email) {
+            const emailName = user.main_email.split('@')[0];
+
+            return `${emailName}`;
+        }
+
+        if (user?.main_phone) {
+            return `Stranger (+${user.main_phone})`;
+        }
+
+        return 'Stranger';
     };
 
     return (
         <div className={cn('flex items-center gap-3', styles.container, className)}>
             {showName && (
-                <span className={darkMode ? 'font-medium text-white' : 'font-medium'}>
-                    Hello, {user?.name || `+${user?.phone}` || 'User'}
-                </span>
+                <span className={darkMode ? 'font-medium text-white' : 'font-medium'}>Hello, {getDisplayName()}</span>
             )}
             <Avatar className={styles.avatar}>
-                <AvatarImage src={user?.image} alt={user?.name || 'User avatar'} />
                 <AvatarFallback>{getInitials()}</AvatarFallback>
             </Avatar>
         </div>

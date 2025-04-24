@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { Booking } from '@/app/api/rp-trips/route';
 import BackGreenButton from '@/components/BackGreenButton';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -9,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Separator } from '@/components/ui/separator';
 import { CitizenshipSelector } from '@/components/ui/updated-citizenship-selector';
+import { useTripsRp } from '@/contexts/TripsRpContext';
+import { getTripSavingsString } from '@/lib/money';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useForm } from 'react-hook-form';
@@ -35,6 +38,10 @@ interface UserRpUserInfoInputViewProps {
 
 export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUserInfoInputViewProps) {
     const router = useRouter();
+    const { getTrip } = useTripsRp();
+
+    const trip = getTrip(rpId);
+
     const form = useForm<UserInfoFormValues>({
         resolver: zodResolver(userInfoSchema),
         defaultValues: {
@@ -60,7 +67,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
                         router.push('/user-rps/');
                     }}
                 />
-                <div className='text-xl font-bold'>How to get {'XAmount'} back:</div>
+                <div className='text-xl font-bold'>How to get {getTripSavingsString(trip, true)} back:</div>
                 <div className='mb-6 text-sm'>First, confirm your traveler information to continue:</div>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className='flex h-full flex-col'>

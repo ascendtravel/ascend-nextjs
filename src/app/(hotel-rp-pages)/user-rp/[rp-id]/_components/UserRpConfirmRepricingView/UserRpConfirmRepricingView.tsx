@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
-import { FlightTrip, HotelTrip } from '@/app/api/rp-trips/route';
+import { Booking } from '@/app/api/rp-trips/route';
 import BackGreenButton from '@/components/BackGreenButton';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 
@@ -16,11 +16,9 @@ interface UserRpConfirmRepricingViewProps {
 export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepricingViewProps) {
     const router = useRouter();
     const { getTrip } = useTripsRp();
+    const trip = getTrip(rpId);
 
-    // const trip = getTrip(rpId);
-    // const trip = getTrip('FL001');
-    // HT001
-    const trip = getTrip('HT001');
+    if (!trip) return null;
 
     return (
         <div className='absolute inset-0 mt-[72px] flex flex-col rounded-t-xl bg-neutral-50'>
@@ -32,11 +30,11 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
                 />
             </div>
             <div className='mb-4 px-6 text-3xl font-semibold'>Review your pricing</div>
-            {trip?.type === 'flight' ? (
-                <UserRpFlightConfirmationSection trip={trip as FlightTrip} />
-            ) : (
-                <UserRpHotelConfirmationSection trip={trip as HotelTrip} />
-            )}
+            {trip.type === 'flight' ? (
+                <UserRpFlightConfirmationSection trip={{ ...trip, type: 'flight' } as Booking & { type: 'flight' }} />
+            ) : trip.type === 'hotel' ? (
+                <UserRpHotelConfirmationSection trip={{ ...trip, type: 'hotel' } as Booking & { type: 'hotel' }} />
+            ) : null}
         </div>
     );
 }

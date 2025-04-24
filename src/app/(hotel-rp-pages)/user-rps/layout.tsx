@@ -1,11 +1,11 @@
 'use client';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
-import UserAvatar from '@/components/UserAvatar';
+import UserDropdownMenu from '@/components/UserDropdownMenu';
 import { useUser } from '@/contexts/UserContext';
 
 export default function UserRpsLayout({ children }: { children: React.ReactNode }) {
-    const { user, isLoading } = useUser();
+    const { isLoading } = useUser();
 
     if (isLoading) {
         return (
@@ -29,14 +29,14 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
                     <div className='flex max-w-[90px] flex-row items-center justify-center'>
                         <IconNewWhite />
                     </div>
-                    <div className='flex flex-row items-center justify-center'>
-                        <UserAvatar variant='md' showName={true} darkMode={true} />
-                    </div>
+                    <UserDropdownMenu />
                 </div>
             </header>
 
             {/* Main content with padding for header */}
-            <main className='absolute inset-0 flex flex-col items-center justify-center pt-[72px]'>{children}</main>
+            <main className='absolute inset-0 flex flex-col items-center justify-center overflow-scroll pt-[72px]'>
+                {children}
+            </main>
         </div>
     );
 }

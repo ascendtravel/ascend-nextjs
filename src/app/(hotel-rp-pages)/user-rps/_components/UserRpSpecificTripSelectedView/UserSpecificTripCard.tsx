@@ -5,16 +5,16 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-import { FlightTrip, HotelTrip, Trip } from '@/app/api/rp-trips/route';
+import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import IconHotelBed from '@/components/Icon/IconHotelBed';
 import IconPlaneCircleTilt from '@/components/Icon/IconPlaneCircleTilt';
 import { Button } from '@/components/ui/button';
+import { getTripSavingsString } from '@/lib/money';
 
-import { PlaneIcon } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 
 interface UserSpecificTripCardProps {
-    trip: Trip;
+    trip?: Booking;
 }
 
 export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps) {
@@ -27,9 +27,14 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
         }, 2000);
     }, []);
 
+    if (!trip) return null;
+
     const handleRepriceClick = () => {
-        router.push(`/user-rp/${trip.id}?view-state=ConfirmUserInfo`);
+        router.push(`/user-rp/${trip.import_session_id}?view-state=ConfirmUserInfo`);
     };
+
+    const potentialSavings = (trip.payload.potential_savings_cents?.amount ?? 0) / 100;
+    const pastSavings = (trip.payload.past_savings_cents?.amount ?? 0) / 100;
 
     return (
         <div className='w-full px-4'>
@@ -42,52 +47,52 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                 tweenDuration={200}
             />
             <div className='flex flex-row gap-4 py-4'>
-                <div className='relative h-[84px] w-[140px]'>
+                <div className='relative h-[84px] w-[140px] overflow-hidden rounded-lg'>
                     <Image
-                        src={trip.type === 'hotel' ? (trip as HotelTrip).image_url : (trip as FlightTrip).image_url}
+                        // src={trip.payload.image_url || 'https://cataas.com/cat'}
+                        src={'https://cataas.com/cat'} // TODO: remove this
                         alt={`Repricing Card for ${trip.type}`}
                         width={140}
                         height={84}
                         className='absolute inset-0 rounded-lg object-cover'
                     />
-                    <div className='absolute -bottom-3.5 left-0 flex size-10 items-center justify-center rounded-full opacity-70 drop-shadow-md'>
+                    <div className='absolute -bottom-1 left-0 flex size-10 items-center justify-center rounded-full opacity-70 drop-shadow-md'>
                         {trip.type === 'hotel' ? (
-                            <IconHotelBed fill={trip.potential_savings ? '#1DC167' : '#fff'} />
+                            <IconHotelBed fill={potentialSavings > 0 ? '#1DC167' : '#fff'} />
                         ) : (
-                            <IconPlaneCircleTilt fill={trip.potential_savings ? '#1DC167' : '#fff'} />
+                            <IconPlaneCircleTilt fill={potentialSavings > 0 ? '#1DC167' : '#fff'} />
                         )}
                     </div>
                 </div>
                 {trip.type === 'hotel' && (
                     <div className='flex flex-col items-start justify-end'>
-                        <div className='text-md'>{(trip as HotelTrip).hotel_name}</div>
-                        <div className='text-xs'>{(trip as HotelTrip).check_in_date}</div>
+                        <div className='text-md'>{(trip.payload as HotelPayload).hotel_name}</div>
+                        <div className='text-xs'>{(trip.payload as HotelPayload).check_in_date}</div>
                     </div>
                 )}
                 {trip.type === 'flight' && (
                     <div className='flex flex-col items-start justify-end'>
-                        <div className='text-md'>
-                            {(trip as FlightTrip).departure_city} to {(trip as FlightTrip).arrival_city}
+                        <div className='text-xl font-bold'>
+                            {(trip.payload as FlightPayload).departure_airport_iata_code} to{' '}
+                            {(trip.payload as FlightPayload).arrival_airport_iata_code}
                         </div>
                         <div className='text-xs'>
-                            {new Date((trip as FlightTrip).departure_date).toLocaleDateString()}
+                            {new Date((trip.payload as FlightPayload).departure_date).toLocaleDateString()}
                         </div>
                     </div>
                 )}
             </div>
-            {!!trip.past_savings && (
+            {pastSavings > 0 && (
                 <div className='my-2 text-sm text-gray-500'>
-                    We've saved you ${trip.past_savings} on this {trip.type === 'hotel' ? 'stay' : 'flight'}!
+                    We've saved you ${pastSavings} on this {trip.type === 'hotel' ? 'stay' : 'flight'}!
                 </div>
             )}
-            {!!trip.potential_savings && (
-                <div className='mb-2 text-sm text-gray-500'>
-                    We can save you ${trip.potential_savings} on this stay!
-                </div>
+            {potentialSavings > 0 && (
+                <div className='mb-2 text-sm text-gray-500'>We can save you ${potentialSavings} on this stay!</div>
             )}
-            {!!trip.potential_savings && (
+            {potentialSavings > 0 && (
                 <Button className='w-full rounded-full bg-[#1DC167] font-bold text-white' onClick={handleRepriceClick}>
-                    Reprice now to save ${trip.potential_savings}
+                    Reprice now to save {getTripSavingsString(trip, true)}
                 </Button>
             )}
         </div>

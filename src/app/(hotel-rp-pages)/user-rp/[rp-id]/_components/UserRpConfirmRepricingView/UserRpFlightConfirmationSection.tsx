@@ -1,14 +1,52 @@
 'use client';
 
-import { FlightTrip } from '@/app/api/rp-trips/route';
+import { useEffect, useState } from 'react';
+
+import { Booking, FlightPayload } from '@/app/api/rp-trips/route';
 import FlightSegmentCard from '@/components/FlightSegmentCard';
+import { Airport } from '@/types/flight-types';
 
 interface UserRpFlightConfirmationSectionProps {
-    trip: FlightTrip;
+    trip: Booking & { type: 'flight' };
 }
 
 export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightConfirmationSectionProps) {
-    if (!trip) return null;
+    const [airports, setAirports] = useState<Airport[]>([]);
+    const flightPayload = trip.payload as FlightPayload;
+
+    useEffect(() => {
+        const fetchAirports = async () => {
+            try {
+                const response = await fetch('/api/airport', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        airport_iata_codes: [
+                            flightPayload.departure_airport_iata_code,
+                            flightPayload.arrival_airport_iata_code
+                        ]
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch airports');
+                const data = await response.json();
+                setAirports(data);
+            } catch (error) {
+                console.error('Error fetching airports:', error);
+            }
+        };
+
+        fetchAirports();
+    }, [flightPayload.departure_airport_iata_code, flightPayload.arrival_airport_iata_code]);
+
+    const getDepartureAirport = () => airports.find((a) => a.iataCode === flightPayload.departure_airport_iata_code);
+    const getArrivalAirport = () => airports.find((a) => a.iataCode === flightPayload.arrival_airport_iata_code);
+
+    function handleConfirmBooking() {
+        throw new Error('Function not implemented.');
+    }
 
     return (
         <div className='space-y-4'>
@@ -16,19 +54,69 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
                 Review the details below, and click on continue to confirm your flight updates:
             </div>
 
-            <div className='mx-6 flex flex-row items-center justify-between'>
-                {/* Airline Info */}
+            <div className='flex flex-row items-center justify-between px-4'>
                 <div>
-                    <img
-                        src={`https://www.skyscanner.net/images/airlines/small/${trip.airline.toLowerCase()}.png`}
-                        alt={trip.airline}
-                    />
+                    <span className='font-medium'>Flight </span>
+                    <span>{flightPayload.outbound_flight_numbers[0]}</span>
                 </div>
-                {/* Airline Info */}
+                <div>
+                    <span className='font-medium'>Departure </span>
+                    <span>{flightPayload.departure_date.split('T')[0].split('-').reverse().join('/')}</span>
+                </div>
             </div>
 
-            <FlightSegmentCard trip={trip} />
-            {/* Additional flight confirmation content */}
+            <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
+                <div className='font-medium'>From</div>
+                <div>
+                    {getDepartureAirport()?.city} ({flightPayload.departure_airport_iata_code})
+                </div>
+            </div>
+
+            <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
+                <div className='font-medium'>To</div>
+                <div>
+                    {getArrivalAirport()?.city} ({flightPayload.arrival_airport_iata_code})
+                </div>
+            </div>
+
+            <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
+                <div className='font-medium'>Passenger(s)</div>
+                <div>{flightPayload.passenger_name}</div>
+            </div>
+
+            <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
+                <div className='font-medium'>Seat Class</div>
+                <div>
+                    {flightPayload.seat_class.split('_').join(' ').charAt(0).toUpperCase() +
+                        flightPayload.seat_class.split('_').join(' ').slice(1)}
+                </div>
+            </div>
+
+            <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
+                <div className='font-medium'>Seat Number</div>
+                <div>{flightPayload.seat_number || '--'}</div>
+            </div>
+
+            <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
+                <div className='font-medium'>Total Price</div>
+                <div>${(flightPayload.current_price_cents?.amount ?? 0 / 100).toFixed(2)}</div>
+            </div>
+
+            <div className='mt-4 flex w-full flex-col items-center justify-center px-8'>
+                <div
+                    className='mt-4 w-full cursor-pointer rounded-full bg-[#1DC167] py-2 text-center text-sm font-bold text-white'
+                    onClick={() => {
+                        handleConfirmBooking();
+                    }}>
+                    My booking details are correct
+                </div>
+                <div className='mt-4 mb-8 flex flex-row items-center justify-center gap-2 text-xs text-neutral-700'>
+                    Need Help?{' '}
+                    <a href='mailto:help@ascend.travel' className='text-neutral-900 underline'>
+                        help@ascend.travel
+                    </a>
+                </div>
+            </div>
         </div>
     );
 }

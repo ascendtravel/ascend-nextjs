@@ -2,22 +2,22 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import type { Trip } from '@/app/api/rp-trips/route';
+import type { Booking } from '@/app/api/rp-trips/route';
 
 import { useUser } from './UserContext';
 
 interface TripsRpContextType {
-    trips: Trip[];
+    trips: Booking[];
     isLoading: boolean;
     error: string | null;
-    getTrip: (id: string) => Trip | undefined;
+    getTrip: (id: string) => Booking | undefined;
     refreshTrips: () => Promise<void>;
 }
 
 const TripsRpContext = createContext<TripsRpContextType | undefined>(undefined);
 
-export function TripsRpProvider({ children, initialTrips }: { children: React.ReactNode; initialTrips?: Trip[] }) {
-    const [trips, setTrips] = useState<Trip[]>(initialTrips || []);
+export function TripsRpProvider({ children, initialTrips }: { children: React.ReactNode; initialTrips?: Booking[] }) {
+    const [trips, setTrips] = useState<Booking[]>(initialTrips || []);
     const [isLoading, setIsLoading] = useState(!initialTrips);
     const [error, setError] = useState<string | null>(null);
     const { getToken } = useUser();
@@ -25,11 +25,22 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     const fetchTrips = async () => {
         try {
             const token = await getToken();
-            const response = await fetch('/api/rp-trips', {
+            const impersonationId = localStorage.getItem('impersonateUserId');
+
+            // Add impersonation ID to URL if present
+            const url = new URL('/api/rp-trips', window.location.origin);
+            if (impersonationId) {
+                url.searchParams.set('impersonationId', impersonationId);
+            }
+
+            console.log('url', url.toString());
+
+            const response = await fetch(url.toString(), {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
+
             if (!response.ok) throw new Error('Failed to fetch trips');
             const data = await response.json();
             setTrips(data);
@@ -49,7 +60,9 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     }, [initialTrips]);
 
     const getTrip = (id: string) => {
-        return trips.find((trip) => trip.id === id);
+        console.log('trips', trips);
+
+        return trips.find((trip) => trip.import_session_id === id);
     };
 
     const refreshTrips = async () => {

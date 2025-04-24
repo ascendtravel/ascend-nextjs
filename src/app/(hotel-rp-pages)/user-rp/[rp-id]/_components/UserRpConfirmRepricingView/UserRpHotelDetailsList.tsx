@@ -39,9 +39,9 @@ export default function UserRpHotelDetailsList({
         <div className='mt-4 flex flex-col gap-4 px-4'>
             <div className='flex flex-row items-start justify-between'>
                 <div className='text-left text-sm font-medium'>Guest(s)</div>
-                <div className='flex flex-col items-center gap-2'>
+                <div className='flex flex-col items-end gap-2'>
                     <div className='text-sm'>
-                        {totalGuests || 0} Guest{totalGuests || 1 > 1 ? 's' : ''}
+                        {totalGuests || 0} Guest{totalGuests && totalGuests > 1 ? 's' : ''}
                     </div>
                     {guests
                         ?.filter((guest) => !guest.isChild)
@@ -97,7 +97,7 @@ export default function UserRpHotelDetailsList({
             {localTaxesAndFees && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Local Taxes and Fees</div>
-                    <div className='text-right text-sm'>U${localTaxesAndFees}</div>
+                    <div className='text-right text-sm'>U${localTaxesAndFees}1</div>
                 </div>
             )}
             {totalPrice && (

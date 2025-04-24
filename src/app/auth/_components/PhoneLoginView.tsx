@@ -6,8 +6,11 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { PhoneInput } from '@/components/ui/phone-input';
+import { useUser } from '@/contexts/UserContext';
+import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -41,9 +44,10 @@ const cardVariants = {
 
 interface PhoneLoginViewProps {
     redirectUrl: string;
+    showImpersonate?: boolean;
 }
 
-export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
+export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewProps) {
     const router = useRouter();
     const [isFlipped, setIsFlipped] = useState(false);
     const [selectedCountry, setSelectedCountry] = useState('US');
@@ -53,6 +57,9 @@ export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [cooldown, setCooldown] = useState(0);
+    const [impersonateId, setImpersonateId] = useState('');
+
+    const { isImpersonating, stopImpersonating, startImpersonating } = useUser();
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -147,9 +154,12 @@ export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
             }
 
             if (data.success) {
-                // Client-side storage
                 localStorage.setItem('authToken', data.token);
                 localStorage.setItem('customerId', data.customer_id);
+
+                if (impersonateId) {
+                    startImpersonating(impersonateId);
+                }
 
                 // Set cookie for server-side
                 document.cookie = `authToken=${data.token}; path=/`;
@@ -169,9 +179,14 @@ export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
 
     return (
         <div
-            className={`perspective-1000 relative ${
-                isFlipped ? 'h-[350px]' : 'h-[270px]'
-            } w-full max-w-[400px] transition-all duration-500`}>
+            className={cn(
+                'perspective-1000 relative',
+                isFlipped && 'h-[350px]',
+                !isFlipped && 'h-[270px]',
+                showImpersonate && isFlipped && 'h-[380px]',
+
+                'w-full max-w-[400px] transition-all duration-500'
+            )}>
             <AnimatePresence>
                 {!isFlipped ? (
                     <motion.div
@@ -232,6 +247,16 @@ export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
                                     </InputOTPGroup>
                                 </InputOTP>
                             </div>
+                            {/* Show impersonate input if enabled */}
+                            {showImpersonate && (
+                                <Input
+                                    type='text'
+                                    placeholder='Impersonate User Id'
+                                    value={impersonateId}
+                                    onChange={(e) => setImpersonateId(e.target.value)}
+                                    className='mt-4 h-16 rounded-md border border-neutral-300 p-2 px-4 text-sm'
+                                />
+                            )}
                             <Button
                                 onClick={handleVerifyOtp}
                                 disabled={otpValue.length !== 6 || isVerifying}
@@ -242,8 +267,8 @@ export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
                                 variant='link'
                                 onClick={handleResend}
                                 disabled={cooldown > 0}
-                                className='mt-2 text-sm text-neutral-600/60 underline'>
-                                {cooldown > 0 ? `Resend in ${formatCooldown()}` : "Didn't receive code? Resend"}
+                                className='text-sm text-neutral-600/60 underline'>
+                                {cooldown > 0 ? `Resend in ${formatCooldown()}` : 'Resend?'}
                             </Button>
                         </div>
                     </motion.div>

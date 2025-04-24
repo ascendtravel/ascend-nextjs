@@ -23,6 +23,24 @@ const nextConfig = {
                 hostname: 'images.unsplash.com',
                 port: '',
                 pathname: '/**'
+            },
+            {
+                protocol: 'https',
+                hostname: 'example.com',
+                port: '',
+                pathname: '/**'
+            },
+            {
+                protocol: 'https',
+                hostname: 'cdn.worldota.net',
+                port: '',
+                pathname: '/**'
+            },
+            {
+                protocol: 'https',
+                hostname: 'pixabay.com',
+                port: '',
+                pathname: '/**'
             }
         ]
     }

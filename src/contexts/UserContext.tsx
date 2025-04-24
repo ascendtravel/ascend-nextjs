@@ -3,8 +3,14 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 interface UserProfile {
-    phone: string;
-    customer_id: string;
+    main_phone: string;
+    main_email: string;
+    emails: string[];
+    phones: string[];
+    first_name: string | null;
+    last_name: string | null;
+    is_admin: boolean;
+    stats: Record<string, unknown>;
 }
 
 interface UserContextType {
@@ -14,6 +20,10 @@ interface UserContextType {
     login: (token: string, customer_id: string) => void;
     logout: () => void;
     getToken: () => string | null;
+    isImpersonating: () => boolean;
+    stopImpersonating: () => void;
+    startImpersonating: (userId: string) => void;
+    reloadUser: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -35,9 +45,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
+    const reloadUser = () => {
+        fetchUser(getToken() || '', localStorage.getItem('customerId') || '');
+    };
+
     const fetchUser = async (token: string, customer_id: string) => {
         try {
-            const response = await fetch('/api/user/me', {
+            const impersonateUserId = localStorage.getItem('impersonateUserId');
+
+            const url = new URL('/api/user/me', window.location.origin);
+            if (impersonateUserId) {
+                url.searchParams.set('impersonationId', impersonateUserId);
+            }
+
+            const response = await fetch(url.toString(), {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -47,14 +68,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 throw new Error('Failed to fetch user');
             }
 
-            const data = await response.json();
-            setUser({
-                phone: data.phone,
-                customer_id: customer_id
-            });
+            const data = (await response.json()) as UserProfile;
+
+            setUser(data); // Now storing the complete user profile
         } catch (err) {
+            console.error('[UserContext] Error fetching user:', err);
             setError(err instanceof Error ? err.message : 'An error occurred');
-            // Clear invalid auth
             localStorage.removeItem('authToken');
             localStorage.removeItem('customerId');
         } finally {
@@ -66,6 +85,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('authToken', token);
         localStorage.setItem('customerId', customer_id);
         fetchUser(token, customer_id);
+    };
+
+    const isImpersonating = () => {
+        const impersonateUserId = localStorage.getItem('impersonateUserId');
+
+        return impersonateUserId !== null;
+    };
+
+    const stopImpersonating = () => {
+        localStorage.removeItem('impersonateUserId');
+        // Remove cookie
+        document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+    };
+
+    const startImpersonating = (userId: string) => {
+        localStorage.setItem('impersonateUserId', userId);
+        // Also set cookie for server-side requests
+        document.cookie = `impersonateUserId=${userId}; path=/`;
     };
 
     const logout = () => {
@@ -89,7 +126,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 error,
                 login,
                 logout,
-                getToken
+                getToken,
+                isImpersonating,
+                stopImpersonating,
+                startImpersonating,
+                reloadUser
             }}>
             {children}
         </UserContext.Provider>

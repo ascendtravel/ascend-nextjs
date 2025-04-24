@@ -1,18 +1,26 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import type { Trip } from '@/app/api/rp-trips/route';
+import type { Booking } from '@/app/api/rp-trips/route';
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { TripsRpProvider } from '@/contexts/TripsRpContext';
 
 // Move data fetching to a separate server function
-async function getInitialTrips(token: string | null): Promise<{ trips: Trip[] | null; redirect?: string }> {
+async function getInitialTrips(
+    token: string | null,
+    impersonateUserId: string | null | undefined
+): Promise<{ trips: Booking[] | null; redirect?: string }> {
     const headersList = await headers();
     const host = headersList.get('host');
     const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
 
     try {
-        const response = await fetch(`${protocol}://${host}/api/rp-trips`, {
+        const url = new URL(`${protocol}://${host}/api/rp-trips`);
+        if (impersonateUserId) {
+            url.searchParams.set('impersonationId', impersonateUserId);
+        }
+
+        const response = await fetch(url.toString(), {
             cache: 'no-store',
             headers: {
                 ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -44,7 +52,8 @@ export default async function HotelRpPagesLayout({ children }: { children: React
     // Get token from cookies on server side
     const cookieStore = await cookies();
     const token = cookieStore.get('authToken')?.value || null;
-    const { trips, redirect: redirectUrl } = await getInitialTrips(token);
+    const impersonateUserId = cookieStore.get('impersonateUserId')?.value;
+    const { trips, redirect: redirectUrl } = await getInitialTrips(token, impersonateUserId);
 
     if (redirectUrl) {
         redirect(redirectUrl);
