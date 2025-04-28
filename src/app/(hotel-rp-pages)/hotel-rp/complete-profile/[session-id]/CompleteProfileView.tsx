@@ -168,14 +168,34 @@ export default function CompleteProfileView({ initialData, sessionId }: Complete
                                             }}
                                             containerClassName='gap-2'>
                                             <InputOTPGroup>
-                                                <InputOTPSlot index={0} className='w-7.5' />
-                                                <InputOTPSlot index={1} className='mr-3 w-7.5 rounded-r-md' />
-                                                <InputOTPSlot index={3} className='w-7.5 rounded-l-md' />
-                                                <InputOTPSlot index={4} className='mr-3 w-7.5 rounded-r-md' />
-                                                <InputOTPSlot index={6} className='w-7.5 rounded-l-md' />
-                                                <InputOTPSlot index={7} className='w-7.5' />
-                                                <InputOTPSlot index={8} className='w-7.5' />
-                                                <InputOTPSlot index={9} className='w-7.5' />
+                                                <InputOTPSlot index={0} className='w-7.5' placeholder='M' />
+                                                <InputOTPSlot
+                                                    index={1}
+                                                    className='mr-3 w-7.5 rounded-r-md'
+                                                    placeholder='M'
+                                                />
+                                                <InputOTPSlot
+                                                    index={3}
+                                                    className='w-7.5 rounded-l-md'
+                                                    placeholder='D'
+                                                />
+                                                <InputOTPSlot
+                                                    index={4}
+                                                    className='mr-3 w-7.5 rounded-r-md'
+                                                    placeholder='D'
+                                                />
+                                                <InputOTPSlot
+                                                    index={6}
+                                                    className='w-7.5 rounded-l-md'
+                                                    placeholder='Y'
+                                                />
+                                                <InputOTPSlot index={7} className='w-7.5' placeholder='Y' />
+                                                <InputOTPSlot index={8} className='w-7.5' placeholder='Y' />
+                                                <InputOTPSlot
+                                                    index={9}
+                                                    className='w-7.5 rounded-r-md'
+                                                    placeholder='Y'
+                                                />
                                             </InputOTPGroup>
                                         </InputOTP>
                                     </div>

@@ -22,7 +22,7 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
     }
 
     return (
-        <div className='relative min-h-screen overflow-y-scroll'>
+        <div className='relative min-h-screen'>
             {/* Fixed header with backdrop blur */}
             <header className='fixed top-0 right-0 left-0 z-50 bg-[#006DBC]/80 backdrop-blur-sm'>
                 <div className='flex w-full flex-row items-center justify-between px-6 py-4'>
@@ -34,7 +34,9 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
             </header>
 
             {/* Main content with padding for header */}
-            <main className='absolute inset-0 flex flex-col items-center justify-center overflow-scroll pt-[72px]'>
+            <main
+                id='rp-main-content'
+                className='absolute inset-0 flex flex-col items-center justify-center overflow-x-auto pt-[72px]'>
                 {children}
             </main>
         </div>

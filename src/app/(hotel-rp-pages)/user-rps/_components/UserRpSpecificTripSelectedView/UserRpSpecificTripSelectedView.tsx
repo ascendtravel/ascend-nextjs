@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 
 import { Booking } from '@/app/api/rp-trips/route';
 import BackGreenButton from '@/components/BackGreenButton';
-import { Separator } from '@/components/ui/separator';
-import { useTripsRp } from '@/contexts/TripsRpContext';
 
 import UserSpecificTripCard from './UserSpecificTripCard';
 

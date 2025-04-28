@@ -48,7 +48,7 @@ export default function UserDetailsMenu() {
                 ariaLabel='User Profile'>
                 <div className='flex items-center justify-between bg-[#006DBC] p-6 text-white'>
                     <div className='flex items-center gap-4'>
-                        <UserAvatar variant='md' showName={false} darkMode={false} />
+                        <UserAvatar variant='md' showName={false} darkMode={true} />
                         <div className='text-lg font-medium text-white'>
                             {user?.first_name || user?.main_email || 'User'}
                         </div>

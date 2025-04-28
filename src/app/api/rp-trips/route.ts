@@ -10,21 +10,30 @@ interface MoneyAmount {
 interface CommonBookingPayload {
     booking_id: string;
     created_at: string | null;
-    customer_id: string;
     id: string | null;
-    import_session_id: string;
-    image_url?: string;
-    last_repricing_session_id?: string;
-    repricing_session_id?: string | null;
-    past_repricing_count?: number;
-    total_price_cents: MoneyAmount;
-    potential_savings_cents: MoneyAmount;
+    image_url?: string | null;
+    last_repricing_session_id: string | null;
+    repricing_session_id: string | null;
+    past_repricing_count: number;
     past_savings_cents: MoneyAmount;
+    potential_savings_cents: MoneyAmount;
+    total_price_cents: MoneyAmount;
+    confirmation_number: string | null;
+}
+
+interface RoomPersonCombination {
+    adult_count: number;
+    child_list: number[];
 }
 
 export interface HotelPayload extends CommonBookingPayload {
     hotel_name: string;
     city: string;
+    country_code: string;
+    postal_code: string;
+    address: string;
+    lat: number;
+    long: number;
     check_in_date: string;
     check_out_date: string;
     check_in_time: string | null;
@@ -34,6 +43,7 @@ export interface HotelPayload extends CommonBookingPayload {
     nights: number;
     price_per_night_cents: MoneyAmount;
     local_tax_and_fees_cents: MoneyAmount;
+    room_person_combinations: RoomPersonCombination[];
 }
 
 export interface FlightPayload extends CommonBookingPayload {
@@ -53,7 +63,6 @@ export interface FlightPayload extends CommonBookingPayload {
     departure_time: string | null;
     arrival_date: string | null;
     arrival_time: string | null;
-    confirmation_number: string;
     outbound_flight_numbers: string[];
     return_flight_numbers: string[];
     passenger_name: string;
@@ -61,18 +70,8 @@ export interface FlightPayload extends CommonBookingPayload {
     seat_number: string | null;
     baggage: string | null;
     current_price_cents: MoneyAmount;
-    new_market_price_cents: {
-        amount: number | null;
-        currency: string | null;
-    };
-    potential_savings_cents: {
-        amount: number | null;
-        currency: string | null;
-    };
-    past_savings_cents: {
-        amount: number | null;
-        currency: string | null;
-    };
+    new_market_price_cents: MoneyAmount;
+    haversine_distance_miles: number;
 }
 
 export type BookingType = 'hotel' | 'flight';
@@ -83,6 +82,9 @@ export interface Booking {
     created_at: string;
     updated_at: string;
     import_session_id: string;
+    is_fake: boolean;
+    is_forgotten: boolean;
+    metadata?: unknown;
     type: BookingType;
     payload: HotelPayload | FlightPayload;
 }
@@ -134,6 +136,8 @@ export async function GET(request: NextRequest) {
             ...booking,
             type: inferBookingType(booking.payload)
         }));
+
+        console.log('data', JSON.stringify(data, null, 2));
 
         return NextResponse.json(data);
     } catch (error: any) {

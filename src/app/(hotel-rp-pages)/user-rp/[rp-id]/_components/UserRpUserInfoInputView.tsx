@@ -123,6 +123,34 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
         }
     };
 
+    const validateDate = (value: string) => {
+        // Remove non-digits
+        const digits = value.replace(/\D/g, '');
+        if (digits.length !== 8) return false;
+
+        const month = parseInt(digits.slice(0, 2));
+        const day = parseInt(digits.slice(2, 4));
+        const year = parseInt(digits.slice(4));
+
+        // Check month and day ranges
+        if (month < 1 || month > 12) return false;
+        if (day < 1 || day > 31) return false;
+
+        // Check specific month lengths
+        const monthLengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        // Adjust February for leap years
+        if (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) {
+            monthLengths[1] = 29;
+        }
+        if (day > monthLengths[month - 1]) return false;
+
+        // Check reasonable year range (e.g., between 1900 and current year)
+        const currentYear = new Date().getFullYear();
+        if (year < 1900 || year > currentYear) return false;
+
+        return true;
+    };
+
     return (
         <div className='absolute inset-0 mt-[72px] flex flex-col rounded-t-xl bg-neutral-50'>
             <div className='flex-1 px-6 pt-10'>
@@ -130,6 +158,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
                     onClick={() => {
                         router.push('/user-rps/');
                     }}
+                    backUrl='/user-rps/'
                 />
                 <div className='text-xl font-bold'>How to get {getTripSavingsString(trip, true)} back:</div>
                 <div className='mb-6 text-sm'>First, confirm your traveler information to continue:</div>
@@ -201,15 +230,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
                                                         // Remove all non-digits
                                                         let formatted = value.replace(/\D/g, '');
 
-                                                        // If already have 8 digits, ignore additional inputs
-                                                        if (
-                                                            field.value.replace(/\D/g, '').length === 8 &&
-                                                            formatted.length > 8
-                                                        ) {
-                                                            return;
-                                                        }
-
-                                                        // Handle formatting
+                                                        // Format with dashes
                                                         if (formatted.length > 2) {
                                                             formatted =
                                                                 formatted.slice(0, 2) + '-' + formatted.slice(2);
@@ -221,41 +242,60 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
 
                                                         // Limit to 10 characters (MM-DD-YYYY)
                                                         formatted = formatted.slice(0, 10);
+
+                                                        // Validate date before setting
+                                                        if (formatted.length === 10 && !validateDate(formatted)) {
+                                                            form.setError('bday', {
+                                                                type: 'manual',
+                                                                message: 'Please enter a valid date'
+                                                            });
+                                                        } else {
+                                                            form.clearErrors('bday');
+                                                        }
+
                                                         field.onChange(formatted);
                                                     }}
                                                     containerClassName='gap-2'>
                                                     <InputOTPGroup>
                                                         <InputOTPSlot
                                                             index={0}
+                                                            placeholder='M'
                                                             className='w-9.5 rounded-l-lg border-neutral-200 bg-white'
                                                         />
                                                         <InputOTPSlot
                                                             index={1}
                                                             className='mr-3 w-9.5 rounded-r-lg border-neutral-200 bg-white'
+                                                            placeholder='M'
                                                         />
                                                         <InputOTPSlot
                                                             index={3}
+                                                            placeholder='D'
                                                             className='w-9.5 rounded-l-lg border-neutral-200 bg-white'
                                                         />
                                                         <InputOTPSlot
                                                             index={4}
                                                             className='mr-3 w-9.5 rounded-r-lg border-neutral-200 bg-white'
+                                                            placeholder='D'
                                                         />
                                                         <InputOTPSlot
                                                             index={6}
+                                                            placeholder='Y'
                                                             className='w-9.5 rounded-l-lg border-neutral-200 bg-white'
                                                         />
                                                         <InputOTPSlot
                                                             index={7}
                                                             className='w-9.5 border-neutral-200 bg-white'
+                                                            placeholder='Y'
                                                         />
                                                         <InputOTPSlot
                                                             index={8}
                                                             className='w-9.5 border-neutral-200 bg-white'
+                                                            placeholder='Y'
                                                         />
                                                         <InputOTPSlot
                                                             index={9}
                                                             className='w-9.5 rounded-r-lg border-neutral-200 bg-white'
+                                                            placeholder='Y'
                                                         />
                                                     </InputOTPGroup>
                                                 </InputOTP>

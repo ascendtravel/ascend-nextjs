@@ -19,8 +19,8 @@ export interface Pick {
 }
 
 export enum PickTypeV3 {
-    InsaneODeal = 'INSANE_O_DEAL'
-    // Add other pick types as needed
+    InsaneODeal = 'INSANE_O_DEAL',
+    NormalDeal = 'NORMAL_DEAL'
 }
 
 interface HotelMapProps {

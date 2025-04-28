@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Separator } from '@/components/ui/separator';
+import { FRAMER_LINKS } from '@/config/navigation';
 
 import { motion } from 'framer-motion';
 import { DockIcon, InfoIcon, LockIcon } from 'lucide-react';
@@ -9,25 +10,25 @@ type RpFooterSectionProps = {
     email: string;
 };
 
-export default function RpFooterSection({ email }: RpFooterSectionProps) {
-    const Links = [
-        {
-            title: 'Terms of Service',
-            href: '/terms-of-service',
-            Icon: DockIcon
-        },
-        {
-            title: 'Privacy Policy',
-            href: '/privacy-policy',
-            Icon: LockIcon
-        },
-        {
-            title: 'Help',
-            href: '/help',
-            Icon: InfoIcon
-        }
-    ];
+const Links = [
+    {
+        title: 'Privacy Policy',
+        Icon: LockIcon,
+        href: FRAMER_LINKS.privacy
+    },
+    {
+        title: 'Terms of Service',
+        Icon: DockIcon,
+        href: FRAMER_LINKS.terms
+    },
+    {
+        title: 'Support',
+        Icon: InfoIcon,
+        href: FRAMER_LINKS.support
+    }
+];
 
+export default function RpFooterSection({ email }: RpFooterSectionProps) {
     return (
         <motion.div
             className='mt-6 w-full pb-12'
@@ -43,12 +44,14 @@ export default function RpFooterSection({ email }: RpFooterSectionProps) {
             <div className='ml-6 flex flex-col items-center justify-center gap-2 py-2'>
                 {Links.map((link) => (
                     <React.Fragment key={link.title}>
-                        <div
-                            className='flex w-full flex-row items-start justify-start gap-2 py-2 text-xs'
-                            key={link.title}>
+                        <a
+                            href={link.href}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='flex w-full flex-row items-start justify-start gap-2 py-2 text-xs'>
                             <link.Icon className='h-4 w-4' />
                             <div className='font-bold'>{link.title}</div>
-                        </div>
+                        </a>
                         <Separator />
                     </React.Fragment>
                 ))}

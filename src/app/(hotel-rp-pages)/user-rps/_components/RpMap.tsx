@@ -7,7 +7,7 @@ import * as turf from '@turf/turf';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Types
+// Types from FlightMap
 export interface Airport {
     latitude: number;
     longitude: number;
@@ -19,37 +19,46 @@ export interface FlightMapSegment {
     to: Airport;
 }
 
-interface AirportInfo {
-    iataCode: string;
-    latitude: number;
-    longitude: number;
-}
-
 export interface FlightSegmentBasic {
     from: string; // IATA code
     to: string; // IATA code
 }
 
-interface FlightMapProps {
-    segments: FlightSegmentBasic[];
-    zoom?: number;
+// Types from HotelMap
+export interface Hotel {
+    id: string;
+    lat: number;
+    lon: number;
+    price: string;
+}
+
+interface RpMapProps {
+    hotels?: Hotel[];
+    flightSegments?: FlightSegmentBasic[];
+    onHotelClick?: (hotel: Hotel) => void;
+    highlightedHotelIds?: string[];
     showResetBtn?: boolean;
 }
 
 const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN as string;
 
-export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: FlightMapProps) {
+export default function RpMap({
+    hotels = [],
+    flightSegments = [],
+    onHotelClick,
+    highlightedHotelIds = [],
+    showResetBtn = true
+}: RpMapProps) {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markers = useRef<mapboxgl.Marker[]>([]);
     const animationFrameId = useRef<number | null>(null);
-    const [airportsMap, setAirportsMap] = useState<Map<string, AirportInfo>>(new Map());
+    const [airportsMap, setAirportsMap] = useState<Map<string, Airport>>(new Map());
     const [processedSegments, setProcessedSegments] = useState<FlightMapSegment[]>([]);
 
-    // Set Mapbox token
     mapboxgl.accessToken = mapboxToken;
 
-    // Helper functions
+    // Flight-related helper functions
     const calculateArcForSegment = (segment: FlightMapSegment): number[][] => {
         const steps = 900;
         const arc = [];
@@ -64,13 +73,14 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         return arc;
     };
 
+    // Cleanup functions
     const removeExistingMarkers = () => {
         markers.current.forEach((marker) => marker.remove());
         markers.current = [];
     };
 
     const removeExistingLayersAndSources = () => {
-        if (!map.current || !map.current.isStyleLoaded()) return;
+        if (!map.current?.isStyleLoaded()) return;
 
         try {
             const existingLayers = map.current.getStyle().layers?.map((layer) => layer.id);
@@ -102,25 +112,39 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         }
     };
 
-    // Map functions
+    // Map control functions
     const resetMap = () => {
         if (!map.current) return;
-        if (processedSegments.length === 0) {
-            // US center 39.8283° N, 98.5795° W
-            map.current.setCenter([-98.5795, 39.8283]);
-            map.current.setZoom(1);
 
-            return;
-        }
         const bounds = new mapboxgl.LngLatBounds();
+        let hasPoints = false;
+
+        // Add flight segments to bounds
         processedSegments.forEach((segment) => {
             bounds.extend([segment.from.longitude, segment.from.latitude]);
             bounds.extend([segment.to.longitude, segment.to.latitude]);
+            hasPoints = true;
         });
-        map.current.fitBounds(bounds, { padding: 10, zoom: 3 });
+
+        // Add hotels to bounds
+        hotels.forEach((hotel) => {
+            bounds.extend([hotel.lon, hotel.lat]);
+            hasPoints = true;
+        });
+
+        if (hasPoints && flightSegments.length > 0) {
+            map.current.fitBounds(bounds, { padding: 50 });
+        } else if (hasPoints && hotels.length > 0) {
+            map.current.fitBounds(bounds, { padding: 100, zoom: 16 });
+        } else {
+            // Default view (centered on US)
+            map.current.setCenter([-98.5795, 39.8283]);
+            map.current.setZoom(1);
+        }
     };
 
-    const drawSegments = (segments: FlightMapSegment[]) => {
+    // Drawing functions
+    const drawFlightSegments = (segments: FlightMapSegment[]) => {
         if (!map.current) return;
 
         segments.forEach((segment, index) => {
@@ -151,9 +175,8 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         });
     };
 
-    const addMarkers = (segments: FlightMapSegment[]) => {
+    const addAirportMarkers = (segments: FlightMapSegment[]) => {
         if (!map.current) return;
-        removeExistingMarkers();
 
         const uniquePoints = new Map();
         segments.forEach((segment) => {
@@ -168,34 +191,52 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
             }
         });
 
-        let index = 0;
         uniquePoints.forEach((point) => {
-            const markerElement = document.createElement('div');
-            markerElement.className = 'custom-marker';
+            const el = document.createElement('div');
+            el.className = 'airport-marker';
 
-            const labelElement = document.createElement('div');
-            labelElement.className = 'marker-pill';
-            labelElement.innerText = (point as Airport).iataCode;
+            const label = document.createElement('div');
+            label.className = 'airport-label';
+            label.innerText = point.iataCode;
 
-            markerElement.appendChild(labelElement);
+            el.appendChild(label);
 
-            const verticalOffset = -(20 * index);
-
-            const marker = new mapboxgl.Marker({
-                element: markerElement,
-                offset: [0, verticalOffset]
-            })
+            const marker = new mapboxgl.Marker({ element: el })
                 .setLngLat([point.longitude, point.latitude])
                 .addTo(map.current!);
 
             markers.current.push(marker);
-            index++;
+        });
+    };
+
+    const addHotelMarkers = (hotels: Hotel[]) => {
+        if (!map.current) return;
+
+        hotels.forEach((hotel) => {
+            const el = document.createElement('div');
+            el.className = 'airport-marker';
+
+            const label = document.createElement('div');
+            label.className = 'airport-label';
+            label.innerText = hotel.price;
+
+            // priceLabel.className = `hotel-price ${highlightedHotelIds.includes(hotel.id) ? 'highlighted' : ''}`;
+            // priceLabel.innerText = hotel.price;
+
+            el.appendChild(label);
+
+            const marker = new mapboxgl.Marker({ element: el }).setLngLat([hotel.lon, hotel.lat]).addTo(map.current!);
+
+            if (onHotelClick) {
+                el.addEventListener('click', () => onHotelClick(hotel));
+            }
+
+            markers.current.push(marker);
         });
     };
 
     const animatePlane = (segments: FlightMapSegment[]) => {
-        if (!map.current) return;
-        if (segments.length === 0) return;
+        if (!map.current || segments.length === 0) return;
 
         let currentSegmentIndex = 0;
         let counter = 0;
@@ -226,8 +267,7 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         });
 
         function animate() {
-            if (!map.current) return;
-            if (segments.length === 0) return;
+            if (!map.current || segments.length === 0) return;
 
             if (counter < currentArc.length - 1) {
                 const start = turf.point(currentArc[counter]);
@@ -264,55 +304,82 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         animate();
     };
 
-    // Fetch and cache airport info
+    // Fetch airport data
     useEffect(() => {
-        async function fetchAirportInfo(iataCode: string): Promise<AirportInfo | null> {
-            const response = await fetch(`/api/airport?iata=${iataCode}`);
-            if (!response.ok) return null;
-            const data = await response.json();
+        async function fetchAirportsInfo(iataCodes: string[]): Promise<Map<string, Airport>> {
+            const response = await fetch('/api/airport', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ airport_iata_codes: iataCodes })
+            });
 
-            return {
-                iataCode,
-                latitude: data.latitude || 0,
-                longitude: data.longitude || 0
-            };
+            if (!response.ok) return new Map();
+
+            const airports = await response.json();
+
+            return new Map(
+                airports.map((airport: any) => [
+                    airport.iataCode,
+                    {
+                        iataCode: airport.iataCode,
+                        latitude: airport.latitude,
+                        longitude: airport.longitude
+                    }
+                ])
+            );
         }
 
-        async function processSegments() {
-            const newAirportsMap = new Map(airportsMap);
+        async function processFlightSegments() {
+            const uniqueIataCodes = Array.from(new Set(flightSegments.flatMap((seg) => [seg.from, seg.to])));
 
-            // Get unique IATA codes
-            const uniqueIataCodes = new Set(segments.flatMap((seg) => [seg.from, seg.to]));
+            // Only fetch if we have new airports to fetch
+            const missingCodes = uniqueIataCodes.filter((code) => !airportsMap.has(code));
+            if (missingCodes.length === 0) {
+                // Process segments with existing airport data
+                const newProcessedSegments = flightSegments
+                    .filter((seg) => airportsMap.has(seg.from) && airportsMap.has(seg.to))
+                    .map((seg) => ({
+                        from: airportsMap.get(seg.from)!,
+                        to: airportsMap.get(seg.to)!
+                    }));
+                setProcessedSegments(newProcessedSegments);
 
-            // Fetch missing airports
-            const fetchPromises = Array.from(uniqueIataCodes)
-                .filter((code) => !newAirportsMap.has(code))
-                .map(async (code) => {
-                    const airportInfo = await fetchAirportInfo(code);
-                    if (airportInfo) {
-                        newAirportsMap.set(code, airportInfo);
-                    }
+                return;
+            }
+
+            try {
+                const newAirportsData = await fetchAirportsInfo(missingCodes);
+                const updatedAirportsMap = new Map(airportsMap);
+
+                // Merge new airports data with existing
+                newAirportsData.forEach((airport, code) => {
+                    updatedAirportsMap.set(code, airport);
                 });
 
-            await Promise.all(fetchPromises);
-            setAirportsMap(newAirportsMap);
+                setAirportsMap(updatedAirportsMap);
 
-            // Create processed segments
-            const newProcessedSegments = segments
-                .filter((seg) => newAirportsMap.has(seg.from) && newAirportsMap.has(seg.to))
-                .map((seg) => ({
-                    from: newAirportsMap.get(seg.from)!,
-                    to: newAirportsMap.get(seg.to)!
-                }));
+                // Process all segments with updated airport data
+                const newProcessedSegments = flightSegments
+                    .filter((seg) => updatedAirportsMap.has(seg.from) && updatedAirportsMap.has(seg.to))
+                    .map((seg) => ({
+                        from: updatedAirportsMap.get(seg.from)!,
+                        to: updatedAirportsMap.get(seg.to)!
+                    }));
 
-            setProcessedSegments(newProcessedSegments);
-            resetMap();
+                setProcessedSegments(newProcessedSegments);
+            } catch (error) {
+                console.error('Failed to fetch airports:', error);
+            }
         }
 
-        if (segments.length > 0) {
-            processSegments();
+        if (flightSegments.length > 0) {
+            processFlightSegments();
+        } else {
+            setProcessedSegments([]);
         }
-    }, [segments]);
+    }, [flightSegments, airportsMap]);
 
     // Initialize map
     useEffect(() => {
@@ -321,56 +388,45 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: 'mapbox://styles/mapbox/streets-v12',
-            // if no cneter go to center of US 39.8283° N, 98.5795° W
-            center:
-                processedSegments.length > 0
-                    ? [
-                          (processedSegments[0].from.longitude + processedSegments[0].to.longitude) / 2,
-                          (processedSegments[0].from.latitude + processedSegments[0].to.latitude) / 2
-                      ]
-                    : [-98.5795, 39.8283],
-            zoom: processedSegments.length > 0 ? zoom : 1
+            center: [-98.5795, 39.8283],
+            zoom: 1
         });
 
         map.current.on('style.load', () => {
-            drawSegments(processedSegments);
-            addMarkers(processedSegments);
+            removeExistingLayersAndSources();
+            removeExistingMarkers();
+            drawFlightSegments(processedSegments);
+            addAirportMarkers(processedSegments);
+            addHotelMarkers(hotels);
             resetMap();
-            animatePlane(processedSegments);
+            if (processedSegments.length > 0) {
+                animatePlane(processedSegments);
+            }
         });
 
         return () => {
             cancelPlaneAnimation();
-            if (map.current) {
-                map.current.remove();
-            }
+            map.current?.remove();
         };
-    }, []);
+    }, [flightSegments, processedSegments, hotels]);
 
-    // Watch for segment changes
+    // Watch for changes in data
     useEffect(() => {
-        if (!map.current) return;
+        if (!map.current?.isStyleLoaded()) return;
 
-        if (map.current.isStyleLoaded()) {
-            removeExistingLayersAndSources();
-            removeExistingMarkers();
-            cancelPlaneAnimation();
-            drawSegments(processedSegments);
-            addMarkers(processedSegments);
-            resetMap();
+        removeExistingLayersAndSources();
+        removeExistingMarkers();
+        cancelPlaneAnimation();
+
+        drawFlightSegments(processedSegments);
+        addAirportMarkers(processedSegments);
+        addHotelMarkers(hotels);
+        resetMap();
+
+        if (processedSegments.length > 0) {
             animatePlane(processedSegments);
-        } else {
-            map.current.once('style.load', () => {
-                removeExistingLayersAndSources();
-                removeExistingMarkers();
-                cancelPlaneAnimation();
-                drawSegments(processedSegments);
-                addMarkers(processedSegments);
-                resetMap();
-                animatePlane(processedSegments);
-            });
         }
-    }, [processedSegments]);
+    }, [processedSegments, hotels, highlightedHotelIds]);
 
     return (
         <div ref={mapContainer} className='relative h-full w-full'>
@@ -381,20 +437,14 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
                     Reset
                 </button>
             )}
-            <div
-                id='debug-info'
-                className='absolute bottom-4 left-4 z-10 rounded bg-neutral-50 px-2 py-1 text-neutral-700 shadow-lg'>
-                {processedSegments.length}
-                {JSON.stringify(segments)}
-            </div>
             <style jsx global>{`
                 .mapboxgl-ctrl-logo,
                 .mapboxgl-ctrl-bottom-right {
                     display: none !important;
                 }
-            `}</style>
-            <style jsx>{`
-                .custom-marker {
+
+                .airport-marker,
+                .hotel-marker {
                     position: relative;
                     width: 20px;
                     height: 20px;
@@ -405,7 +455,8 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
                     align-items: center;
                 }
 
-                .custom-marker::before {
+                .hotel-marker::before,
+                .airport-marker::before {
                     content: '';
                     position: absolute;
                     width: 10px;
@@ -414,7 +465,7 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
                     border-radius: 50%;
                 }
 
-                .marker-pill {
+                .airport-label {
                     position: absolute;
                     top: -25px;
                     background-color: black;
@@ -423,6 +474,22 @@ export default function FlightMap({ segments, zoom = 2, showResetBtn = true }: F
                     font-weight: bold;
                     padding: 2px 8px;
                     border-radius: 10px;
+                    text-wrap: nowrap;
+                }
+
+                .hotel-price {
+                    padding: 2px 8px;
+                    background-color: white;
+                    border: 1px solid #666;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+
+                .hotel-price.highlighted {
+                    background-color: #1dc167;
+                    color: white;
+                    border-color: #1dc167;
                 }
             `}</style>
         </div>
