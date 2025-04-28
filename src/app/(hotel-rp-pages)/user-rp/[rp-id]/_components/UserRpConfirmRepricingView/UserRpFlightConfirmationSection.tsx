@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Booking, FlightPayload } from '@/app/api/rp-trips/route';
 import FlightSegmentCard from '@/components/FlightSegmentCard';
 import { useUser } from '@/contexts/UserContext';
+import { getCurrencyAndAmountText } from '@/lib/money';
 import { Airport } from '@/types/flight-types';
 
 import { toast } from 'sonner';
@@ -140,7 +141,7 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
 
             <div className='flex w-full flex-row items-center justify-between px-6 text-sm text-neutral-700'>
                 <div className='font-medium'>Total Price</div>
-                <div>${(flightPayload.current_price_cents?.amount ?? 0 / 100).toFixed(2)}</div>
+                <div>{getCurrencyAndAmountText(flightPayload.current_price_cents)}</div>
             </div>
 
             <div className='mt-4 flex w-full flex-col items-center justify-center px-8'>

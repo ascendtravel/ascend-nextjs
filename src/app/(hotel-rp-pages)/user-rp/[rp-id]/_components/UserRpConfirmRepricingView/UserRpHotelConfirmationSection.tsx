@@ -6,6 +6,7 @@ import Image from 'next/image';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
 import { useUser } from '@/contexts/UserContext';
+import { getCurrencyAndAmountText } from '@/lib/money';
 
 import UserRpHotelDetailsList from './UserRpHotelDetailsList';
 import { toast } from 'sonner';
@@ -92,12 +93,8 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                 nightlyPrice={
                     hotelPayload.price_per_night_cents.amount ? hotelPayload.price_per_night_cents.amount / 100 : 0
                 }
-                localTaxesAndFees={
-                    hotelPayload.local_tax_and_fees_cents.amount
-                        ? hotelPayload.local_tax_and_fees_cents.amount / 100
-                        : 0
-                }
-                totalPrice={hotelPayload.total_price_cents.amount ? hotelPayload.total_price_cents.amount / 100 : 0}
+                localTaxesAndFees={getCurrencyAndAmountText(hotelPayload.local_tax_and_fees_cents)}
+                totalPrice={getCurrencyAndAmountText(hotelPayload.total_price_cents)}
                 // These fields aren't in the new API, so using defaults or removing
                 totalGuests={1}
                 roomsPersonCombos={[
@@ -113,6 +110,7 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                         isChild: false
                     }
                 ]}
+                nights={hotelPayload.nights}
             />
             <div className='mt-4 flex w-full flex-col items-center justify-center px-8'>
                 <div

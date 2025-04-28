@@ -13,8 +13,9 @@ interface UserRpHotelDetailsListProps {
     checkInDate?: string;
     checkOutDate?: string;
     nightlyPrice?: number;
-    localTaxesAndFees?: number;
-    totalPrice?: number;
+    localTaxesAndFees?: string;
+    totalPrice?: string;
+    nights?: number;
 }
 
 export default function UserRpHotelDetailsList({
@@ -25,12 +26,11 @@ export default function UserRpHotelDetailsList({
     checkOutDate,
     nightlyPrice,
     localTaxesAndFees,
-    totalPrice
+    totalPrice,
+    nights
 }: UserRpHotelDetailsListProps) {
     function calcTotalPriceForAllNights() {
-        if (!nightlyPrice) return 0;
-
-        const nights = nightsBetweenDates(checkInDate, checkOutDate);
+        if (!nightlyPrice || !nights) return 0;
 
         return nightlyPrice * nights;
     }
@@ -89,35 +89,23 @@ export default function UserRpHotelDetailsList({
             {nightlyPrice && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>
-                        Price for {nightsBetweenDates(checkInDate, checkOutDate)} Nights
+                        Price for {nights} {nights === 1 ? 'Night' : 'Nights'}
                     </div>
-                    <div className='text-right text-sm'>U${calcTotalPriceForAllNights()}</div>
+                    <div className='text-right text-sm'>{calcTotalPriceForAllNights()}</div>
                 </div>
             )}
             {localTaxesAndFees && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Local Taxes and Fees</div>
-                    <div className='text-right text-sm'>U${localTaxesAndFees}1</div>
+                    <div className='text-right text-sm'>{localTaxesAndFees}1</div>
                 </div>
             )}
             {totalPrice && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Total</div>
-                    <div className='text-right text-sm'>U${totalPrice}</div>
+                    <div className='text-right text-sm'>{totalPrice}</div>
                 </div>
             )}
         </div>
     );
-}
-
-function nightsBetweenDates(checkInDate: string | undefined, checkOutDate: string | undefined) {
-    // fix is giving NaN
-    if (!checkInDate || !checkOutDate) return 0;
-
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-    const diffTime = Math.abs(checkOut.getTime() - checkIn.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return diffDays;
 }
