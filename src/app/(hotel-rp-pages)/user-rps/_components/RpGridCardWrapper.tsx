@@ -3,6 +3,7 @@
 import Image from 'next/image';
 
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
+import { getCurrencyAndAmountText } from '@/lib/money';
 import { PlusIcon } from '@radix-ui/react-icons';
 
 type RpGridCardWrapperProps = {
@@ -26,7 +27,7 @@ export default function RpGridCardWrapper({
     const getPotentialSavings = (trip?: Booking) => {
         if (!trip?.payload.potential_savings_cents?.amount) return 0;
 
-        return trip.payload.potential_savings_cents.amount / 100;
+        return trip.payload.potential_savings_cents.amount;
     };
 
     // Helper to get image alt text
@@ -56,7 +57,10 @@ export default function RpGridCardWrapper({
             {getPotentialSavings(trip) ? (
                 <div className='absolute inset-x-0 -top-1 flex h-8 flex-row bg-[#1DC167]'>
                     <div className='flex w-full items-center justify-center text-xs font-semibold text-white'>
-                        Tap to save ${getPotentialSavings(trip)}
+                        Tap to save{' '}
+                        {getCurrencyAndAmountText(
+                            trip?.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' }
+                        )}
                     </div>
                 </div>
             ) : null}

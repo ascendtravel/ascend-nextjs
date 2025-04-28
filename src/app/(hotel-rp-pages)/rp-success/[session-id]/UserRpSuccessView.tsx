@@ -6,6 +6,7 @@ import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useTripsRp } from '@/contexts/TripsRpContext';
+import { getCurrencyAndAmountText } from '@/lib/money';
 
 import { CircleCheck, CopyIcon } from 'lucide-react';
 import Confetti from 'react-confetti';
@@ -27,7 +28,7 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
     const getPotentialSavings = () => {
         if (!trip.payload.potential_savings_cents?.amount) return 0;
 
-        return (trip.payload.potential_savings_cents.amount / 100).toFixed(2);
+        return trip.payload.potential_savings_cents.amount;
     };
 
     return (
@@ -66,19 +67,13 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
                         <div className='absolute inset-x-0 top-3.5 left-1/2 h-0.5 w-[90%] -translate-x-1/2 bg-neutral-700/40' />
                         <div className='text-md font-semibold text-neutral-600'>Your original total was</div>
                         <div className='text-lg font-bold text-red-700'>
-                            $
-                            {flightPayload?.current_price_cents?.amount
-                                ? (flightPayload.current_price_cents.amount / 100).toFixed(2)
-                                : '0.00'}
+                            {getCurrencyAndAmountText(flightPayload?.current_price_cents)}
                         </div>
                     </div>
                     <div className='-mt-4 flex w-full flex-row items-center justify-between px-6'>
                         <div className='text-md font-semibold text-neutral-600'>With Ascend, you've paid only</div>
                         <div className='text-xl font-bold text-[#1DC167]'>
-                            $
-                            {flightPayload?.new_market_price_cents?.amount
-                                ? (flightPayload?.new_market_price_cents?.amount / 100).toFixed(2)
-                                : '0.00'}
+                            {getCurrencyAndAmountText(flightPayload?.new_market_price_cents)}
                         </div>
                     </div>
                 </div>

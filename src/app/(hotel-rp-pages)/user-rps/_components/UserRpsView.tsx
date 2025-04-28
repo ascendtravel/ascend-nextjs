@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { TRIP_YEARS, useTripsRp } from '@/contexts/TripsRpContext';
+import { getCurrencyAndAmountText } from '@/lib/money';
 
 import FlightMap, { FlightMapSegment, FlightSegmentBasic } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
@@ -65,7 +66,7 @@ export default function UserRpsView() {
                     id: trip.id.toString(),
                     lat: (trip.payload as HotelPayload).lat,
                     lon: (trip.payload as HotelPayload).long,
-                    price: `${(trip.payload as HotelPayload).price_per_night_cents.currency} ${(trip.payload as HotelPayload).price_per_night_cents.amount ?? 0}`
+                    price: getCurrencyAndAmountText((trip.payload as HotelPayload).price_per_night_cents)
                 }
             ]);
             // Clear segments when clicking a hotel
