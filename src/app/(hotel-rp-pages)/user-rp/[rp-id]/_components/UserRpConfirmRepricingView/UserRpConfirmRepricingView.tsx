@@ -27,6 +27,7 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
                     onClick={() => {
                         router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`);
                     }}
+                    backUrl={`/user-rp/${rpId}?view-state=ConfirmUserInfo`}
                 />
             </div>
             <div className='mb-4 px-6 text-3xl font-semibold'>Review your pricing</div>

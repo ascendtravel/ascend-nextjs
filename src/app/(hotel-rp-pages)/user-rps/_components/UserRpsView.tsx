@@ -3,43 +3,33 @@
 import React, { useEffect, useState } from 'react';
 
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
-import { useTripsRp } from '@/contexts/TripsRpContext';
+import { TRIP_YEARS, useTripsRp } from '@/contexts/TripsRpContext';
 
-import FlightMap, { FlightMapSegment } from './FlightMap';
+import FlightMap, { FlightMapSegment, FlightSegmentBasic } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
+import HotelMap from './HotelMap';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
 import RpFooterSection from './RpFooterSection';
 import RpGridCardWrapper from './RpGridCardWrapper';
+import RpMap, { Hotel } from './RpMap';
 import UserRpNoTripsCard from './UserRpNoTripsCard';
+import UserRpNoUpcomingTripsFound from './UserRpNoUpcomingTripsFound';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export default function UserRpsView() {
-    const { trips, isLoading, error } = useTripsRp();
+    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
-    const [flightSegments, setFlightSegments] = useState<FlightMapSegment[]>([]);
+
+    // Map Data and Types
+    const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
+    const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
 
     useEffect(() => {
-        // Filter flight bookings and map to segments
-        const segments = trips
-            .filter((booking): booking is Booking & { payload: FlightPayload } => booking.type === 'flight')
-            .map((booking) => ({
-                from: {
-                    iataCode: booking.payload.departure_airport_iata_code,
-                    // You would need to add these to your booking type or fetch from a mapping
-                    latitude: 33.9416,
-                    longitude: -118.4085
-                },
-                to: {
-                    iataCode: booking.payload.arrival_airport_iata_code,
-                    latitude: 37.7749,
-                    longitude: -122.4194
-                }
-            }));
-
-        setFlightSegments(segments);
-    }, [trips]);
+        setFlightSegments([]);
+        setHotelsMapDetails([]);
+    }, [filteredTrips]);
 
     if (isLoading) {
         return (
@@ -59,47 +49,95 @@ export default function UserRpsView() {
 
     const handleTripClick = (trip: Booking) => {
         setSelectedTrip(trip);
-        // Scroll to top smoothly
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (trip.type === 'flight') {
+            const segment = {
+                from: (trip.payload as FlightPayload).departure_airport_iata_code,
+                to: (trip.payload as FlightPayload).arrival_airport_iata_code
+            };
+            // Then set the new segment in the next tick
+            setTimeout(() => {
+                setFlightSegments([segment]);
+            }, 0);
+            setHotelsMapDetails([]);
+        } else if (trip.type === 'hotel') {
+            setHotelsMapDetails([
+                {
+                    id: trip.id.toString(),
+                    lat: (trip.payload as HotelPayload).lat,
+                    lon: (trip.payload as HotelPayload).long,
+                    price: `${(trip.payload as HotelPayload).price_per_night_cents.currency} ${(trip.payload as HotelPayload).price_per_night_cents.amount ?? 0}`
+                }
+            ]);
+            // Clear segments when clicking a hotel
+            setFlightSegments([]);
+        } else {
+            setHotelsMapDetails([]);
+            setFlightSegments([]);
+        }
     };
 
     useEffect(() => {
         if (selectedTrip) {
             setTimeout(() => {
+                // Target the main content wrapper with overflow-scroll
+                const mainContent = document.querySelector('#rp-main-content');
+                if (mainContent) {
+                    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+                }
                 setShowSpecificTrip(true);
-            }, 1000);
+            }, 500);
         }
     }, [selectedTrip]);
 
-    const years = ['Upcoming', 2025, 2024, 2023];
-
     return (
-        <div className='mt-4 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
+        <div className='mt-8 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
             {/* <UserRpsView /> */}
             <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl'>
-                <FlightMap segments={[]} showResetBtn={false} />
+                {/* {JSON.stringify(flightSegments)} */}
+                <RpMap hotels={hotelsMapDetails} flightSegments={flightSegments} showResetBtn={false} />
             </div>
-            {/* <div className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'> */}
-            {/* {years.map((year) => (
-                    <React.Fragment key={year}>
-                        {year === 'Upcoming' ? (
-                            <div key={year} className='flex w-full rounded-full bg-[#1DC167] px-2 text-neutral-50'>
-                                {year}
-                            </div>
-                        ) : (
-                            <div key={year} className='flex w-full px-4 py-2 font-semibold'>
-                                {year}
-                            </div>
-                        )}
-                    </React.Fragment>
-                ))} */}
-            {/* </div> */}
+            <AnimatePresence>
+                {!selectedTrip && (
+                    <motion.div
+                        className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        transition={{
+                            duration: 0.3,
+                            ease: 'easeInOut'
+                        }}>
+                        {TRIP_YEARS.map((year) => (
+                            <React.Fragment key={year}>
+                                <div
+                                    onClick={() => setSelectedYear(year)}
+                                    className={`flex w-full cursor-pointer px-4 py-2 ${
+                                        selectedYear === year
+                                            ? 'rounded-full bg-[#1DC167] text-neutral-50'
+                                            : 'font-semibold'
+                                    }`}>
+                                    {year}
+                                </div>
+                            </React.Fragment>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <div className='relative -mt-2 w-full rounded-t-xl bg-neutral-50'>
-                {trips.length === 0 && <UserRpNoTripsCard totalSavings='more than $500' />}
+                {/* No trip on past years */}
+                {filteredTrips.length === 0 && selectedYear !== 'Repricings' && (
+                    <UserRpNoTripsCard totalSavings='more than $500' />
+                )}
+
+                {/* No upcoming trip */}
+                {filteredTrips.length === 0 && selectedYear === 'Repricings' && (
+                    <UserRpNoUpcomingTripsFound totalSavings='more than $500' />
+                )}
+
                 <div className='grid w-full grid-cols-2 gap-2 pt-8'>
                     {!showSpecificTrip ? (
                         <AnimatePresence>
-                            {trips.map((trip, index) => (
+                            {filteredTrips.map((trip, index) => (
                                 <motion.div
                                     key={trip.type + index}
                                     initial={{ opacity: 1, x: 0 }}
@@ -146,6 +184,8 @@ export default function UserRpsView() {
                         handleBackClick={() => {
                             setShowSpecificTrip(false);
                             setSelectedTrip(null);
+                            setFlightSegments([]);
+                            setHotelsMapDetails([]);
                         }}
                         trip={selectedTrip || undefined}
                     />

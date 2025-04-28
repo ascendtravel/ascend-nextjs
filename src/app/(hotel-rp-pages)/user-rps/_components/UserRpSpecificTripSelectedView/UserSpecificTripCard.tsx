@@ -21,12 +21,15 @@ interface UserSpecificTripCardProps {
 export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps) {
     const router = useRouter();
     const [showConfetti, setShowConfetti] = useState(true);
+    const hasSavings = (trip?.payload.potential_savings_cents?.amount ?? 0) > 0;
 
     useEffect(() => {
-        setTimeout(() => {
-            setShowConfetti(false);
-        }, 2000);
-    }, []);
+        if (hasSavings) {
+            setTimeout(() => {
+                setShowConfetti(false);
+            }, 2000);
+        }
+    }, [hasSavings]);
 
     if (!trip) return null;
 
@@ -46,22 +49,23 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                 duration: 0.5,
                 ease: 'easeOut'
             }}>
-            <ReactConfetti
-                className='fixed inset-0 z-50 max-w-md'
-                numberOfPieces={100}
-                recycle={showConfetti}
-                height={400}
-                gravity={0.1}
-                colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
-                tweenDuration={200}
-            />
-            <div className='flex flex-row gap-4 py-4'>
-                <div className='relative h-[84px] w-[140px] overflow-hidden rounded-lg bg-neutral-200'>
+            {hasSavings && (
+                <ReactConfetti
+                    className='fixed inset-0 z-50 max-w-md'
+                    numberOfPieces={100}
+                    recycle={showConfetti}
+                    height={400}
+                    gravity={0.1}
+                    colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
+                    tweenDuration={200}
+                />
+            )}
+            <div className='flex flex-row items-center justify-start gap-4 py-4'>
+                <div className='relative h-[170px] w-[120px] overflow-hidden rounded-lg bg-neutral-200'>
                     <Image
                         src={trip.payload.image_url || ''}
                         alt={`Repricing Card for ${trip.type}`}
-                        width={140}
-                        height={84}
+                        fill
                         className='absolute inset-0 rounded-lg object-cover'
                     />
                     <div className='absolute -bottom-1 left-0 flex size-10 items-center justify-center rounded-full opacity-70 drop-shadow-md'>
@@ -74,8 +78,8 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                 </div>
                 {trip.type === 'hotel' && (
                     <div className='flex flex-col items-start justify-end'>
-                        <div className='text-md'>{(trip.payload as HotelPayload).hotel_name}</div>
-                        <div className='text-xs'>{(trip.payload as HotelPayload).check_in_date}</div>
+                        <div className='text-2xl font-bold'>{(trip.payload as HotelPayload).hotel_name}</div>
+                        <div className='text-md'>{(trip.payload as HotelPayload).check_in_date}</div>
                     </div>
                 )}
                 {trip.type === 'flight' && (
@@ -90,6 +94,7 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                     </div>
                 )}
             </div>
+
             {pastSavings > 0 && (
                 <div className='my-2 text-sm text-gray-500'>
                     We've saved you ${pastSavings} on this {trip.type === 'hotel' ? 'stay' : 'flight'}!
@@ -98,9 +103,12 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
             {potentialSavings > 0 && (
                 <div className='mb-2 text-sm text-gray-500'>We can save you ${potentialSavings} on this stay!</div>
             )}
+
             {potentialSavings > 0 && (
-                <Button className='w-full rounded-full bg-[#1DC167] font-bold text-white' onClick={handleRepriceClick}>
-                    Reprice now to save {getTripSavingsString(trip, true)}
+                <Button
+                    className='mt-4 w-full rounded-full bg-[#1DC167] font-bold text-white'
+                    onClick={handleRepriceClick}>
+                    Reprice and get {getTripSavingsString(trip, true)}
                 </Button>
             )}
         </motion.div>
