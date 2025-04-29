@@ -6,10 +6,6 @@ import { FRAMER_LINKS } from '@/config/navigation';
 import { motion } from 'framer-motion';
 import { DockIcon, InfoIcon, LockIcon } from 'lucide-react';
 
-type RpFooterSectionProps = {
-    email: string;
-};
-
 const Links = [
     {
         title: 'Privacy Policy',
@@ -28,10 +24,10 @@ const Links = [
     }
 ];
 
-export default function RpFooterSection({ email }: RpFooterSectionProps) {
+export default function RpFooterSection() {
     return (
         <motion.div
-            className='mt-6 w-full pb-12'
+            className='mt-6 w-full pb-2'
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -39,26 +35,22 @@ export default function RpFooterSection({ email }: RpFooterSectionProps) {
                 delay: 0.2,
                 ease: 'easeOut'
             }}>
-            <div className='mb-2 pl-4 text-sm font-bold'>More</div>
+            <div className='mb-1 pl-4 text-sm font-bold'>More</div>
             <Separator />
-            <div className='ml-6 flex flex-col items-center justify-center gap-2 py-2'>
-                {Links.map((link) => (
+            <div className='ml-6 flex flex-col items-center justify-center gap-2 pt-2'>
+                {Links.map((link, index) => (
                     <React.Fragment key={link.title}>
                         <a
                             href={link.href}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='flex w-full flex-row items-start justify-start gap-2 py-2 text-xs'>
+                            className='flex w-full flex-row items-start justify-start gap-2 py-1 text-xs'>
                             <link.Icon className='h-4 w-4' />
                             <div className='font-bold'>{link.title}</div>
                         </a>
-                        <Separator />
+                        {index !== Links.length - 1 && <Separator />}
                     </React.Fragment>
                 ))}
-            </div>
-            <div className='mt-3 ml-4 flex flex-col items-start justify-center text-xs'>
-                Your Unique email for forwarding missing trips is:
-                <div className='font-bold underline'>{email}</div>
             </div>
         </motion.div>
     );

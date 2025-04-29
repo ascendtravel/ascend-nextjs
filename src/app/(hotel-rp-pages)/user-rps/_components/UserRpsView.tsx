@@ -51,6 +51,15 @@ export default function UserRpsView() {
     }
 
     const handleTripClick = (trip: Booking) => {
+        setTimeout(() => {
+            // Target the main content wrapper with overflow-scroll
+            const mainContent = document.querySelector('#rp-main-content');
+            if (mainContent) {
+                mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            setShowSpecificTrip(true);
+        }, 1000);
+
         setSelectedTrip(trip);
         if (trip.type === 'flight') {
             const segment = {
@@ -114,7 +123,7 @@ export default function UserRpsView() {
                             <React.Fragment key={year}>
                                 <div
                                     onClick={() => setSelectedYear(year)}
-                                    className={`flex w-full cursor-pointer px-4 py-2 ${
+                                    className={`flex w-fit cursor-pointer justify-center px-4 py-2 ${
                                         selectedYear === year
                                             ? 'rounded-full bg-[#1DC167] text-neutral-50'
                                             : 'font-semibold'
@@ -191,8 +200,8 @@ export default function UserRpsView() {
                     />
                 )}
 
-                <div className='relative mt-8 h-full w-full bg-neutral-50'>
-                    <RpFooterSection email='help@ascend.travel.com' />
+                <div className='relative mt-2 h-full w-full bg-neutral-50'>
+                    <RpFooterSection />
                 </div>
             </div>
         </div>
