@@ -28,7 +28,7 @@ export default function UserRpSpecificTripSelectedView({ trip, handleBackClick }
 
     return (
         <div className='-mt-2 flex flex-col items-center justify-start px-2'>
-            <BackGreenButton onClick={handleBackClick} className='w-full px-4 py-0' />
+            <BackGreenButton onClick={handleBackClick} className='w-full px-4 py-0' preventNavigation={true} />
             <UserSpecificTripCard trip={trip} />
             {/* <div className='w-full pl-4 text-left text-sm uppercase'>Upcoming Trips ({upcomingTrips.length})</div>
             {upcomingTrips.map((trip) => (

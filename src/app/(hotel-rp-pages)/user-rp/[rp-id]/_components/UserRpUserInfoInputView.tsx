@@ -158,7 +158,7 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
                     onClick={() => {
                         router.push('/user-rps/');
                     }}
-                    backUrl='/user-rps/'
+                    preventNavigation={true}
                 />
                 <div className='text-xl font-bold'>How to get {getTripSavingsString(trip, true)} back:</div>
                 <div className='mb-6 text-sm'>First, confirm your traveler information to continue:</div>

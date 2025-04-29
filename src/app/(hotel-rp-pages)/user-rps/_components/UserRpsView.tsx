@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { TRIP_YEARS, useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
@@ -22,7 +24,7 @@ export default function UserRpsView() {
     const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
-
+    const router = useRouter();
     // Map Data and Types
     const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
     const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
@@ -66,7 +68,7 @@ export default function UserRpsView() {
                     id: trip.id.toString(),
                     lat: (trip.payload as HotelPayload).lat,
                     lon: (trip.payload as HotelPayload).long,
-                    price: getCurrencyAndAmountText((trip.payload as HotelPayload).price_per_night_cents)
+                    price: getCurrencyAndAmountText((trip.payload as HotelPayload).total_price_cents)
                 }
             ]);
             // Clear segments when clicking a hotel
@@ -125,15 +127,12 @@ export default function UserRpsView() {
                 )}
             </AnimatePresence>
             <div className='relative -mt-2 w-full rounded-t-xl bg-neutral-50'>
-                {/* No trip on past years */}
-                {filteredTrips.length === 0 && selectedYear !== 'Repricings' && (
-                    <UserRpNoTripsCard totalSavings='more than $500' />
-                )}
-
-                {/* No upcoming trip */}
-                {filteredTrips.length === 0 && selectedYear === 'Repricings' && (
+                {/* Update no trips messaging */}
+                {filteredTrips.length === 0 && selectedYear === 'Upcoming' && (
                     <UserRpNoUpcomingTripsFound totalSavings='more than $500' />
                 )}
+
+                {filteredTrips.length === 0 && selectedYear !== 'Upcoming' && <UserRpNoTripsCard />}
 
                 <div className='grid w-full grid-cols-2 gap-2 pt-8'>
                     {!showSpecificTrip ? (

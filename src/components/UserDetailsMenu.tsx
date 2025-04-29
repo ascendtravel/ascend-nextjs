@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useUser } from '@/contexts/UserContext';
 
+import { format, parseISO } from 'date-fns';
 import { PencilIcon, X } from 'lucide-react';
 
 export default function UserDetailsMenu() {
@@ -46,7 +47,7 @@ export default function UserDetailsMenu() {
                 className='w-full bg-white p-0 sm:max-w-md'
                 showClose={false}
                 ariaLabel='User Profile'>
-                <div className='flex items-center justify-between bg-[#006DBC] p-6 text-white'>
+                <div className='flex items-center justify-between bg-[#006DBC] p-6'>
                     <div className='flex items-center gap-4'>
                         <UserAvatar variant='md' showName={false} darkMode={true} />
                         <div className='text-lg font-medium text-white'>
@@ -146,12 +147,21 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
             {/* User Info */}
             {userFields.map(({ key, label }) => (
                 <MenuItem key={key} className='cursor-default px-2 py-1 opacity-50'>
-                    <div className='flex w-full justify-between gap-2'>
-                        <span className='text-xs font-medium'>{label}:</span>
-                        <span className='truncate text-xs'>
-                            {String(user?.[key as keyof typeof user] || 'Not provided')}
-                        </span>
-                    </div>
+                    {key === 'date_of_birth' ? (
+                        <div className='flex w-full justify-between gap-2'>
+                            <span className='text-xs font-medium'>{label}:</span>
+                            <span className='truncate text-xs'>
+                                {getNiceFormattedDate(user?.[key as keyof typeof user] as string)}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className='flex w-full justify-between gap-2'>
+                            <span className='text-xs font-medium'>{label}:</span>
+                            <span className='truncate text-xs'>
+                                {String(user?.[key as keyof typeof user] || 'Not provided')}
+                            </span>
+                        </div>
+                    )}
                 </MenuItem>
             ))}
 
@@ -204,4 +214,8 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
             </MenuItem>
         </div>
     );
+}
+
+function getNiceFormattedDate(date: string) {
+    return format(parseISO(date), 'MMM d, yyyy');
 }
