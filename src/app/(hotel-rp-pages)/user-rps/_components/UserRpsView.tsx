@@ -102,9 +102,9 @@ export default function UserRpsView() {
     }, [selectedTrip]);
 
     return (
-        <div className='mt-2 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
+        <div className='mt-2 h-full w-full rounded-t-xl bg-neutral-50 transition-all duration-300'>
             {/* <UserRpsView /> */}
-            <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl'>
+            <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
                 {/* {JSON.stringify(flightSegments)} */}
                 <RpMap hotels={hotelsMapDetails} flightSegments={flightSegments} showResetBtn={false} />
             </div>
@@ -143,7 +143,7 @@ export default function UserRpsView() {
 
                 {filteredTrips.length === 0 && selectedYear !== 'Upcoming' && <UserRpNoTripsCard />}
 
-                <div className='grid w-full grid-cols-2 gap-2 pt-8'>
+                <div className='grid w-full grid-cols-2 gap-2 pt-8 md:gap-8'>
                     {!showSpecificTrip ? (
                         <AnimatePresence>
                             {filteredTrips.map((trip, index) => (
