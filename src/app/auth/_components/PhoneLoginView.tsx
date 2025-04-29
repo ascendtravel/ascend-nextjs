@@ -59,7 +59,7 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
     const [cooldown, setCooldown] = useState(0);
     const [impersonateId, setImpersonateId] = useState('');
 
-    const { startImpersonating, login, stopImpersonating, logout } = useUser();
+    const { login, stopImpersonating, logout } = useUser();
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -159,10 +159,10 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
             }
 
             if (data.success) {
-                login(data.token, data.customer_id);
-
                 if (impersonateId) {
-                    startImpersonating(impersonateId);
+                    login(data.token, data.customer_id, impersonateId);
+                } else {
+                    login(data.token, data.customer_id);
                 }
 
                 toast.success('Login successful');

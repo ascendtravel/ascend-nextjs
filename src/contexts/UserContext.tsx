@@ -19,7 +19,7 @@ interface UserContextType {
     user: UserProfile | null;
     isLoading: boolean;
     error: string | null;
-    login: (token: string, customer_id: string) => void;
+    login: (token: string, customer_id: string, impersonateUserId?: string) => void;
     logout: () => void;
     getToken: () => string | null;
     isImpersonating: () => boolean;
@@ -147,12 +147,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const login = (token: string, customer_id: string) => {
+    const login = (token: string, customer_id: string, impersonateUserId?: string) => {
         localStorage.setItem('authToken', token);
-        localStorage.setItem('customerId', customer_id);
-
         // add it to cokies also, make it secure with secure: true
         document.cookie = `authToken=${token}; path=/; secure; samesite=strict;`;
+
+        localStorage.setItem('customerId', customer_id);
+
+        if (impersonateUserId) {
+            startImpersonating(impersonateUserId);
+        }
 
         fetchUser(token);
     };
@@ -166,6 +170,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
         // clear impersonations cookies
         document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
+
+        stopImpersonating();
 
         setUser(null);
     };
