@@ -93,7 +93,7 @@ export default function UserRpsView() {
     }, [selectedTrip]);
 
     return (
-        <div className='mt-8 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
+        <div className='mt-2 h-full w-full max-w-md rounded-t-xl bg-neutral-50 transition-all duration-300'>
             {/* <UserRpsView /> */}
             <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl'>
                 {/* {JSON.stringify(flightSegments)} */}

@@ -43,9 +43,9 @@ export default function UserAvatar({ variant = 'md', showName = false, className
 
         // Use first letter of email name if available
         if (user?.main_email) {
-            const emailName = user.main_email.split('@')[0];
+            const emailName = user.main_email?.split('@')[0];
 
-            return emailName[0].toUpperCase();
+            return emailName?.[0]?.toUpperCase() || 'U';
         }
 
         return 'U';
@@ -58,7 +58,7 @@ export default function UserAvatar({ variant = 'md', showName = false, className
         }
 
         if (user?.main_email) {
-            const emailName = user.main_email.split('@')[0];
+            const emailName = user.main_email?.split('@')[0];
 
             return `${emailName}`;
         }

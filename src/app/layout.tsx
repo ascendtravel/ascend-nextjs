@@ -47,12 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html
             lang='en'
-            className={cn(
-                geistSans.variable,
-                geistMono.variable,
-                figtree.variable,
-                'bg-background text-foreground overscroll-none antialiased'
-            )}
+            className={cn(geistSans.variable, geistMono.variable, figtree.variable, 'overscroll-none antialiased')}
             suppressHydrationWarning>
             <head>
                 {/* Standard icons */}
@@ -122,12 +117,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     fetchPriority='high'
                     imageSizes='(max-width: 768px) 100vw, 1920px'
                 />
+
+                {/* PWA essentials */}
+                <meta
+                    name='viewport'
+                    content='width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover'
+                />
+                <meta name='mobile-web-app-capable' content='yes' />
+                <meta name='apple-mobile-web-app-capable' content='yes' />
+                <meta name='apple-mobile-web-app-status-bar-style' content='default' />
+                <meta name='theme-color' content='#006DBC' media='(prefers-color-scheme: light)' />
+                <meta name='theme-color' content='#006DBC' media='(prefers-color-scheme: dark)' />
+                <meta name='apple-mobile-web-app-title' content='Ascend Travel' />
+                <meta name='application-name' content='Ascend Travel' />
+
+                {/* PWA icons */}
+                <link rel='apple-touch-icon' sizes='180x180' href='/icons/apple-touch-icon.png' />
+                <link rel='icon' type='image/png' sizes='32x32' href='/icons/favicon-32x32.png' />
+                <link rel='icon' type='image/png' sizes='16x16' href='/icons/favicon-16x16.png' />
+                <link rel='manifest' href='/manifest.json' />
+
+                {/* Prevent translation popups */}
+                <meta name='google' content='notranslate' />
             </head>
-            <body>
+            <body className='fixed inset-0 flex flex-col overflow-hidden'>
                 <ThemeProvider attribute='class' defaultTheme='light' enableSystem={false} disableTransitionOnChange>
                     <UserProvider>
                         <NavigationBar />
-                        {children}
+                        <main className='relative flex-1 overflow-hidden'>{children}</main>
                         <Toaster />
                         <Analytics />
                         <CookiesBanner />

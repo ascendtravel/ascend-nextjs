@@ -59,7 +59,7 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
     const [cooldown, setCooldown] = useState(0);
     const [impersonateId, setImpersonateId] = useState('');
 
-    const { startImpersonating, login } = useUser();
+    const { startImpersonating, login, stopImpersonating, logout } = useUser();
 
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -97,6 +97,11 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
 
     const onPhoneSubmit = async (data: FormData) => {
         setIsLoading(true);
+
+        // Clear previous impersonation and logout
+        stopImpersonating();
+        logout();
+
         const phone = form.getValues('phone');
         setPhoneNumber(phone);
 
