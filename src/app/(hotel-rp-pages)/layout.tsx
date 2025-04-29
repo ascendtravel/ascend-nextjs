@@ -61,7 +61,7 @@ export default async function HotelRpPagesLayout({ children }: { children: React
 
     return (
         <TripsRpProvider initialTrips={trips || []}>
-            <div className='flex min-h-screen flex-col bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC]'>
+            <div className='h-full bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC]'>
                 {children}
             </div>
         </TripsRpProvider>

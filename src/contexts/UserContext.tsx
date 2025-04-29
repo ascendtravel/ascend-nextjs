@@ -3,16 +3,16 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 export interface UserProfile {
-    main_phone: string;
-    main_email: string;
-    emails: string[];
-    phones: string[];
-    first_name: string | null;
-    last_name: string | null;
-    is_admin: boolean;
-    stats: Record<string, unknown>;
-    citizenship: string;
-    date_of_birth: string;
+    main_phone?: string;
+    main_email?: string;
+    emails?: string[];
+    phones?: string[];
+    first_name?: string | null;
+    last_name?: string | null;
+    is_admin?: boolean;
+    stats?: Record<string, unknown>;
+    citizenship?: string;
+    date_of_birth?: string;
 }
 
 interface UserContextType {

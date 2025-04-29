@@ -1,0 +1,94 @@
+{
+    "name": "Ascend Travel",
+    "short_name": "Ascend",
+    "description": "The travel agent that pays you back",
+    "start_url": "/user-rps",
+    "display": "standalone",
+    "background_color": "#006DBC",
+    "theme_color": "#006DBC",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon-16x16-dark-mode.png",
+            "sizes": "16x16",
+            "type": "image/png",
+            "purpose": "dark"
+        },
+        {
+            "src": "/favicon-32x32-dark-mode.png",
+            "sizes": "32x32",
+            "type": "image/png",
+            "purpose": "dark"
+        }
+    ],
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "View My Trips",
+            "short_name": "Trips",
+            "description": "View your saved trips",
+            "url": "/user-rps",
+            "icons": [
+                {
+                    "src": "/apple-touch-icon.png",
+                    "sizes": "180x180"
+                }
+            ]
+        }
+    ],
+    "categories": [
+        "travel",
+        "finance"
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshots/mobile.png",
+            "sizes": "1170x2532",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Ascend Travel Mobile View"
+        }
+    ],
+    "edge_side_panel": {
+        "preferred_width": 480
+    },
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": [
+            "navigate-existing",
+            "auto"
+        ]
+    },
+    "scope": "/",
+    "id": "ascend-travel-pwa"
+}
