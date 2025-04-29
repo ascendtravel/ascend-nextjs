@@ -5,9 +5,20 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 
 import { useUser } from './UserContext';
+import { isFuture, parseISO } from 'date-fns';
 
-export const TRIP_YEARS = ['All', 'Repricings', 2025, 2024, 2023] as const;
+export const TRIP_YEARS = ['Upcoming', 2025, 2024, 2023] as const;
 export type TripYear = (typeof TRIP_YEARS)[number];
+
+// Add helper for checking upcoming trips
+const isTripUpcoming = (trip: Booking) => {
+    const date =
+        trip.type === 'flight'
+            ? (trip.payload as FlightPayload).departure_date
+            : (trip.payload as HotelPayload).check_in_date;
+
+    return isFuture(parseISO(date));
+};
 
 // Add helper function for sorting
 const getSavingsAmount = (trip: Booking) => trip.payload.potential_savings_cents?.amount ?? 0;
@@ -53,7 +64,7 @@ const TripsRpContext = createContext<TripsRpContextType | undefined>(undefined);
 export function TripsRpProvider({ children, initialTrips }: { children: React.ReactNode; initialTrips?: Booking[] }) {
     const [trips, setTrips] = useState<Booking[]>(initialTrips || []);
     const [filteredTrips, setFilteredTrips] = useState<Booking[]>(initialTrips || []);
-    const [selectedYear, setSelectedYear] = useState<TripYear>('All');
+    const [selectedYear, setSelectedYear] = useState<TripYear>('Upcoming');
     const [isLoading, setIsLoading] = useState(!initialTrips);
     const [error, setError] = useState<string | null>(null);
     const { getToken, getImpersonateUserId } = useUser();
@@ -62,9 +73,9 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     useEffect(() => {
         let filtered = [...trips];
 
-        if (selectedYear === 'Repricings') {
-            filtered = filtered.filter((trip) => getSavingsAmount(trip) > 0);
-        } else if (selectedYear !== 'All') {
+        if (selectedYear === 'Upcoming') {
+            filtered = filtered.filter(isTripUpcoming);
+        } else {
             filtered = filtered.filter((trip) => {
                 const tripDate = getDate(trip);
 

@@ -9,37 +9,39 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft } from 'lucide-react';
 
 interface BackGreenButtonProps {
-    backUrl?: string;
     onClick?: () => void;
     className?: string;
+    preventNavigation?: boolean;
 }
 
-export default function BackGreenButton({ backUrl, onClick, className = '' }: BackGreenButtonProps) {
+export default function BackGreenButton({ onClick, className = '', preventNavigation = false }: BackGreenButtonProps) {
     const router = useRouter();
 
     useEffect(() => {
-        // Only add listener if backUrl is provided
-        if (!backUrl) return;
+        if (!preventNavigation) return;
 
         const handlePopState = (event: PopStateEvent) => {
-            // Prevent default back behavior
-            event.preventDefault();
-            // Navigate to specified URL
-            router.push(backUrl);
+            // Prevent the navigation
+            window.history.pushState(null, '', window.location.href);
+
+            // Execute onClick if provided
+            if (onClick) {
+                onClick();
+            }
         };
 
+        // Add an initial state so back button works
+        window.history.pushState(null, '', window.location.href);
         window.addEventListener('popstate', handlePopState);
 
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
-    }, [backUrl, router]);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [onClick, preventNavigation]);
 
     const handleClick = () => {
-        if (backUrl) {
-            router.push(backUrl);
-        } else if (onClick) {
+        if (onClick) {
             onClick();
+        } else {
+            router.back();
         }
     };
 

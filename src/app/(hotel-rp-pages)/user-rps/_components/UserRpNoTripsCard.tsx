@@ -1,4 +1,4 @@
-export default function UserRpNoTripsCard({ totalSavings = 'more than $500' }: { totalSavings?: string }) {
+export default function UserRpNoTripsCard() {
     return (
         <div className='flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-gray-200 p-4'>
             <div className='mb-2 flex items-center justify-center'>
