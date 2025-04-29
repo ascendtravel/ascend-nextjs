@@ -156,7 +156,7 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                     <Button
                         className='mt-4 w-full rounded-full bg-[#1DC167] font-bold text-white'
                         onClick={handleRepriceClick}>
-                        Reprice and get {getTripSavingsString(trip, true)}
+                        Reprice and get {getCurrencyAndAmountText(trip.payload.potential_savings_cents)}
                     </Button>
                 </>
             )}
