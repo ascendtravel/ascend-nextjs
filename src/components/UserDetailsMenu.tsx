@@ -151,7 +151,7 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
                         <div className='flex w-full justify-between gap-2'>
                             <span className='text-xs font-medium'>{label}:</span>
                             <span className='truncate text-xs'>
-                                {getNiceFormattedDate(user?.[key as keyof typeof user] as string)}
+                                {getNiceFormattedDate(user?.[key as keyof typeof user] as string | undefined)}
                             </span>
                         </div>
                     ) : (
@@ -216,6 +216,12 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
     );
 }
 
-function getNiceFormattedDate(date: string) {
-    return format(parseISO(date), 'MMM d, yyyy');
+function getNiceFormattedDate(date: string | null | undefined) {
+    if (!date) return 'Not provided';
+
+    try {
+        return format(parseISO(date), 'MMM d, yyyy');
+    } catch (error) {
+        return 'Not provided';
+    }
 }

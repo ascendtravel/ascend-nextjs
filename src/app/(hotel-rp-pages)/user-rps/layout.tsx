@@ -5,9 +5,9 @@ import UserDetailsMenu from '@/components/UserDetailsMenu';
 import { useUser } from '@/contexts/UserContext';
 
 export default function UserRpsLayout({ children }: { children: React.ReactNode }) {
-    const { isLoading } = useUser();
+    const { isLoading, user } = useUser();
 
-    if (isLoading) {
+    if (isLoading || !user) {
         return (
             <div className='flex h-full flex-col'>
                 <div className='flex h-full w-full items-center justify-center'>

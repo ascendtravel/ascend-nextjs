@@ -42,16 +42,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Check for existing auth on mount
+    // Improved initial load handling
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        const customer_id = localStorage.getItem('customerId');
+        const initializeUser = async () => {
+            setIsLoading(true);
+            const token = localStorage.getItem('authToken');
+            const impersonateUserId = localStorage.getItem('impersonateUserId');
 
-        if (token) {
-            fetchUser(token);
-        } else {
-            setIsLoading(false);
-        }
+            if (!token) {
+                setIsLoading(false);
+
+                return;
+            }
+
+            try {
+                // First load Impersonated User
+                if (impersonateUserId) {
+                    await fetchUser(token, true);
+                } else {
+                    // Then load Regular User
+                    await fetchUser(token);
+                }
+            } catch (err) {
+                console.error('[UserContext] Error in initialization:', err);
+                setError(err instanceof Error ? err.message : 'An error occurred');
+                // Clear auth on error
+                logout();
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        initializeUser();
     }, []);
 
     /*
@@ -89,20 +111,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         fetchUser(getToken() || '');
     };
 
-    const fetchUser = async (token: string) => {
+    // Modified fetchUser to handle impersonation more explicitly
+    const fetchUser = async (token: string, isImpersonationLoad = false) => {
         try {
             const impersonateUserId = localStorage.getItem('impersonateUserId');
-
             const url = new URL('/api/user/me', window.location.origin);
 
-            console.log('\n\nFetching user from /me', {
-                token,
-                impersonateUserId
-            });
-
-            if (impersonateUserId) {
+            if (isImpersonationLoad && impersonateUserId) {
                 url.searchParams.set('impersonationId', impersonateUserId);
             }
+
+            console.log('[UserContext] Fetching user', {
+                token,
+                impersonateUserId,
+                isImpersonationLoad
+            });
 
             const response = await fetch(url.toString(), {
                 headers: {
@@ -115,15 +138,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             }
 
             const data = (await response.json()) as UserProfile;
+            setUser(data);
 
-            setUser(data); // Now storing the complete user profile
+            return data;
         } catch (err) {
             console.error('[UserContext] Error fetching user:', err);
-            setError(err instanceof Error ? err.message : 'An error occurred');
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('customerId');
-        } finally {
-            setIsLoading(false);
+            throw err; // Re-throw to handle in the caller
         }
     };
 
