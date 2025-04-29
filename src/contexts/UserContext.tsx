@@ -158,7 +158,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             startImpersonating(impersonateUserId);
         }
 
-        fetchUser(token);
+        fetchUser(token, impersonateUserId ? true : false);
     };
 
     const logout = () => {
