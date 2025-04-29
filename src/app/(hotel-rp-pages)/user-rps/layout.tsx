@@ -7,7 +7,7 @@ import { useUser } from '@/contexts/UserContext';
 export default function UserRpsLayout({ children }: { children: React.ReactNode }) {
     const { isLoading, user } = useUser();
 
-    if (isLoading || !user) {
+    if (isLoading) {
         return (
             <div className='flex h-full flex-col'>
                 <div className='flex h-full w-full items-center justify-center'>
@@ -29,7 +29,9 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
                     <div className='flex max-w-[90px] flex-row items-center justify-center'>
                         <IconNewWhite />
                     </div>
-                    <UserDetailsMenu />
+
+                    {user && <UserDetailsMenu />}
+                    {!user && <div>Loading...</div>}
                 </div>
             </header>
 

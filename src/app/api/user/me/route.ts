@@ -18,6 +18,12 @@ export async function GET(request: NextRequest) {
         const token = request.headers.get('Authorization')?.split(' ')[1];
         const impersonationId = request.nextUrl.searchParams.get('impersonationId');
 
+        console.log('Is Impersonation Call', impersonationId ? 'Yes' : 'No');
+        console.log('[/api/user/me] Request:', {
+            token,
+            impersonationId
+        });
+
         const response = await UserRelatedFetch(
             '/me',
             {
