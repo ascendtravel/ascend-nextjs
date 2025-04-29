@@ -1,11 +1,6 @@
 // Injected content via Sentry wizard below
 const { withSentryConfig } = require('@sentry/nextjs');
-
-const withPWA = require('next-pwa')({
-    dest: 'public',
-    register: true,
-    skipWaiting: true
-});
+const withPWA = require('next-pwa');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -30,8 +25,8 @@ requiredEnvs.forEach((env) => {
     }
 });
 
-// Apply PWA configuration with your specific backend URLs
-const withPWAConfig = withPWA({
+// PWA Configuration
+const pwaConfig = {
     dest: 'public',
     register: true,
     skipWaiting: true,
@@ -160,19 +155,20 @@ const withPWAConfig = withPWA({
             }
         }
     ]
-});
+};
 
-// Apply both PWA and Sentry configurations
-export default withPWAConfig(
-    withSentryConfig(nextConfig, {
-        org: 'ascend-rq',
-        project: 'ascend-nextjs',
-        silent: !process.env.CI,
-        widenClientFileUpload: true,
-        reactComponentAnnotation: {
-            enabled: true
-        },
-        disableLogger: true,
-        automaticVercelMonitors: true
-    })
-);
+// Apply configurations
+const withPWAConfig = withPWA(pwaConfig);
+
+// Export the final config
+module.exports = withSentryConfig(withPWAConfig(nextConfig), {
+    org: 'ascend-rq',
+    project: 'ascend-nextjs',
+    silent: !process.env.CI,
+    widenClientFileUpload: true,
+    reactComponentAnnotation: {
+        enabled: true
+    },
+    disableLogger: true,
+    automaticVercelMonitors: true
+});
