@@ -79,7 +79,7 @@ export default function RpGridCardWrapper({
             {/* bottom up shadow to top */}
             <div className='absolute top-0 right-0 bottom-0 left-0 bg-gradient-to-t from-black from-0% via-black/60 via-25% to-transparent to-100%' />
             {getPotentialSavings(trip) ? (
-                <div className='absolute inset-x-0 -top-1 flex h-8 flex-row bg-[#1DC167]'>
+                <div className='absolute inset-x-0 flex h-8 flex-row bg-[#1DC167]'>
                     <div className='flex w-full items-center justify-center text-xs font-semibold text-white'>
                         Tap to save{' '}
                         {getCurrencyAndAmountText(

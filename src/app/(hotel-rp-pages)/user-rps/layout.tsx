@@ -22,7 +22,7 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
     }
 
     return (
-        <div className='flex h-full flex-col'>
+        <div className='flex h-full flex-col items-center justify-center'>
             {/* Fixed header with backdrop blur */}
             <header className='fixed top-0 right-0 left-0 z-50 bg-[#006DBC]/80 backdrop-blur-sm'>
                 <div className='flex w-full flex-row items-center justify-between px-6 py-4'>
@@ -38,9 +38,9 @@ export default function UserRpsLayout({ children }: { children: React.ReactNode 
             {/* Scrollable content area */}
             <div
                 id='rp-main-content'
-                className='flex-1 overflow-y-auto overscroll-none'
+                className='flex w-full max-w-lg flex-1 flex-col items-center justify-center overflow-y-auto overscroll-none'
                 style={{
-                    paddingTop: '72px',
+                    paddingTop: '90px',
                     WebkitOverflowScrolling: 'touch'
                 }}>
                 {children}
