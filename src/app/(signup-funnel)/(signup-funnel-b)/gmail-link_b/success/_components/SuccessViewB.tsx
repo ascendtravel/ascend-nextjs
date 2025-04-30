@@ -85,7 +85,8 @@ export function SuccessViewB() {
                 position: 'bottom-center'
             });
 
-            router.push('/user-rps');
+            // router.push('/user-rps'); // TODO: Uncomment this when we have the new member page
+            router.push('/new-member');
         } catch (error) {
             console.error('Form submission error:', error);
             toast.error(error instanceof Error ? error.message : 'Something went wrong', {
