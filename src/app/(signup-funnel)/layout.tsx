@@ -29,5 +29,5 @@ const figtree = Figtree({
 // This layout is in a route group which tells Next.js to use this layout
 // instead of the root layout for all routes within the (signup-funnel) group
 export default function SignupLayout({ children }: { children: React.ReactNode }) {
-    return <div className='min-h-screen'>{children}</div>;
+    return <div className='flex h-full min-h-screen flex-col'>{children}</div>;
 }

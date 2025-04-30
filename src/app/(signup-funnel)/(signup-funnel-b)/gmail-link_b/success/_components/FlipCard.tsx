@@ -84,8 +84,7 @@ export function FlipCard({ onSubmit, frontContent }: FlipCardProps) {
                             backfaceVisibility: 'hidden',
                             transformStyle: 'preserve-3d'
                         }}
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => setIsFlipped(true)}>
+                        whileHover={{ scale: 1.02 }}>
                         {frontContent}
                     </motion.div>
                 ) : (

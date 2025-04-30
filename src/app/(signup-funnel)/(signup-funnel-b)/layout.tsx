@@ -7,12 +7,14 @@ export default function SignupFunnelBLayout({ children }: { children: React.Reac
             <div className='flex flex-row items-center justify-center gap-2 bg-[#00345A]'>
                 <YcombBanner />
             </div>
-            <div className='flex flex-row items-center justify-center gap-2 py-6'>
-                <IconNewWhite className='h-12 w-auto' />
-            </div>
 
             {/* Content */}
-            {children}
+            <div className='flex flex-1 flex-col items-center overflow-y-auto'>
+                <div className='flex flex-row items-center justify-center gap-2 py-6'>
+                    <IconNewWhite className='h-12 w-auto' />
+                </div>
+                {children}
+            </div>
         </div>
     );
 }
