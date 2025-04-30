@@ -70,7 +70,7 @@ function GmailLinkB() {
     }, [searchParams]);
 
     return (
-        <div className='flex h-screen flex-col'>
+        <div className='flex h-full w-full flex-col overflow-y-auto'>
             <p className='text-md w-full px-4 pb-1 text-center font-semibold text-white'>Step 1 of 2</p>
             <div className='mb-4 flex flex-col items-center justify-center gap-4 px-2'>
                 <p className='font-figtree max-w-md px-6 text-center text-[24px] leading-[28px] font-extrabold tracking-[-0.02em] text-white'>

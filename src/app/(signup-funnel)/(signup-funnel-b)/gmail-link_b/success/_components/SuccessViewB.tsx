@@ -85,8 +85,8 @@ export function SuccessViewB() {
                 position: 'bottom-center'
             });
 
-            // router.push('/user-rps'); // TODO: Uncomment this when we have the new member page
-            router.push('/new-member');
+            router.push(`/auth/phone-register?state_id=${stateId}`);
+            // router.push('/new-member'); // TODO: Remove this when we Finish testing
         } catch (error) {
             console.error('Form submission error:', error);
             toast.error(error instanceof Error ? error.message : 'Something went wrong', {
@@ -166,7 +166,11 @@ export function SuccessViewB() {
                                 </p>
                                 <div className='flex items-start justify-start gap-1 text-2xl font-bold'>Free</div>
                                 <div className='hidden h-5 w-full md:block' />
-                                <button className='w-full rounded-full border border-neutral-900 bg-white py-2.5 font-semibold text-neutral-900 transition-all'>
+                                <button
+                                    className='w-full rounded-full border border-neutral-900 bg-white py-2.5 font-semibold text-neutral-900 transition-all'
+                                    onClick={() => {
+                                        router.push(`/auth/phone-register?state_id=${stateId}`);
+                                    }}>
                                     I'll Call The Airline Myself
                                 </button>
                             </div>

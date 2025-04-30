@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { phone_number, otp_code } = body;
+        const { phone_number, otp_code, state_id } = body;
 
         if (!phone_number) {
             return NextResponse.json({ error: 'Missing phone_number' }, { status: 400 });
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         console.log('Validating OTP for phone number:', phone_number);
         console.log('OTP code:', otp_code);
 
-        const baseUrl = process.env.DECISION_ENGINE_BASE_URL || 'https://decision-engine.onrender.com';
+        const baseUrl = process.env.WEBAPP_BFF_URL || 'https://webapp-bff.onrender';
         const response = await fetch(`${baseUrl}/verify-otp`, {
             method: 'POST',
             headers: {
@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
             },
             body: JSON.stringify({
                 phone_number: `+${phone_number}`,
-                token: otp_code
+                token: otp_code,
+                ...(state_id ? { state_id } : {})
             })
         });
 
