@@ -53,8 +53,8 @@ export default function UserAvatar({ variant = 'md', showName = false, className
 
     // Get display name
     const getDisplayName = () => {
-        if (user?.first_name || user?.last_name) {
-            return [user.first_name, user.last_name].filter(Boolean).join(' ');
+        if (user?.first_name) {
+            return user.first_name;
         }
 
         if (user?.main_email) {

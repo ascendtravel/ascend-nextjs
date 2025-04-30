@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
 import { useUser } from '@/contexts/UserContext';
@@ -18,56 +19,43 @@ interface UserRpHotelConfirmationSectionProps {
 export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConfirmationSectionProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const hotelPayload = trip.payload as HotelPayload;
-    const { user } = useUser();
+    const { getToken, getImpersonateUserId } = useUser();
+    const router = useRouter();
 
     async function handleConfirmBooking() {
         setIsSubmitting(true);
 
-        const redirectUrl = `${window.location.origin}/rp-success/${trip.import_session_id}`;
-
         try {
-            console.log('submitting approval info', {
-                repricing_session_id: trip.payload.repricing_session_id,
-                first_name: user?.first_name || '',
-                last_name: user?.last_name || '',
-                birthday: user?.date_of_birth || '',
-                citizenship: user?.citizenship || '',
-                redirect_url: redirectUrl.toString()
-            });
+            const impersonateUserId = getImpersonateUserId();
+            const url = new URL('/api/hotel-rp/approved', window.location.origin);
 
-            const response = await fetch('/api/hotel-rp/submit-approval-info', {
+            if (impersonateUserId) {
+                url.searchParams.set('impersonationId', impersonateUserId);
+            }
+
+            const approveResponse = await fetch(url.toString(), {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`
                 },
                 body: JSON.stringify({
-                    repricing_session_id: trip.payload.repricing_session_id,
-                    first_name: user?.first_name || '',
-                    last_name: user?.last_name || '',
-                    birthday: user?.date_of_birth || '',
-                    citizenship: user?.citizenship || '',
-                    redirect_url: redirectUrl.toString()
+                    repricing_session_id: trip.payload.repricing_session_id
                 })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to confirm booking');
+            if (!approveResponse.ok) {
+                const errorData = await approveResponse.json();
+                throw new Error(errorData.error || 'Failed to approve booking');
             }
 
-            const responseData = await response.json();
+            toast.success('Booking approved!');
 
-            if (!responseData.stripe_link_url) {
-                throw new Error('No payment link received');
-            }
-
-            toast.success('Booking confirmed!');
-
-            // Redirect to Stripe
-            window.location.href = responseData.stripe_link_url;
+            // Navigate to payment view or next step
+            router.push(`/rp-success/${trip.id}`);
         } catch (error) {
-            console.error('Error confirming booking:', error);
-            toast.error(error instanceof Error ? error.message : 'Failed to confirm booking');
+            console.error('Error approving booking:', error);
+            toast.error(error instanceof Error ? error.message : 'Failed to approve booking');
         } finally {
             setIsSubmitting(false);
         }
@@ -93,6 +81,7 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                 nightlyPrice={
                     hotelPayload.price_per_night_cents.amount ? hotelPayload.price_per_night_cents.amount / 100 : 0
                 }
+                nightlyPriceCurrency={hotelPayload.price_per_night_cents.currency || 'USD'}
                 localTaxesAndFees={getCurrencyAndAmountText(hotelPayload.local_tax_and_fees_cents)}
                 totalPrice={getCurrencyAndAmountText(hotelPayload.total_price_cents)}
                 // These fields aren't in the new API, so using defaults or removing
@@ -120,7 +109,7 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                     onClick={() => {
                         if (!isSubmitting) handleConfirmBooking();
                     }}>
-                    {isSubmitting ? 'Processing...' : 'My booking details are correct'}
+                    {isSubmitting ? 'Processing...' : 'Rebook Me'}
                 </div>
                 <div className='mt-4 mb-8 flex flex-row items-center justify-center gap-2 text-xs text-neutral-700'>
                     Need Help?{' '}
