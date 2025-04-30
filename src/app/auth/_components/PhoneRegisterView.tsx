@@ -161,16 +161,14 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
             }
 
             if (data.success) {
-                console.log('TOKEN', data.token);
-                console.log('CUSTOMER ID', data.customer_id);
                 login(data.token, data.customer_id);
 
                 toast.success('Login successful');
-                // if (redirectUrl) {
-                //     router.push(redirectUrl);
-                // } else {
-                //     router.push('/user-rps');
-                // }
+                if (redirectUrl) {
+                    router.push(redirectUrl);
+                } else {
+                    router.push('/user-rps');
+                }
             } else {
                 throw new Error(data.message || 'Verification failed');
             }
