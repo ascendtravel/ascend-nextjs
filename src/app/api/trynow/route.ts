@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'X-API-KEY': '2835f35c8f0ea281lbaaebac8b5385d0358b58096a82bc05b0188eac7333e9ce',
+                'X-API-KEY': process.env.PICKS_BACKEND_API_KEY!,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(payload)
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
         const responseText = await response.text();
         console.log('Response status:', response.status);
         console.log('Response text:', responseText);
+        console.log('Response:', response);
 
         // Handle non-JSON responses
         if (response.status === 200) {
