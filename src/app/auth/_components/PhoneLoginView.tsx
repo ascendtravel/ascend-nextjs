@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -191,6 +192,9 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
 
                 'w-full max-w-[400px] transition-all duration-500'
             )}>
+            <div className='relative top-2 left-1/2 -mt-36 flex max-w-[250px] -translate-x-1/2 items-center gap-2 pb-18'>
+                <IconNewWhite />
+            </div>
             <AnimatePresence>
                 {!isFlipped ? (
                     <motion.div
