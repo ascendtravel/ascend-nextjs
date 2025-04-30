@@ -85,7 +85,7 @@ export function SuccessViewB() {
                 position: 'bottom-center'
             });
 
-            router.push('/new-member');
+            router.push('/user-rps');
         } catch (error) {
             console.error('Form submission error:', error);
             toast.error(error instanceof Error ? error.message : 'Something went wrong', {
