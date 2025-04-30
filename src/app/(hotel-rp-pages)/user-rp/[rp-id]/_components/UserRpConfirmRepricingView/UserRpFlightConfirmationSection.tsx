@@ -152,7 +152,7 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
                     onClick={() => {
                         if (!isSubmitting) handleConfirmBooking();
                     }}>
-                    {isSubmitting ? 'Processing...' : 'My booking details are correct'}
+                    {isSubmitting ? 'Processing...' : 'Rebook Me'}
                 </div>
                 <div className='mt-4 mb-8 flex flex-row items-center justify-center gap-2 text-xs text-neutral-700'>
                     Need Help?{' '}

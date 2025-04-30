@@ -1,3 +1,7 @@
+import { getCurrencyAndAmountText } from '@/lib/money';
+
+import { format } from 'date-fns';
+
 interface UserRpHotelDetailsListProps {
     totalGuests?: number;
     guests?: {
@@ -13,6 +17,7 @@ interface UserRpHotelDetailsListProps {
     checkInDate?: string;
     checkOutDate?: string;
     nightlyPrice?: number;
+    nightlyPriceCurrency?: string;
     localTaxesAndFees?: string;
     totalPrice?: string;
     nights?: number;
@@ -27,7 +32,8 @@ export default function UserRpHotelDetailsList({
     nightlyPrice,
     localTaxesAndFees,
     totalPrice,
-    nights
+    nights,
+    nightlyPriceCurrency
 }: UserRpHotelDetailsListProps) {
     function calcTotalPriceForAllNights() {
         if (!nightlyPrice || !nights) return 0;
@@ -77,13 +83,13 @@ export default function UserRpHotelDetailsList({
             {checkInDate && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Check in</div>
-                    <div className='text-right text-sm'>{checkInDate}</div>
+                    <div className='text-right text-sm'>{format(new Date(checkInDate), 'd MMMM yyyy')}</div>
                 </div>
             )}
             {checkOutDate && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Check out</div>
-                    <div className='text-right text-sm'>{checkOutDate}</div>
+                    <div className='text-right text-sm'>{format(new Date(checkOutDate), 'd MMMM yyyy')}</div>
                 </div>
             )}
             {nightlyPrice && (
@@ -91,7 +97,10 @@ export default function UserRpHotelDetailsList({
                     <div className='text-left text-sm font-medium'>
                         Price for {nights} {nights === 1 ? 'Night' : 'Nights'}
                     </div>
-                    <div className='text-right text-sm'>{calcTotalPriceForAllNights()}</div>
+                    <div className='text-right text-sm'>{`${getCurrencyAndAmountText({
+                        amount: calcTotalPriceForAllNights(),
+                        currency: nightlyPriceCurrency || 'USD'
+                    })}`}</div>
                 </div>
             )}
             {localTaxesAndFees && (
