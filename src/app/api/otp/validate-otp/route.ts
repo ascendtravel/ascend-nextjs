@@ -31,8 +31,19 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Error validating OTP:', errorData);
+            console.error('Error validating OTP:', data);
+
+            // Handle specific error cases
+            if (data.error === 'No customer ID found') {
+                return NextResponse.json(
+                    {
+                        error: 'No customer ID found',
+                        success: false,
+                        shouldRedirectToGmail: true
+                    },
+                    { status: 404 }
+                );
+            }
 
             // Return specific error for invalid OTP
             if (response.status === 401) {
