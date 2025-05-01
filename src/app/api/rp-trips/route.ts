@@ -101,6 +101,9 @@ export async function GET(request: NextRequest) {
     try {
         const token = request.headers.get('Authorization')?.split(' ')[1];
         const impersonationId = request.nextUrl.searchParams.get('impersonationId');
+        const authRedirectUrl = request.nextUrl.searchParams.get('authRedirectUrl');
+
+        console.log('authRedirectUrl', authRedirectUrl);
 
         console.log('impersonationId', impersonationId);
 
@@ -119,7 +122,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json(
                 {
                     error: 'Unauthorized',
-                    redirect: '/auth/phone-login?redirect=/user-rps'
+                    redirect: `/auth/phone-login?redirect=${authRedirectUrl || '/user-rps'}`
                 },
                 { status: 401 }
             );

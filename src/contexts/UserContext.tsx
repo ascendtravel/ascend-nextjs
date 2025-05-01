@@ -114,11 +114,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // Modified fetchUser to handle impersonation more explicitly
     const fetchUser = async (token: string, isImpersonationLoad = false) => {
         try {
+            // getCurrentUrl to set as redirect in case of 401
+            const currentUrl = window.location.href;
+
             const impersonateUserId = localStorage.getItem('impersonateUserId');
             const url = new URL('/api/user/me', window.location.origin);
 
             if (isImpersonationLoad && impersonateUserId) {
                 url.searchParams.set('impersonationId', impersonateUserId);
+            }
+
+            if (currentUrl) {
+                url.searchParams.set('authRedirectUrl', currentUrl);
             }
 
             console.log('[UserContext] Fetching user', {

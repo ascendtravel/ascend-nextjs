@@ -46,9 +46,10 @@ const cardVariants = {
 interface PhoneLoginViewProps {
     redirectUrl: string;
     showImpersonate?: boolean;
+    user_phone?: string;
 }
 
-export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewProps) {
+export function PhoneLoginView({ redirectUrl, showImpersonate, user_phone }: PhoneLoginViewProps) {
     const router = useRouter();
     const [isFlipped, setIsFlipped] = useState(false);
     const [selectedCountry, setSelectedCountry] = useState('US');
@@ -65,7 +66,7 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
     const form = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            phone: ''
+            phone: user_phone || ''
         }
     });
 

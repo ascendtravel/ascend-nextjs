@@ -20,8 +20,12 @@ import UserRpNoUpcomingTripsFound from './UserRpNoUpcomingTripsFound';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
 
-export default function UserRpsView() {
-    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
+interface UserRpsViewProps {
+    preselectedRpId?: string | null;
+}
+
+export default function UserRpsView(props: UserRpsViewProps) {
+    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear, getTrip } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
     const router = useRouter();
@@ -32,6 +36,30 @@ export default function UserRpsView() {
     useEffect(() => {
         setFlightSegments([]);
         setHotelsMapDetails([]);
+
+        if (props.preselectedRpId) {
+            const preselectedRp = getTrip(props.preselectedRpId);
+            if (preselectedRp) {
+                setSelectedTrip(preselectedRp);
+                if (preselectedRp.type === 'flight') {
+                    setFlightSegments([
+                        {
+                            from: (preselectedRp.payload as FlightPayload).departure_airport_iata_code,
+                            to: (preselectedRp.payload as FlightPayload).arrival_airport_iata_code
+                        }
+                    ]);
+                } else if (preselectedRp.type === 'hotel') {
+                    setHotelsMapDetails([
+                        {
+                            id: preselectedRp.id.toString(),
+                            lat: (preselectedRp.payload as HotelPayload).lat,
+                            lon: (preselectedRp.payload as HotelPayload).long,
+                            price: getCurrencyAndAmountText((preselectedRp.payload as HotelPayload).total_price_cents)
+                        }
+                    ]);
+                }
+            }
+        }
     }, [filteredTrips]);
 
     if (isLoading) {
@@ -67,9 +95,7 @@ export default function UserRpsView() {
                 to: (trip.payload as FlightPayload).arrival_airport_iata_code
             };
             // Then set the new segment in the next tick
-            setTimeout(() => {
-                setFlightSegments([segment]);
-            }, 0);
+            setFlightSegments([segment]);
             setHotelsMapDetails([]);
         } else if (trip.type === 'hotel') {
             setHotelsMapDetails([
