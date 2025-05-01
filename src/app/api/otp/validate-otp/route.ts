@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
             })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
             console.error('Error validating OTP:', data);
 
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
                         success: false,
                         shouldRedirectToGmail: true
                     },
-                    { status: 404 }
+                    { status: 401 }
                 );
             }
 
@@ -59,7 +61,6 @@ export async function POST(request: NextRequest) {
             throw new Error('Failed to validate OTP');
         }
 
-        const data = await response.json();
         console.log('OTP validated successfully, response:', JSON.stringify(data, null, 2));
 
         if (!data.success) {
