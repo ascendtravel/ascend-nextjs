@@ -158,8 +158,9 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
             if (!response.ok) {
                 // Check if we need to redirect to Gmail link
                 if (data.shouldRedirectToGmail) {
-                    toast.info('Please sing on as a member first.');
+                    toast.info('Please sign on as a member first.');
                     router.push('/gmail-link');
+
                     return;
                 }
                 throw new Error(data.error || 'Invalid verification code');
