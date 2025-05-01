@@ -20,7 +20,11 @@ import UserRpNoUpcomingTripsFound from './UserRpNoUpcomingTripsFound';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
 
-export default function UserRpsView() {
+interface UserRpsViewProps {
+    initialSelectedTripId?: string;
+}
+
+export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps) {
     const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
@@ -28,6 +32,16 @@ export default function UserRpsView() {
     // Map Data and Types
     const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
     const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
+
+    // Handle initial selected trip
+    useEffect(() => {
+        if (initialSelectedTripId && filteredTrips.length > 0) {
+            const trip = filteredTrips.find(t => t.import_session_id === initialSelectedTripId);
+            if (trip) {
+                handleTripClick(trip);
+            }
+        }
+    }, [initialSelectedTripId, filteredTrips]);
 
     useEffect(() => {
         setFlightSegments([]);
