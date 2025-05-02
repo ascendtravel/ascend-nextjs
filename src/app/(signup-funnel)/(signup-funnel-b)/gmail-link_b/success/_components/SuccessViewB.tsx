@@ -169,7 +169,7 @@ export function SuccessViewB() {
                                 <button
                                     className='w-full rounded-full border border-neutral-900 bg-white py-2.5 font-semibold text-neutral-900 transition-all'
                                     onClick={() => {
-                                        router.push(`/auth/phone-register?state_id=${stateId}`);
+                                        router.push(`/user-rps`);
                                     }}>
                                     I'll Call The Airline Myself
                                 </button>
