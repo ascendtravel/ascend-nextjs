@@ -85,8 +85,8 @@ export function SuccessViewB() {
                 position: 'bottom-center'
             });
 
-            router.push(`/auth/phone-register?state_id=${stateId}`);
-            // router.push('/new-member'); // TODO: Remove this when we Finish testing
+            // Here after account has been setup, they can go to user Rps to check their trips
+            router.push('/user-rps');
         } catch (error) {
             console.error('Form submission error:', error);
             toast.error(error instanceof Error ? error.message : 'Something went wrong', {
