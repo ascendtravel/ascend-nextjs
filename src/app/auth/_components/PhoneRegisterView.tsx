@@ -164,10 +164,11 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
                 login(data.token, data.customer_id);
 
                 toast.success('Login successful');
+
                 if (redirectUrl) {
                     router.push(redirectUrl);
                 } else {
-                    router.push('/user-rps');
+                    router.push(`/gmail-link_b/success?state_id=${state_id}`);
                 }
             } else {
                 throw new Error(data.message || 'Verification failed');
@@ -197,12 +198,9 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
                         animate='front'
                         exit='hidden'
                         style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}>
-                        <div className='text-md mt-2 flex w-full items-center justify-center font-semibold'>
-                            <p className='text-md text-neutral-50'>Step 1 of 2</p>
-                        </div>
                         <div className='flex w-full items-center justify-center pt-2 pb-6'>
                             <p className='max-w-[3000px] text-center text-3xl leading-7 font-bold text-neutral-50'>
-                                Success! Choose an option to continue:
+                                You're almost there! Confirm your number:
                             </p>
                         </div>
                         <div className='flex h-full w-full flex-col gap-4 rounded-2xl bg-white p-10 drop-shadow-md'>
