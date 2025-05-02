@@ -19,12 +19,13 @@ import UserRpNoTripsCard from './UserRpNoTripsCard';
 import UserRpNoUpcomingTripsFound from './UserRpNoUpcomingTripsFound';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
+import ReactConfetti from 'react-confetti';
 
 export default function UserRpsView() {
     const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
-    const router = useRouter();
+    const [showConfetti, setShowConfetti] = useState(false);
     // Map Data and Types
     const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
     const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
@@ -59,6 +60,13 @@ export default function UserRpsView() {
             }
             setShowSpecificTrip(true);
         }, 1000);
+
+        if (trip.payload.potential_savings_cents?.amount && trip.payload.potential_savings_cents.amount > 0) {
+            setShowConfetti(true);
+            setTimeout(() => {
+                setShowConfetti(false);
+            }, 8000);
+        }
 
         setSelectedTrip(trip);
         if (trip.type === 'flight') {
@@ -103,8 +111,18 @@ export default function UserRpsView() {
 
     return (
         <div className='mt-2 h-full w-full rounded-t-xl bg-neutral-50 transition-all duration-300'>
+            {
+                <ReactConfetti
+                    className='fixed inset-0 z-50 max-w-md'
+                    numberOfPieces={400}
+                    recycle={showConfetti}
+                    gravity={0.1}
+                    colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
+                    tweenDuration={200}
+                />
+            }
             {/* <UserRpsView /> */}
-            <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
+            <div className='relative -mt-2 h-[260px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
                 {/* {JSON.stringify(flightSegments)} */}
                 <RpMap hotels={hotelsMapDetails} flightSegments={flightSegments} showResetBtn={false} />
             </div>
@@ -195,6 +213,7 @@ export default function UserRpsView() {
                             setSelectedTrip(null);
                             setFlightSegments([]);
                             setHotelsMapDetails([]);
+                            setShowConfetti(false);
                         }}
                         trip={selectedTrip || undefined}
                     />

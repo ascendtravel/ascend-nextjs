@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -13,8 +11,7 @@ import { getCurrencyAndAmountText, getTripSavingsString } from '@/lib/money';
 
 import { format, isFuture, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
-import { PlaneIcon, ShieldCheck } from 'lucide-react';
-import ReactConfetti from 'react-confetti';
+import { ShieldCheck } from 'lucide-react';
 
 interface UserSpecificTripCardProps {
     trip?: Booking;
@@ -22,7 +19,6 @@ interface UserSpecificTripCardProps {
 
 export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps) {
     const router = useRouter();
-    const [showConfetti, setShowConfetti] = useState(true);
     const hasSavings = (trip?.payload.potential_savings_cents?.amount ?? 0) > 0;
 
     const isTripInFuture = (trip: Booking) => {
@@ -37,14 +33,6 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
     };
 
     const isUpcoming = trip ? isTripInFuture(trip) : false;
-
-    useEffect(() => {
-        if (hasSavings) {
-            setTimeout(() => {
-                setShowConfetti(false);
-            }, 2000);
-        }
-    }, [hasSavings]);
 
     if (!trip) return null;
 
@@ -64,17 +52,6 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                 duration: 0.5,
                 ease: 'easeOut'
             }}>
-            {hasSavings && (
-                <ReactConfetti
-                    className='fixed inset-0 z-50 max-w-md'
-                    numberOfPieces={100}
-                    recycle={showConfetti}
-                    height={400}
-                    gravity={0.1}
-                    colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
-                    tweenDuration={200}
-                />
-            )}
             <div className='flex flex-row items-center justify-start gap-4 py-4'>
                 <div className='relative h-[150px] w-[200px] overflow-hidden rounded-lg bg-neutral-200'>
                     <Image

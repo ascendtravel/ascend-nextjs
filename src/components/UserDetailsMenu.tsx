@@ -39,7 +39,7 @@ export default function UserDetailsMenu() {
         <Sheet>
             <SheetTrigger asChild>
                 <button className='outline-none'>
-                    <UserAvatar variant='md' showName={true} darkMode={true} />
+                    <UserAvatar variant='md' showName={false} darkMode={true} />
                 </button>
             </SheetTrigger>
             <SheetContent
@@ -47,7 +47,7 @@ export default function UserDetailsMenu() {
                 className='w-full bg-white p-0 sm:max-w-md'
                 showClose={false}
                 ariaLabel='User Profile'>
-                <div className='flex items-center justify-between bg-[#006DBC] p-6'>
+                <div className='flex items-center justify-between bg-[#006DBC] px-4 py-2'>
                     <div className='flex items-center gap-4'>
                         <UserAvatar variant='md' showName={false} darkMode={true} />
                         <div className='text-lg font-medium text-white'>
@@ -130,20 +130,6 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
 
     return (
         <div className={`flex flex-col gap-2 ${isMobile ? 'p-4' : ''}`}>
-            {!isMobile && <MenuLabel className='px-2'>Profile ({profileStatus.percentage}%)</MenuLabel>}
-
-            {/* Progress bar */}
-            <div className='px-2 py-1'>
-                <div className='h-1 w-full rounded-full bg-gray-200'>
-                    <div
-                        className={`h-full rounded-full ${
-                            profileStatus.percentage === 100 ? 'bg-[#1DC167]' : 'bg-[#006DBC]'
-                        }`}
-                        style={{ width: `${profileStatus.percentage}%` }}
-                    />
-                </div>
-            </div>
-
             {/* User Info */}
             {userFields.map(({ key, label }) => (
                 <MenuItem key={key} className='cursor-default px-2 py-1 opacity-50'>
@@ -164,6 +150,14 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
                     )}
                 </MenuItem>
             ))}
+            {profileStatus.percentage < 100 && (
+                <MenuLabel className='px-2 text-xs font-semibold text-gray-700'>
+                    <div className='flex items-center justify-between gap-2'>
+                        <span className='text-xs font-semibold text-gray-700'>Profile Completion</span>
+                        <span className='text-xs font-semibold text-gray-700'>{profileStatus.percentage}%</span>
+                    </div>
+                </MenuLabel>
+            )}
 
             {showImpersonation && (
                 <>
