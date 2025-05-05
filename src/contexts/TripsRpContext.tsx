@@ -7,8 +7,7 @@ import type { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/ro
 import { useUser } from './UserContext';
 import { isFuture, parseISO } from 'date-fns';
 
-export const TRIP_YEARS = ['Upcoming', 2025, 2024, 2023] as const;
-export type TripYear = (typeof TRIP_YEARS)[number];
+export type TripYear = number | 'Upcoming';
 
 // Add helper for checking upcoming trips
 const isTripUpcoming = (trip: Booking) => {
@@ -57,6 +56,7 @@ interface TripsRpContextType {
     getTrip: (id: string) => Booking | undefined;
     refreshTrips: () => Promise<void>;
     setSelectedYear: (year: TripYear) => void;
+    allYears: TripYear[];
 }
 
 const TripsRpContext = createContext<TripsRpContextType | undefined>(undefined);
@@ -68,6 +68,7 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     const [isLoading, setIsLoading] = useState(!initialTrips);
     const [error, setError] = useState<string | null>(null);
     const { getToken, getImpersonateUserId } = useUser();
+    const [allYears, setAllYears] = useState<TripYear[]>([]);
 
     // Filter trips based on selected year
     useEffect(() => {
@@ -111,10 +112,12 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
             // Sort trips before setting state
             const sortedTrips = sortTrips(data);
             setTrips(sortedTrips);
+            fillYears();
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
         } finally {
             setIsLoading(false);
+            fillYears();
         }
     };
 
@@ -137,6 +140,16 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
         await fetchTrips();
     };
 
+    const fillYears = () => {
+        // Should be upcoming tips and then all the years we have trips for
+        console.log('SETTING YEARS', trips);
+        setAllYears(['Upcoming', ...new Set(trips.map((trip) => getDate(trip).getFullYear()))]);
+    };
+
+    if (initialTrips && allYears.length === 0) {
+        fillYears();
+    }
+
     const value = {
         trips,
         filteredTrips,
@@ -145,7 +158,8 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
         error,
         getTrip,
         refreshTrips,
-        setSelectedYear
+        setSelectedYear,
+        allYears
     };
 
     return <TripsRpContext.Provider value={value}>{children}</TripsRpContext.Provider>;

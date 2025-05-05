@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
-import { TRIP_YEARS, useTripsRp } from '@/contexts/TripsRpContext';
+import { useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
 import FlightMap, { FlightMapSegment, FlightSegmentBasic } from './FlightMap';
@@ -22,7 +22,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
 
 export default function UserRpsView() {
-    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
+    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear, allYears } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
@@ -129,7 +129,7 @@ export default function UserRpsView() {
             <AnimatePresence>
                 {!selectedTrip && (
                     <motion.div
-                        className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
+                        className='relative -mt-20 flex w-full flex-row items-center justify-start rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
@@ -137,7 +137,7 @@ export default function UserRpsView() {
                             duration: 0.3,
                             ease: 'easeInOut'
                         }}>
-                        {TRIP_YEARS.map((year) => (
+                        {allYears.map((year) => (
                             <React.Fragment key={year}>
                                 <div
                                     onClick={() => setSelectedYear(year)}

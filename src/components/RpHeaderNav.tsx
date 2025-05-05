@@ -16,8 +16,7 @@ export default function RpHeaderNav({ className = '' }: RpHeaderNavProps) {
                     <IconNewWhite />
                 </div>
 
-                {user && <UserDetailsMenu />}
-                {!user && <div>Loading...</div>}
+                {user && <UserDetailsMenu loading={isLoading || !user} />}
             </div>
         </header>
     );

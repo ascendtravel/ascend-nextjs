@@ -104,7 +104,8 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
         logout();
 
         const phone = form.getValues('phone');
-        setPhoneNumber(phone);
+        const formattedPhone = phone.replace(/\D/g, '');
+        setPhoneNumber(formattedPhone);
 
         try {
             const response = await fetch('/api/otp/send-otp', {
@@ -163,7 +164,23 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
             if (data.success) {
                 login(data.token, data.customer_id);
 
+                // CALL FINISH REGISTRATION
+                try {
+                    const registrationResponse = await fetch('/api/user/complete-registration', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ state_id })
+                    });
+
+                    if (!registrationResponse.ok) {
+                        console.error('Failed to complete registration:', await registrationResponse.json());
+                    }
+                } catch (error) {
+                    console.error('Error calling complete-registration endpoint:', error);
+                }
+
                 toast.success('Login successful');
+
                 if (redirectUrl) {
                     router.push(redirectUrl);
                 } else {

@@ -18,10 +18,11 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useUser } from '@/contexts/UserContext';
 
+import { Skeleton } from './ui/skeleton';
 import { format, parseISO } from 'date-fns';
 import { PencilIcon, X } from 'lucide-react';
 
-export default function UserDetailsMenu() {
+export default function UserDetailsMenu({ loading }: { loading?: boolean }) {
     const { user } = useUser();
     const [isMobile, setIsMobile] = useState(false);
 
@@ -38,9 +39,15 @@ export default function UserDetailsMenu() {
     return isMobile ? (
         <Sheet>
             <SheetTrigger asChild>
-                <button className='outline-none'>
-                    <UserAvatar variant='md' showName={false} darkMode={true} />
-                </button>
+                <div className='flex items-center gap-2'>
+                    {loading ? (
+                        <Skeleton className='size-10 animate-pulse rounded-full border border-neutral-200/20' />
+                    ) : (
+                        <button className='outline-none'>
+                            <UserAvatar variant='md' showName={false} darkMode={true} />
+                        </button>
+                    )}
+                </div>
             </SheetTrigger>
             <SheetContent
                 side='right'
@@ -131,6 +138,7 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
     return (
         <div className={`flex flex-col gap-2 ${isMobile ? 'p-4' : ''}`}>
             {/* User Info */}
+
             {userFields.map(({ key, label }) => (
                 <MenuItem key={key} className='cursor-default px-2 py-1 opacity-50'>
                     {key === 'date_of_birth' ? (
