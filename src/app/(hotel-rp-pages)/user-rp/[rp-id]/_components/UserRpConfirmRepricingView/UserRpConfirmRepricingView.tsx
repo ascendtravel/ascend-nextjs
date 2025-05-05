@@ -21,7 +21,7 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
     if (!trip) return null;
 
     return (
-        <div className='absolute inset-0 mt-[72px] flex h-full flex-col overflow-y-auto rounded-t-xl bg-neutral-50'>
+        <div className='absolute inset-0 mt-[60px] flex h-full flex-col overflow-y-auto rounded-t-xl bg-neutral-50'>
             <div className='px-6 pt-10'>
                 <BackGreenButton
                     onClick={() => {

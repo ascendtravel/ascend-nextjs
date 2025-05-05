@@ -152,8 +152,8 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
     };
 
     return (
-        <div className='absolute inset-0 mt-[72px] flex flex-col rounded-t-xl bg-neutral-50'>
-            <div className='flex-1 px-6 pt-10'>
+        <div className='absolute inset-0 mt-[60px] flex flex-col rounded-t-xl bg-neutral-50'>
+            <div className='flex-1 px-6 pt-4'>
                 <BackGreenButton
                     onClick={() => {
                         router.push('/user-rps/');

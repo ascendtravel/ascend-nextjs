@@ -38,6 +38,9 @@ const config: Config = {
                 800: ['TWKLausanne-800', ...builtinFontList],
                 850: ['TWKLausanne-850', ...builtinFontList]
             },
+            spacing: {
+                'rp-header': 'var(--rp-header-height, 90px)'
+            },
             borderRadius: {
                 lg: 'var(--radius)',
                 md: 'calc(var(--radius) - 2px)',

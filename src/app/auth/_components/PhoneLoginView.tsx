@@ -104,7 +104,8 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
         logout();
 
         const phone = form.getValues('phone');
-        setPhoneNumber(phone);
+        const formattedPhone = phone.replace(/\D/g, '');
+        setPhoneNumber(formattedPhone);
 
         try {
             const response = await fetch('/api/otp/send-otp', {

@@ -2,15 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
-import { TRIP_YEARS, useTripsRp } from '@/contexts/TripsRpContext';
+import { useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
-import FlightMap, { FlightMapSegment, FlightSegmentBasic } from './FlightMap';
+import { FlightSegmentBasic } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
-import HotelMap from './HotelMap';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
 import RpFooterSection from './RpFooterSection';
 import RpGridCardWrapper from './RpGridCardWrapper';
@@ -19,16 +16,17 @@ import UserRpNoTripsCard from './UserRpNoTripsCard';
 import UserRpNoUpcomingTripsFound from './UserRpNoUpcomingTripsFound';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
+import ReactConfetti from 'react-confetti';
 
 interface UserRpsViewProps {
     initialSelectedTripId?: string;
 }
 
 export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps) {
-    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear } = useTripsRp();
+    const { filteredTrips, isLoading, error, selectedYear, setSelectedYear, allYears } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
-    const router = useRouter();
+    const [showConfetti, setShowConfetti] = useState(false);
     // Map Data and Types
     const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
     const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
@@ -36,7 +34,7 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
     // Handle initial selected trip
     useEffect(() => {
         if (initialSelectedTripId && filteredTrips.length > 0) {
-            const trip = filteredTrips.find(t => t.import_session_id === initialSelectedTripId);
+            const trip = filteredTrips.find((t) => t.import_session_id === initialSelectedTripId);
             if (trip) {
                 handleTripClick(trip);
             }
@@ -73,6 +71,13 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
             }
             setShowSpecificTrip(true);
         }, 1000);
+
+        if (trip.payload.potential_savings_cents?.amount && trip.payload.potential_savings_cents.amount > 0) {
+            setShowConfetti(true);
+            setTimeout(() => {
+                setShowConfetti(false);
+            }, 8000);
+        }
 
         setSelectedTrip(trip);
         if (trip.type === 'flight') {
@@ -117,15 +122,25 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
 
     return (
         <div className='mt-2 h-full w-full rounded-t-xl bg-neutral-50 transition-all duration-300'>
+            {
+                <ReactConfetti
+                    className='fixed inset-0 z-50 max-w-md'
+                    numberOfPieces={400}
+                    recycle={showConfetti}
+                    gravity={0.1}
+                    colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
+                    tweenDuration={200}
+                />
+            }
             {/* <UserRpsView /> */}
-            <div className='relative -mt-2 h-[250px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
+            <div className='relative -mt-2 h-[260px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
                 {/* {JSON.stringify(flightSegments)} */}
                 <RpMap hotels={hotelsMapDetails} flightSegments={flightSegments} showResetBtn={false} />
             </div>
             <AnimatePresence>
                 {!selectedTrip && (
                     <motion.div
-                        className='relative -mt-20 flex w-full flex-row items-center justify-center rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
+                        className='relative -mt-20 flex w-full flex-row items-center justify-start rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
@@ -133,7 +148,7 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                             duration: 0.3,
                             ease: 'easeInOut'
                         }}>
-                        {TRIP_YEARS.map((year) => (
+                        {allYears.map((year) => (
                             <React.Fragment key={year}>
                                 <div
                                     onClick={() => setSelectedYear(year)}
@@ -209,6 +224,7 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                             setSelectedTrip(null);
                             setFlightSegments([]);
                             setHotelsMapDetails([]);
+                            setShowConfetti(false);
                         }}
                         trip={selectedTrip || undefined}
                     />
