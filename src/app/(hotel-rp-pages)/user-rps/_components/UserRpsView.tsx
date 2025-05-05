@@ -2,15 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
-import FlightMap, { FlightMapSegment, FlightSegmentBasic } from './FlightMap';
+import { FlightSegmentBasic } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
-import HotelMap from './HotelMap';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
 import RpFooterSection from './RpFooterSection';
 import RpGridCardWrapper from './RpGridCardWrapper';
@@ -21,7 +18,11 @@ import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/Use
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
 
-export default function UserRpsView() {
+interface UserRpsViewProps {
+    initialSelectedTripId?: string;
+}
+
+export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps) {
     const { filteredTrips, isLoading, error, selectedYear, setSelectedYear, allYears } = useTripsRp();
     const [selectedTrip, setSelectedTrip] = useState<Booking | null>(null);
     const [showSpecificTrip, setShowSpecificTrip] = useState(false);
@@ -29,6 +30,16 @@ export default function UserRpsView() {
     // Map Data and Types
     const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
     const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
+
+    // Handle initial selected trip
+    useEffect(() => {
+        if (initialSelectedTripId && filteredTrips.length > 0) {
+            const trip = filteredTrips.find((t) => t.import_session_id === initialSelectedTripId);
+            if (trip) {
+                handleTripClick(trip);
+            }
+        }
+    }, [initialSelectedTripId, filteredTrips]);
 
     useEffect(() => {
         setFlightSegments([]);

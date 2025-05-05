@@ -85,8 +85,8 @@ export function SuccessViewB() {
                 position: 'bottom-center'
             });
 
-            router.push(`/auth/phone-register?state_id=${stateId}`);
-            // router.push('/new-member'); // TODO: Remove this when we Finish testing
+            // Here after account has been setup, they can go to user Rps to check their trips
+            router.push('/user-rps');
         } catch (error) {
             console.error('Form submission error:', error);
             toast.error(error instanceof Error ? error.message : 'Something went wrong', {
@@ -169,7 +169,7 @@ export function SuccessViewB() {
                                 <button
                                     className='w-full rounded-full border border-neutral-900 bg-white py-2.5 font-semibold text-neutral-900 transition-all'
                                     onClick={() => {
-                                        router.push(`/auth/phone-register?state_id=${stateId}`);
+                                        router.push(`/user-rps`);
                                     }}>
                                     I'll Call The Airline Myself
                                 </button>
