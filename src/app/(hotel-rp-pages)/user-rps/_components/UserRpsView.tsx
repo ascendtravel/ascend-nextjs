@@ -214,7 +214,7 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                                     )}
                                 </motion.div>
                             ))}
-                            {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />}
+                            {/* {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />} */}
                             {/* <div
                                 className={cn('flex w-full cursor-pointer', {
                                     hidden: filteredTrips.length === 0,
