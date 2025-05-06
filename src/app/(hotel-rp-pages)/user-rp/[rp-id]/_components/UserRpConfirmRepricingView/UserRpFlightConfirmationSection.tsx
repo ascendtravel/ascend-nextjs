@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Booking, FlightPayload } from '@/app/api/rp-trips/route';
-import FlightSegmentCard from '@/components/FlightSegmentCard';
 import { useUser } from '@/contexts/UserContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
 import { Airport } from '@/types/flight-types';
@@ -62,8 +61,6 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
             return;
         }
 
-        console.log('[/api/flight-rp/approval_info] Token:', getToken());
-
         const impersonationId = getImpersonateUserId();
 
         try {
@@ -87,12 +84,12 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
             }
 
             toast.success('Booking confirmed!');
-            router.push(`/rp-success/${trip.import_session_id}`);
         } catch (error) {
             console.error('Error confirming booking:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to confirm booking');
         } finally {
-            setIsSubmitting(false);
+            // TODO: DONT LIKE THIS, WE SHOULD AT LEAST RAISE A SENTRY ERROR
+            router.push(`/rp-success/${trip.import_session_id}`);
         }
     }
 
