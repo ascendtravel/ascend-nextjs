@@ -6,6 +6,9 @@ import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
+// import { cn } from '@/lib/utils';
+
+// import AddTripCard from './AddTripCard';
 import { FlightSegmentBasic } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
@@ -30,7 +33,6 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
     // Map Data and Types
     const [flightSegments, setFlightSegments] = useState<FlightSegmentBasic[]>([]);
     const [hotelsMapDetails, setHotelsMapDetails] = useState<Hotel[]>([]);
-
     // Handle initial selected trip
     useEffect(() => {
         if (initialSelectedTripId && filteredTrips.length > 0) {
@@ -54,13 +56,13 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
         );
     }
 
-    if (error) {
-        return (
-            <div className='flex h-full w-full items-center justify-center'>
-                <div>Error: {error}</div>
-            </div>
-        );
-    }
+    // if (error) {
+    //     return (
+    //         <div className='flex h-full w-full items-center justify-center'>
+    //             <div>Error: {error}</div>
+    //         </div>
+    //     );
+    // }
 
     const handleTripClick = (trip: Booking) => {
         setTimeout(() => {
@@ -122,16 +124,16 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
 
     return (
         <div className='mt-2 h-full w-full rounded-t-xl bg-neutral-50 transition-all duration-300'>
-            {
+            {showConfetti && (
                 <ReactConfetti
-                    className='fixed inset-0 z-50 max-w-md'
+                    className='fixed inset-0 z-50'
                     numberOfPieces={400}
                     recycle={showConfetti}
                     gravity={0.1}
                     colors={['#1DC167', '#006DBC', '#5AA6DA', '#FFD700', '#FF69B4']}
                     tweenDuration={200}
                 />
-            }
+            )}
             {/* <UserRpsView /> */}
             <div className='relative -mt-2 h-[260px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
                 {/* {JSON.stringify(flightSegments)} */}
@@ -148,8 +150,8 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                             duration: 0.3,
                             ease: 'easeInOut'
                         }}>
-                        {allYears.map((year) => (
-                            <React.Fragment key={year}>
+                        {allYears.map((year, index) => (
+                            <React.Fragment key={`${year} + ${index}`}>
                                 <div
                                     onClick={() => setSelectedYear(year)}
                                     className={`flex w-fit cursor-pointer justify-center px-4 py-2 ${
@@ -177,13 +179,12 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                         <AnimatePresence>
                             {filteredTrips.map((trip, index) => (
                                 <motion.div
-                                    key={trip.type + index}
+                                    key={`${trip.id} + ${index}`}
                                     initial={{ opacity: 1, x: 0 }}
                                     animate={{
                                         opacity: selectedTrip ? 0 : 1,
                                         x: selectedTrip ? (index % 2 === 0 ? -100 : 100) : 0
                                     }}
-                                    exit={{ opacity: 0 }}
                                     transition={{ duration: 0.5 }}
                                     onClick={() => handleTripClick(trip)}>
                                     {trip.type === 'flight' ? (
@@ -213,6 +214,15 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                                     )}
                                 </motion.div>
                             ))}
+                            {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />}
+                            {/* <div
+                                className={cn('flex w-full cursor-pointer', {
+                                    hidden: filteredTrips.length === 0,
+                                    'justify-end pr-2': filteredTrips.length % 2 === 1,
+                                    'justify-start pl-2': filteredTrips.length % 2 === 2
+                                })}>
+                                <AddTripCard />
+                            </div> */}
                         </AnimatePresence>
                     ) : null}
                 </div>

@@ -1,6 +1,6 @@
 export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $500' }: { totalSavings?: string }) {
     return (
-        <div className='flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-gray-200 p-4'>
+        <div className='flex w-full flex-col items-center justify-center gap-2 rounded-lg border-t border-gray-200 p-4 pt-8'>
             <div className='mb-2 flex items-center justify-center'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 32 32'>
                     <path
@@ -11,8 +11,8 @@ export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $
             </div>
             <div className='text-center text-sm'>No upcoming trips were found</div>
             <div className='max-w-[274px] text-center text-lg font-bold'>
-                Based on your travel history, you could've saved{' '}
-                <span className='font-bold text-[#1DC167]'>{totalSavings}</span> in the past year with Ascend!
+                Average User saves more than <span className='font-bold text-[#1DC167]'>{totalSavings} </span>a year
+                with Ascend!
             </div>
         </div>
     );

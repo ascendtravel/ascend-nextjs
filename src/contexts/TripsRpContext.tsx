@@ -143,7 +143,8 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     const fillYears = () => {
         // Should be upcoming tips and then all the years we have trips for
         console.log('SETTING YEARS', trips);
-        setAllYears(['Upcoming', ...new Set(trips.map((trip) => getDate(trip).getFullYear()))]);
+        const years = [...new Set(trips.map((trip) => getDate(trip).getFullYear()))];
+        setAllYears(['Upcoming', ...years.reverse()]);
     };
 
     if (initialTrips && allYears.length === 0) {
