@@ -56,6 +56,12 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
     async function handleConfirmBooking() {
         setIsSubmitting(true);
 
+        if (trip.is_fake) {
+            router.push(`/rp-success/${trip.id}`);
+
+            return;
+        }
+
         console.log('[/api/flight-rp/approval_info] Token:', getToken());
 
         const impersonationId = getImpersonateUserId();

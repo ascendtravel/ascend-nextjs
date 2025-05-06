@@ -25,6 +25,12 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
     async function handleConfirmBooking() {
         setIsSubmitting(true);
 
+        if (trip.is_fake) {
+            router.push(`/rp-success/${trip.id}`);
+
+            return;
+        }
+
         try {
             const impersonateUserId = getImpersonateUserId();
             const url = new URL('/api/hotel-rp/approved', window.location.origin);
