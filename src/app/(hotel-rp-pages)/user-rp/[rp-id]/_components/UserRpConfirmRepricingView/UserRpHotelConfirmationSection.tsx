@@ -56,14 +56,13 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
             }
 
             toast.success('Booking approved!');
-
             // Navigate to payment view or next step
-            router.push(`/rp-success/${trip.id}`);
         } catch (error) {
             console.error('Error approving booking:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to approve booking');
         } finally {
-            setIsSubmitting(false);
+            // TODO: DONT LIKE THIS, WE SHOULD AT LEAST RAISE A SENTRY ERROR
+            router.push(`/rp-success/${trip.import_session_id}`);
         }
     }
 
