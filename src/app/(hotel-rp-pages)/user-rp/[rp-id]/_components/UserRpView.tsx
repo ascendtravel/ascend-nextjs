@@ -34,7 +34,7 @@ export default function UserRpView({ viewState, rpId }: UserRpViewProps) {
     const router = useRouter();
 
     useEffect(() => {
-        if (ValidateProfileCompleted(user)) {
+        if (user && ValidateProfileCompleted(user)) {
             router.push(`/user-rp/${rpId}?view-state=ConfirmRepricing`);
         }
     }, [user]);
