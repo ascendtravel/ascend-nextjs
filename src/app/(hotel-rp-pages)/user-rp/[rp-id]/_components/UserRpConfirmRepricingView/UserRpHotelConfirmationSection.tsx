@@ -26,7 +26,7 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
         setIsSubmitting(true);
 
         if (trip.is_fake) {
-            router.push(`/rp-success/${trip.id}`);
+            router.push(`/rp-success/${trip.import_session_id}`);
 
             return;
         }

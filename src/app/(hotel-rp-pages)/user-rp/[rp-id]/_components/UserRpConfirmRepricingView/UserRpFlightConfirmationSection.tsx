@@ -57,7 +57,7 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
         setIsSubmitting(true);
 
         if (trip.is_fake) {
-            router.push(`/rp-success/${trip.id}`);
+            router.push(`/rp-success/${trip.import_session_id}`);
 
             return;
         }
