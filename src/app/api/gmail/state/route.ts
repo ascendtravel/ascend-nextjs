@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        const { fbp, fbc, utm_params } = await request.json();
+        const { fbp, fbc, utm_params, customer_id } = await request.json();
         const headersList = await headers();
         const userAgent = headersList.get('user-agent') || '';
 
@@ -18,7 +18,8 @@ export async function POST(request: Request) {
                 user_agent: userAgent,
                 ...(fbp ? { fbp } : {}),
                 ...(fbc ? { fbc } : {}),
-                ...(utm_params ? { utm_params } : {})
+                ...(utm_params ? { utm_params } : {}),
+                ...(customer_id ? { customer_id } : {})
             })
         });
 

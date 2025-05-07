@@ -72,7 +72,12 @@ export default function RpGridCardWrapper({
                     <span className='text-xs font-semibold text-[#1DC167]'>Price drop protection</span>
                 </div>
             )}
-            <Image src={trip?.payload.image_url || defaultImage} alt={getAltText(trip)} fill className='object-cover' />
+            <Image
+                src={trip?.payload.image_url || defaultImage}
+                alt={getAltText(trip) || 'Trip image '}
+                fill
+                className='object-cover'
+            />
             {/* TODO: remove this */}
             {/* <Image src={'https://cataas.com/cat'} alt={getAltText(trip)} fill className='object-cover' /> */}
 

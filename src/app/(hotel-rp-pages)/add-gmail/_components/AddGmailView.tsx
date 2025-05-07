@@ -7,52 +7,27 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { FRAMER_LINKS } from '@/config/navigation';
+import { useUser } from '@/contexts/UserContext';
 
-import { CheckboxNotice } from '../../gmail-link/_components/CheckboxNotice';
+import AddGmailCheckboxCTA from './AddGmailCheckboxCTA';
 import Cookies from 'js-cookie';
 import { Lock } from 'lucide-react';
 
-function GmailLinkB() {
+function AddGmailView() {
     const [stateId, setStateId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const searchParams = useSearchParams();
-    const getUtmParams = () => {
-        const utmParams = new URLSearchParams();
-        const utmParamsObject: { [key: string]: string } = {};
-
-        searchParams.forEach((value, key) => {
-            if (key.startsWith('utm_')) {
-                utmParams.append(key, value);
-            }
-        });
-
-        const utmParamsString = utmParams.toString();
-        const utmParamsArray = utmParamsString.split('&');
-
-        utmParamsArray.forEach((param) => {
-            const [key, value] = param.split('=');
-            utmParamsObject[key] = value;
-        });
-        console.log(utmParamsObject);
-
-        return utmParamsObject;
-    };
+    const { user } = useUser();
 
     useEffect(() => {
         async function getStateId() {
             try {
-                const fbp = Cookies.get('_fbp');
-                const fbc = Cookies.get('_fbc');
-
-                const utmParams = getUtmParams();
                 const response = await fetch('/api/gmail/state', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        ...(fbp ? { fbp } : {}),
-                        ...(fbc ? { fbc } : {}),
-                        ...(utmParams ? { utm_params: utmParams } : {})
+                        customer_id: user?.id
                     })
                 });
 
@@ -81,17 +56,14 @@ function GmailLinkB() {
             </div>
 
             <Link href={stateId ? `https://gmail.heyascend.com/gmail/import/start/${stateId} ` : ''}>
-                <div className='flex flex-col items-center justify-center gap-4 overflow-clip rounded-3xl'>
-                    {stateId && (
-                        <div
-                            onClick={() =>
-                                (window.location.href = `https://gmail.heyascend.com/gmail/import/start/${stateId} `)
-                            }
-                            className='cursor-pointer'>
-                            <CheckboxNotice width={260} height={120} showText={false} />
-                        </div>
-                    )}
-                    {!stateId && <CheckboxNotice width={260} height={120} showText={false} />}
+                <div className='mb-12 flex flex-col items-center justify-center gap-4 overflow-clip rounded-3xl'>
+                    <div
+                        onClick={() =>
+                            (window.location.href = `https://gmail.heyascend.com/gmail/import/start/${stateId} `)
+                        }
+                        className='cursor-pointer'>
+                        <AddGmailCheckboxCTA width={260} height={120} showText={false} />
+                    </div>
                 </div>
             </Link>
 
@@ -145,7 +117,7 @@ function GmailLinkB() {
 export default function Page() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <GmailLinkB />
+            <AddGmailView />
         </Suspense>
     );
 }

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 
 export interface UserProfile {
+    id: string;
     main_phone?: string;
     main_email?: string;
     emails?: string[];
@@ -108,7 +109,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
      */
 
     const reloadUser = () => {
-        fetchUser(getToken() || '');
+        const isImpersonatingUser = isImpersonating();
+        fetchUser(getToken() || '', isImpersonatingUser);
     };
 
     // Modified fetchUser to handle impersonation more explicitly
