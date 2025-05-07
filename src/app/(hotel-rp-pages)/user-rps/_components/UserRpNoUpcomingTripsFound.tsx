@@ -1,4 +1,12 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
+import { Plus } from 'lucide-react';
+
 export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $500' }: { totalSavings?: string }) {
+    const router = useRouter();
+
     return (
         <div className='flex w-full flex-col items-center justify-center gap-2 rounded-lg border-t border-gray-200 p-4 pt-8'>
             <div className='mb-2 flex items-center justify-center'>
@@ -13,6 +21,17 @@ export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $
             <div className='max-w-[274px] text-center text-lg font-bold'>
                 Average User saves more than <span className='font-bold text-[#1DC167]'>{totalSavings} </span>a year
                 with Ascend!
+            </div>
+            <div className='mt-5 rounded-full text-center text-sm font-semibold text-neutral-700'>
+                Did we miss a trip?
+            </div>
+            <div
+                className='flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full border border-dashed border-neutral-500 px-4 py-1 text-center text-xl font-semibold text-neutral-500'
+                onClick={() => {
+                    router.push('/add-trip');
+                }}>
+                <Plus className='size-5' />
+                Add a trip manualy
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
-export function CheckboxNotice(
+export default function AddGmailCheckboxCTA(
     props: { width?: number; height?: number; className?: string; showText?: boolean } = {
         width: 512,
         height: 300,

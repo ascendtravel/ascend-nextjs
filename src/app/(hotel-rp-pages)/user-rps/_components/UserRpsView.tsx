@@ -5,10 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
+import { cn } from '@/lib/utils';
 
-// import { cn } from '@/lib/utils';
-
-// import AddTripCard from './AddTripCard';
+import AddTripCard from './AddTripCard';
 import { FlightSegmentBasic } from './FlightMap';
 import FlightTripRpGridCard from './FlightTripRpGridCard';
 import HotelStayRPGridCard from './HotelStayRPGridCard';
@@ -142,7 +141,7 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
             <AnimatePresence>
                 {!selectedTrip && (
                     <motion.div
-                        className='relative -mt-20 flex w-full flex-row items-center justify-start rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
+                        className='relative -mt-20 flex w-full flex-row items-center justify-start overflow-x-auto rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
@@ -150,19 +149,24 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                             duration: 0.3,
                             ease: 'easeInOut'
                         }}>
-                        {allYears.map((year, index) => (
-                            <React.Fragment key={`${year} + ${index}`}>
-                                <div
-                                    onClick={() => setSelectedYear(year)}
-                                    className={`flex w-fit cursor-pointer justify-center px-4 py-2 ${
-                                        selectedYear === year
-                                            ? 'rounded-full bg-[#1DC167] text-neutral-50'
-                                            : 'font-semibold'
-                                    }`}>
-                                    {year}
-                                </div>
-                            </React.Fragment>
-                        ))}
+                        <div
+                            className={cn('flex flex-row items-center justify-start gap-2', {
+                                'overflow-x-auto pb-2': filteredTrips.length > 3
+                            })}>
+                            {allYears.map((year, index) => (
+                                <React.Fragment key={`${year} + ${index}`}>
+                                    <div
+                                        onClick={() => setSelectedYear(year)}
+                                        className={`flex w-fit cursor-pointer justify-center px-4 py-2 ${
+                                            selectedYear === year
+                                                ? 'rounded-full bg-[#1DC167] text-neutral-50'
+                                                : 'font-semibold'
+                                        }`}>
+                                        {year}
+                                    </div>
+                                </React.Fragment>
+                            ))}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -214,15 +218,15 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                                     )}
                                 </motion.div>
                             ))}
-                            {/* {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />} */}
-                            {/* <div
+                            {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />}
+                            <div
                                 className={cn('flex w-full cursor-pointer', {
                                     hidden: filteredTrips.length === 0,
-                                    'justify-end pr-2': filteredTrips.length % 2 === 1,
-                                    'justify-start pl-2': filteredTrips.length % 2 === 2
+                                    'justify-start pr-2': filteredTrips.length % 2 === 1,
+                                    'justify-end pl-2': filteredTrips.length % 2 === 0
                                 })}>
                                 <AddTripCard />
-                            </div> */}
+                            </div>
                         </AnimatePresence>
                     ) : null}
                 </div>
