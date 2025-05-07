@@ -26,12 +26,12 @@ export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $
                 Did we miss a trip?
             </div>
             <div
-                className='flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full border border-dashed border-neutral-500 px-4 py-1 text-center text-xl font-semibold text-neutral-500'
+                className='flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full bg-[#1DC167] px-4 py-1 text-center text-base font-semibold text-neutral-50 drop-shadow-lg'
                 onClick={() => {
                     router.push('/add-trip');
                 }}>
                 <Plus className='size-5' />
-                Add a trip manualy
+                Add a trip manually
             </div>
         </div>
     );
