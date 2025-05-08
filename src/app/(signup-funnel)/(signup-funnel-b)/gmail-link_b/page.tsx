@@ -7,21 +7,12 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { FRAMER_LINKS } from '@/config/navigation';
-import Intercom from '@intercom/messenger-js-sdk';
 
 import { CheckboxNotice } from '../../gmail-link/_components/CheckboxNotice';
 import Cookies from 'js-cookie';
 import { Lock } from 'lucide-react';
 
 function GmailLinkB() {
-    console.log(process.env.INTERCOM_APP_ID);
-    Intercom({
-        app_id: 'otkzzyb8',
-        user_id: 'none',
-        name: 'Harrison',
-        email: 'harrison@ascend.travel'
-    });
-
     const [stateId, setStateId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');

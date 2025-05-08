@@ -21,10 +21,10 @@ export default function AddTripsView() {
     const router = useRouter();
 
     Intercom({
-        app_id: process.env.INTERCOM_APP_ID ?? '',
+        app_id: process.env.NEXT_PUBLIC_INTERCOM_APP_ID ?? '',
         user_id: user?.id ?? '',
-        name: user?.first_name ?? '',
-        email: user?.main_email ?? ''
+        name: user?.first_name ?? 'Traveler',
+        ...(user?.main_email && { email: user?.main_email })
     });
 
     useEffect(() => {
