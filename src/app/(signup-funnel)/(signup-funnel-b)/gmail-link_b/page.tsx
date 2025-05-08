@@ -14,8 +14,9 @@ import Cookies from 'js-cookie';
 import { Lock } from 'lucide-react';
 
 function GmailLinkB() {
+    console.log(process.env.INTERCOM_APP_ID);
     Intercom({
-        app_id: process.env.INTERCOM_APP_ID ?? '',
+        app_id: 'otkzzyb8',
         user_id: 'none',
         name: 'Harrison',
         email: 'harrison@ascend.travel'
