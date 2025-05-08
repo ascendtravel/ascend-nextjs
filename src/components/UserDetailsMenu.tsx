@@ -167,7 +167,7 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
                 </MenuLabel>
             )}
 
-            {showImpersonation && (
+            {user?.is_admin && (
                 <>
                     <MenuSeparator />
                     <MenuLabel className='text-yellow-600'>
@@ -202,9 +202,11 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
                             <MenuItem className='cursor-default text-xs opacity-50'>
                                 {localStorage.getItem('impersonateUserId')}
                             </MenuItem>
-                            <MenuItem onClick={handleStopImpersonating} className='text-yellow-600'>
-                                Stop Impersonating
-                            </MenuItem>
+                            {isImpersonating() && (
+                                <MenuItem onClick={handleStopImpersonating} className='text-yellow-600'>
+                                    Stop Impersonating
+                                </MenuItem>
+                            )}
                         </>
                     )}
                 </>

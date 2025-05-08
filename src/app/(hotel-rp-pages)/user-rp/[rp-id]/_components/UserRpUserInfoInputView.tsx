@@ -59,51 +59,16 @@ interface UserRpUserInfoInputViewProps {
 export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUserInfoInputViewProps) {
     const router = useRouter();
     const { getTrip } = useTripsRp();
-    const { updateUser } = useUser();
-    const [approvalInfo, setApprovalInfo] = useState<ApprovalInfo | null>(null);
+    const { updateUser, user } = useUser();
     const trip = getTrip(rpId);
-
-    useEffect(() => {
-        const fetchApprovalInfo = async () => {
-            try {
-                console.log('\n\nfetching approval info session id', trip?.payload.repricing_session_id);
-
-                const response = await fetch('/api/hotel-rp/ask-approval-info', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        session_id: trip?.payload.repricing_session_id
-                    }),
-                    cache: 'no-store'
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch approval info');
-                }
-
-                const data = await response.json();
-                setApprovalInfo(data);
-            } catch (error) {
-                console.error('Error fetching approval info:', error);
-                toast.error('Failed to fetch user information');
-            }
-        };
-
-        if (trip?.payload.repricing_session_id) {
-            console.log('fetching approval info');
-            fetchApprovalInfo();
-        }
-    }, [trip?.payload.repricing_session_id]);
 
     const form = useForm<UserInfoFormValues>({
         resolver: zodResolver(userInfoSchema),
         defaultValues: {
-            firstName: approvalInfo?.first_name || '',
-            lastName: approvalInfo?.last_name || '',
-            bday: approvalInfo?.birthday || '',
-            citizenship: approvalInfo?.citizenship || 'US'
+            firstName: user?.first_name || '',
+            lastName: user?.last_name || '',
+            bday: user?.date_of_birth || '',
+            citizenship: user?.citizenship || 'US'
         }
     });
 

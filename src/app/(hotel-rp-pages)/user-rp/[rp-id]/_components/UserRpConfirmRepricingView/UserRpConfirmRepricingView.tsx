@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Booking } from '@/app/api/rp-trips/route';
 import BackGreenButton from '@/components/BackGreenButton';
 import { useTripsRp } from '@/contexts/TripsRpContext';
+import { useUser } from '@/contexts/UserContext';
+import { ValidateProfileCompleted } from '@/lib/utils';
 
 import UserRpFlightConfirmationSection from './UserRpFlightConfirmationSection';
 import UserRpHotelConfirmationSection from './UserRpHotelConfirmationSection';
@@ -17,6 +19,7 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
     const router = useRouter();
     const { getTrip } = useTripsRp();
     const trip = getTrip(rpId);
+    const { user } = useUser();
 
     if (!trip) return null;
 
@@ -25,7 +28,9 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
             <div className='px-6 pt-10'>
                 <BackGreenButton
                     onClick={() => {
-                        router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`);
+                        user && ValidateProfileCompleted(user)
+                            ? router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`)
+                            : router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`);
                     }}
                     preventNavigation={true}
                 />

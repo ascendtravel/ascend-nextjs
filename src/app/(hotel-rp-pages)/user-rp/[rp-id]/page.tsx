@@ -14,10 +14,10 @@ const UserRpPage = async (props: UserRpPageProps) => {
 
     // if no view state redirect to confirm user info
     if (!viewState) {
-        return redirect(`/user-rp/${params['rp-id']}?view-state=ConfirmUserInfo`);
+        return redirect(`/user-rp/${params['rp-id']}?view-state=ConfirmRepricing`);
     }
 
-    return <UserRpView viewState={(viewState as RpViewState) || 'ConfirmUserInfo'} rpId={params['rp-id']} />;
+    return <UserRpView viewState={(viewState as RpViewState) || 'ConfirmRepricing'} rpId={params['rp-id']} />;
 };
 
 export default UserRpPage;
