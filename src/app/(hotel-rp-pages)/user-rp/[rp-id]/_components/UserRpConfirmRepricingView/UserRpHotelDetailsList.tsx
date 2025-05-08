@@ -1,3 +1,4 @@
+import { formatDateNoTZ } from '@/lib/date-formatters';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
 import { format } from 'date-fns';
@@ -83,13 +84,13 @@ export default function UserRpHotelDetailsList({
             {checkInDate && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Check in</div>
-                    <div className='text-right text-sm'>{format(new Date(checkInDate), 'd MMMM yyyy')}</div>
+                    <div className='text-right text-sm'>{formatDateNoTZ(checkInDate)}</div>
                 </div>
             )}
             {checkOutDate && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Check out</div>
-                    <div className='text-right text-sm'>{format(new Date(checkOutDate), 'd MMMM yyyy')}</div>
+                    <div className='text-right text-sm'>{formatDateNoTZ(checkOutDate)}</div>
                 </div>
             )}
             {nightlyPrice && (

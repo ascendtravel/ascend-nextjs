@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { UserProfile, useUser } from '@/contexts/UserContext';
+import { ValidateProfileCompleted } from '@/lib/utils';
 
 import UserRpConfirmRepricingView from './UserRpConfirmRepricingView/UserRpConfirmRepricingView';
 import UserRpUserInfoInputView from './UserRpUserInfoInputView';
@@ -15,19 +16,6 @@ type UserRpViewProps = {
     viewState: RpViewState;
     rpId: string;
 };
-
-function ValidateProfileCompleted(user: UserProfile) {
-    return (
-        user.last_name &&
-        user.last_name !== '' &&
-        user.first_name &&
-        user.first_name !== '' &&
-        user.citizenship &&
-        user.citizenship !== '' &&
-        user.date_of_birth &&
-        user.date_of_birth !== ''
-    );
-}
 
 export default function UserRpView({ viewState, rpId }: UserRpViewProps) {
     const { user } = useUser();

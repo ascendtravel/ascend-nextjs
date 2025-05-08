@@ -7,6 +7,7 @@ import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import IconHotelBed from '@/components/Icon/IconHotelBed';
 import IconPlaneCircleTilt from '@/components/Icon/IconPlaneCircleTilt';
 import { Button } from '@/components/ui/button';
+import { formatDateNoTZ } from '@/lib/date-formatters';
 import { getCurrencyAndAmountText, getTripSavingsString } from '@/lib/money';
 
 import { format, isFuture, parseISO } from 'date-fns';
@@ -84,11 +85,11 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                         <div className='text-2xl font-bold'>{(trip.payload as HotelPayload).hotel_name}</div>
                         <div className='flex flex-row items-center justify-start gap-2'>
                             <div className='text-xs'>
-                                {getNiceFormattedDate((trip.payload as HotelPayload).check_in_date)}
+                                {formatDateNoTZ((trip.payload as HotelPayload).check_in_date)}
                             </div>
                             <div className='text-sm text-neutral-500'>To</div>
                             <div className='text-xs'>
-                                {getNiceFormattedDate((trip.payload as HotelPayload).check_out_date)}
+                                {formatDateNoTZ((trip.payload as HotelPayload).check_out_date)}
                             </div>
                         </div>
                     </div>
@@ -115,7 +116,7 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                         </div>
                         <div className='flex flex-row items-center justify-start gap-2'>
                             <div className='text-xs'>
-                                {getNiceFormattedDate((trip.payload as FlightPayload).departure_date)}
+                                {formatDateNoTZ((trip.payload as FlightPayload).departure_date)}
                             </div>
                         </div>
                     </div>
@@ -139,9 +140,4 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
             )}
         </motion.div>
     );
-}
-
-// format as feb 28, 2025
-function getNiceFormattedDate(date: string) {
-    return format(new Date(date), 'MMM d, yyyy');
 }

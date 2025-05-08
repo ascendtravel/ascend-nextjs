@@ -223,7 +223,7 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                                 className={cn('flex w-full cursor-pointer', {
                                     hidden: filteredTrips.length === 0,
                                     'justify-start pr-2': filteredTrips.length % 2 === 1,
-                                    'justify-end pl-2': filteredTrips.length % 2 === 0
+                                    'justify-start': filteredTrips.length % 2 === 0
                                 })}>
                                 <AddTripCard />
                             </div>

@@ -1,8 +1,7 @@
 'use client';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
-
-import { format } from 'date-fns';
+import { formatDateNoTZ } from '@/lib/date-formatters';
 
 interface HotelSuccessViewProps {
     trip: Booking & { payload: HotelPayload };
@@ -18,11 +17,11 @@ export default function HotelSuccessView({ trip }: HotelSuccessViewProps) {
             <div className='flex w-full flex-col items-center justify-between text-sm text-neutral-500'>
                 <div className='flex w-full flex-row items-center justify-between'>
                     <div className='font-bold'>Check In</div>
-                    <div>{format(new Date(trip.payload.check_in_date), 'd MMMM yyyy')}</div>
+                    <div>{formatDateNoTZ(trip.payload.check_in_date)}</div>
                 </div>
                 <div className='flex w-full flex-row items-center justify-between'>
                     <div className='font-bold'>Check Out</div>
-                    <div>{format(new Date(trip.payload.check_out_date), 'd MMMM yyyy')}</div>
+                    <div>{formatDateNoTZ(trip.payload.check_out_date)}</div>
                 </div>
             </div>
         </div>
