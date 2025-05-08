@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
+import Intercom from '@intercom/messenger-js-sdk';
 
 import { CopyIcon, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -18,6 +19,13 @@ export default function AddTripsView() {
     const { user, reloadUser } = useUser();
     const [isAccountsExpanded, setIsAccountsExpanded] = useState(true);
     const router = useRouter();
+
+    Intercom({
+        app_id: 'otkzzyb8',
+        user_id: user?.id ?? '',
+        name: user?.first_name ?? '',
+        email: user?.main_email ?? ''
+    });
 
     useEffect(() => {
         reloadUser();
