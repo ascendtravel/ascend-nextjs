@@ -2,12 +2,17 @@
 
 import { useRouter } from 'next/navigation';
 
+import { trackLuckyOrangeEvent } from '@/lib/analytics';
 import { PlusIcon } from '@radix-ui/react-icons';
 
 export default function AddTripCard() {
     const router = useRouter();
 
     const handleClick = () => {
+        // Track the add-trip-clicked event in Lucky Orange
+        trackLuckyOrangeEvent('add-trip-clicked', { source: 'trip_card' });
+
+        // Navigate to the add trip page
         router.push('/add-trip');
     };
 

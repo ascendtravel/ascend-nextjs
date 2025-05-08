@@ -2,10 +2,20 @@
 
 import { useRouter } from 'next/navigation';
 
+import { trackLuckyOrangeEvent } from '@/lib/analytics';
+
 import { Plus } from 'lucide-react';
 
 export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $500' }: { totalSavings?: string }) {
     const router = useRouter();
+
+    const handleAddTripClick = () => {
+        // Track the add-trip-clicked event in Lucky Orange
+        trackLuckyOrangeEvent('add-trip-clicked', { source: 'no_trips_button' });
+
+        // Navigate to the add trip page
+        router.push('/add-trip');
+    };
 
     return (
         <div className='flex w-full flex-col items-center justify-center gap-2 rounded-lg border-t border-gray-200 p-4 pt-8'>
@@ -27,9 +37,7 @@ export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $
             </div>
             <div
                 className='flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full bg-[#1DC167] px-4 py-1 text-center text-base font-semibold text-neutral-50 drop-shadow-lg'
-                onClick={() => {
-                    router.push('/add-trip');
-                }}>
+                onClick={handleAddTripClick}>
                 <Plus className='size-5' />
                 Add a trip manually
             </div>

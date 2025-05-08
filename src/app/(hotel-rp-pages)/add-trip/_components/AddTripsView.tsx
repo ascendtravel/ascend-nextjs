@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
+import { trackLuckyOrangeEvent } from '@/lib/analytics';
 import Intercom from '@intercom/messenger-js-sdk';
 
 import { CopyIcon, Plus } from 'lucide-react';
@@ -112,6 +113,7 @@ export default function AddTripsView() {
                         variant='ghost'
                         className='flex items-center gap-4'
                         onClick={() => {
+                            trackLuckyOrangeEvent('add-account-clicked', { from: 'add_trip_page' });
                             router.push('/add-gmail');
                         }}>
                         <div className='flex size-10 items-center justify-center rounded-full bg-neutral-300'>
