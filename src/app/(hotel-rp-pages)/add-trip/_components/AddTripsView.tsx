@@ -21,7 +21,7 @@ export default function AddTripsView() {
     const router = useRouter();
 
     Intercom({
-        app_id: 'otkzzyb8',
+        app_id: process.env.INTERCOM_APP_ID ?? '',
         user_id: user?.id ?? '',
         name: user?.first_name ?? '',
         email: user?.main_email ?? ''
