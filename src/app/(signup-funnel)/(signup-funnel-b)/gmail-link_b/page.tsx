@@ -82,20 +82,17 @@ function GmailLinkB() {
 
             <Link href={stateId ? `https://gmail.heyascend.com/gmail/import/start/${stateId} ` : ''}>
                 <div className='flex flex-col items-center justify-center gap-4 overflow-clip rounded-3xl'>
-                    {stateId && (
-                        <div
-                            onClick={() =>
-                                (window.location.href = `https://gmail.heyascend.com/gmail/import/start/${stateId} `)
-                            }
-                            className='cursor-pointer'>
-                            <CheckboxNotice width={260} height={120} showText={false} />
-                        </div>
-                    )}
-                    {!stateId && <CheckboxNotice width={260} height={120} showText={false} />}
+                    <div
+                        onClick={() =>
+                            (window.location.href = `https://gmail.heyascend.com/gmail/import/start/${stateId} `)
+                        }
+                        className='cursor-pointer'>
+                        <CheckboxNotice width={260} height={120} showText={false} />
+                    </div>
                 </div>
             </Link>
 
-            <div className='flex flex-1 flex-col items-center'>
+            <div className='mt-8 flex flex-1 flex-col items-center transition-all duration-300'>
                 {stateId ? (
                     <Link
                         href={`https://gmail.heyascend.com/gmail/import/start/${stateId} `}
