@@ -9,6 +9,28 @@ import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 
 import { MetaPixel } from './MetaPixel';
 
+// Helper function to ensure global access to Lucky Orange tracking
+// This will be called from our utility function
+export function trackLuckyOrangeGlobalEvent(eventName: string, metadata?: Record<string, any>): void {
+    if (typeof window === 'undefined') return;
+
+    window.LOQ = window.LOQ || [];
+    window.LOQ.push([
+        'ready',
+        async (LO: any) => {
+            try {
+                await LO.$internal.ready('events');
+                LO.events.track(eventName, metadata);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`[LuckyOrange] Tracked global event: ${eventName}`, metadata);
+                }
+            } catch (err) {
+                console.error(`[LuckyOrange] Error tracking global event "${eventName}":`, err);
+            }
+        }
+    ]);
+}
+
 function LuckyOrange() {
     const { user, isImpersonating } = useUser();
 
