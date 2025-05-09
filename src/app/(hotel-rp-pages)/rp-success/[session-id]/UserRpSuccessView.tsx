@@ -61,13 +61,13 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
                 throw new Error(errorData.error || 'Failed to get payment link');
             }
 
-            const { stripe_link_url } = await response.json();
-            if (!stripe_link_url) {
+            const { payment_link } = await response.json();
+            if (!payment_link) {
                 throw new Error('No payment link received');
             }
 
             // Redirect to Stripe
-            window.location.href = stripe_link_url;
+            window.location.href = payment_link;
         } catch (error) {
             console.error('Error getting payment link:', error);
             toast.error(error instanceof Error ? error.message : 'Failed to process payment');
@@ -84,7 +84,7 @@ export default function UserRpSuccessView({ tripId }: UserRpSuccessViewProps) {
             <div className='flex flex-col gap-2 px-6 pt-8'>
                 <div className='flex w-full flex-row items-center justify-start gap-2'>
                     <CircleCheck className='size-5 text-[#2B9136]' />
-                    <div className='w-full text-lg font-bold text-[#2B9136]'>Payment Confirmed!</div>
+                    <div className='w-full text-lg font-bold text-[#2B9136]'>Repricing Confirmed!</div>
                 </div>
                 <div className='w-full text-left text-2xl font-bold text-neutral-900'>
                     You pocketed {trip.type === 'hotel' ? 'an extra' : ''}{' '}

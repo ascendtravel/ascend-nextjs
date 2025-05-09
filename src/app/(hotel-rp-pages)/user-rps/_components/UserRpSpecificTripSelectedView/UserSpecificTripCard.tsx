@@ -130,7 +130,9 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
             )}
             {potentialSavings > 0 && isUpcoming && (
                 <>
-                    <div className='mb-2 text-sm text-gray-500'>We can save you ${potentialSavings} on this stay!</div>
+                    <div className='mb-2 text-sm text-gray-500'>
+                        We can save you ${potentialSavings} on this {trip.type === 'hotel' ? 'stay' : 'flight'}!
+                    </div>
                     <Button
                         className='mt-4 w-full rounded-full bg-[#1DC167] font-bold text-white'
                         onClick={handleRepriceClick}>
