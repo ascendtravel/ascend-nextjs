@@ -20,21 +20,29 @@ async function getInitialTrips(
             url.searchParams.set('impersonationId', impersonateUserId);
         }
 
+        console.log('Layout fetching data with token:', token ? 'Present' : 'Missing');
+
+        // Properly format the Authorization header
+        const headers: HeadersInit = {};
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch(url.toString(), {
             cache: 'no-store',
-            headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {})
-            }
+            headers
         });
 
         const data = await response.json();
 
         if (response.status === 401) {
+            console.log('Layout received 401 from API, redirecting to:', data.redirect);
+
             return { trips: null, redirect: data.redirect };
         }
 
         if (!response.ok) {
-            console.error('Error fetching initial trips');
+            console.error('Error fetching initial trips:', response.status);
 
             return { trips: [] };
         }
@@ -51,11 +59,38 @@ async function getInitialTrips(
 export default async function HotelRpPagesLayout({ children }: { children: React.ReactNode }) {
     // Get token from cookies on server side
     const cookieStore = await cookies();
-    const token = cookieStore.get('authToken')?.value || null;
-    const impersonateUserId = cookieStore.get('impersonateUserId')?.value;
+    let token = cookieStore.get('authToken')?.value || null;
+
+    // Decode the token if it exists (since it's URI encoded in the cookie)
+    if (token) {
+        try {
+            token = decodeURIComponent(token);
+        } catch (e) {
+            console.error('Error decoding token from cookie:', e);
+            // Keep the token as is if decoding fails
+        }
+    }
+
+    // Get impersonation ID and decode it if needed
+    let impersonateUserId = cookieStore.get('impersonateUserId')?.value;
+    if (impersonateUserId) {
+        try {
+            impersonateUserId = decodeURIComponent(impersonateUserId);
+        } catch (e) {
+            console.error('Error decoding impersonateUserId from cookie:', e);
+            // Keep the value as is if decoding fails
+        }
+    }
+
+    console.log('Layout detected auth state:', {
+        hasToken: !!token,
+        hasImpersonation: !!impersonateUserId
+    });
+
     const { trips, redirect: redirectUrl } = await getInitialTrips(token, impersonateUserId);
 
     if (redirectUrl) {
+        console.log('Layout redirecting to:', redirectUrl);
         redirect(redirectUrl);
     }
 
