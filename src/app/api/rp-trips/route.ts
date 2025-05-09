@@ -99,10 +99,53 @@ function inferBookingType(payload: HotelPayload | FlightPayload): BookingType {
 
 export async function GET(request: NextRequest) {
     try {
-        const token = request.headers.get('Authorization')?.split(' ')[1];
-        const impersonationId = request.nextUrl.searchParams.get('impersonationId');
+        // Get token from Authorization header OR from cookies for server-side rendering support
+        let token = request.headers.get('Authorization')?.split(' ')[1];
 
-        console.log('impersonationId', impersonationId);
+        // If no token in authorization header, try to get from cookies
+        if (!token) {
+            const cookieToken = request.cookies.get('authToken')?.value;
+            if (cookieToken) {
+                // For cookies, we need to handle URL encoding
+                try {
+                    token = decodeURIComponent(cookieToken);
+                } catch (e) {
+                    token = cookieToken;
+                }
+                console.log('API route using token from cookies');
+            }
+        }
+
+        // Similarly handle impersonation ID from both sources
+        let impersonationId = request.nextUrl.searchParams.get('impersonationId');
+
+        // If not in query parameters, try cookies
+        if (!impersonationId) {
+            const cookieImpersonationId = request.cookies.get('impersonateUserId')?.value;
+            if (cookieImpersonationId) {
+                try {
+                    impersonationId = decodeURIComponent(cookieImpersonationId);
+                } catch (e) {
+                    impersonationId = cookieImpersonationId;
+                }
+                console.log('API route using impersonation ID from cookies');
+            }
+        }
+
+        // If still no token, return unauthorized
+        if (!token) {
+            console.log('No auth token found, returning 401');
+
+            return NextResponse.json(
+                {
+                    error: 'Unauthorized',
+                    redirect: '/auth/phone-login?redirect=/user-rps'
+                },
+                { status: 401 }
+            );
+        }
+
+        console.log('API route fetching with impersonationId:', impersonationId);
 
         const response = await UserRelatedFetch(
             '/me/bookings',
@@ -116,6 +159,8 @@ export async function GET(request: NextRequest) {
         );
 
         if (response.status === 401) {
+            console.log('Upstream API returned 401, redirecting to login');
+
             return NextResponse.json(
                 {
                     error: 'Unauthorized',
@@ -139,6 +184,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json(data);
     } catch (error: any) {
+        console.error('Error in rp-trips API route:', error);
+
         return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
     }
 }
