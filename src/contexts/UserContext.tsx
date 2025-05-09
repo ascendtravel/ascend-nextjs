@@ -38,6 +38,130 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+/**
+ * TokenManager - Centralized utilities for managing auth tokens and impersonation
+ * Handles both localStorage and cookie storage for better persistence
+ */
+const TokenManager = {
+    // Cookie utilities
+    getCookie: (name: string): string | null => {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                return cookie.substring(name.length + 1);
+            }
+        }
+
+        return null;
+    },
+
+    setCookie: (name: string, value: string, additionalOptions: string = '') => {
+        // Base cookie security settings
+        const securityFlags = [
+            'path=/', // Cookie path
+            'SameSite=Strict', // Prevent CSRF by restricting cross-site usage
+            'Secure', // Only transmit over HTTPS
+            'HttpOnly', // Prevent JavaScript access to cookies
+            'max-age=86400' // 24 hour expiry as a security best practice
+        ];
+
+        // Add any additional options
+        if (additionalOptions) {
+            securityFlags.push(additionalOptions);
+        }
+
+        // Encode value to prevent injection
+        const encodedValue = encodeURIComponent(value);
+
+        document.cookie = `${name}=${encodedValue}; ${securityFlags.join('; ')}`;
+    },
+
+    clearCookie: (name: string) => {
+        // When clearing cookies, maintain the same security settings
+        document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Strict; Secure; HttpOnly`;
+    },
+
+    // Auth token management
+    getAuthToken: (): string | null => {
+        // Try localStorage first, then cookies
+        const localToken = localStorage.getItem('authToken');
+        if (localToken) return localToken;
+
+        // Check cookies if not in localStorage
+        const cookieToken = TokenManager.getCookie('authToken');
+
+        // If found in cookies but not localStorage, restore it
+        if (cookieToken) {
+            localStorage.setItem('authToken', cookieToken);
+            console.log('[TokenManager] Recovered token from cookies');
+        }
+
+        return cookieToken;
+    },
+
+    setAuthToken: (token: string) => {
+        localStorage.setItem('authToken', token);
+        // Set auth token as secure as possible
+        TokenManager.setCookie('authToken', token);
+    },
+
+    clearAuthToken: () => {
+        localStorage.removeItem('authToken');
+        TokenManager.clearCookie('authToken');
+    },
+
+    // Customer ID management
+    setCustomerId: (id: string) => {
+        localStorage.setItem('customerId', id);
+        // Also store in secure cookie for better persistence
+        TokenManager.setCookie('customerId', id);
+    },
+
+    clearCustomerId: () => {
+        localStorage.removeItem('customerId');
+        TokenManager.clearCookie('customerId');
+    },
+
+    // Impersonation management
+    getImpersonateUserId: (): string | null => {
+        // Try localStorage first, then cookies
+        const localId = localStorage.getItem('impersonateUserId');
+        if (localId) return localId;
+
+        // Check cookies if not in localStorage
+        const cookieId = TokenManager.getCookie('impersonateUserId');
+
+        // If found in cookies but not localStorage, restore it
+        if (cookieId) {
+            localStorage.setItem('impersonateUserId', cookieId);
+        }
+
+        return cookieId;
+    },
+
+    setImpersonateUserId: (userId: string) => {
+        localStorage.setItem('impersonateUserId', userId);
+        TokenManager.setCookie('impersonateUserId', userId);
+    },
+
+    clearImpersonateUserId: () => {
+        localStorage.removeItem('impersonateUserId');
+        TokenManager.clearCookie('impersonateUserId');
+    },
+
+    isImpersonating: (): boolean => {
+        return TokenManager.getImpersonateUserId() !== null;
+    },
+
+    // Clear all auth data
+    clearAllAuth: () => {
+        TokenManager.clearAuthToken();
+        TokenManager.clearCustomerId();
+        TokenManager.clearImpersonateUserId();
+    }
+};
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -47,8 +171,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const initializeUser = async () => {
             setIsLoading(true);
-            const token = localStorage.getItem('authToken');
-            const impersonateUserId = localStorage.getItem('impersonateUserId');
+
+            const token = TokenManager.getAuthToken();
+            const impersonateUserId = TokenManager.getImpersonateUserId();
 
             if (!token) {
                 setIsLoading(false);
@@ -57,11 +182,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             }
 
             try {
-                // First load Impersonated User
                 if (impersonateUserId) {
                     await fetchUser(token, true);
                 } else {
-                    // Then load Regular User
                     await fetchUser(token);
                 }
             } catch (err) {
@@ -82,25 +205,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
      *    Impersonation functions
      *    ------------------------------------------------------------
      */
-    const isImpersonating = () => {
-        const impersonateUserId = localStorage.getItem('impersonateUserId');
+    const isImpersonating = () => TokenManager.isImpersonating();
 
-        return impersonateUserId !== null;
-    };
+    const stopImpersonating = () => TokenManager.clearImpersonateUserId();
 
-    const stopImpersonating = () => {
-        localStorage.removeItem('impersonateUserId');
+    const startImpersonating = (userId: string) => TokenManager.setImpersonateUserId(userId);
 
-        document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-    };
-
-    const startImpersonating = (userId: string) => {
-        localStorage.setItem('impersonateUserId', userId);
-
-        document.cookie = `impersonateUserId=${userId}; path=/`;
-    };
-
-    const getImpersonateUserId = () => localStorage.getItem('impersonateUserId');
+    const getImpersonateUserId = () => TokenManager.getImpersonateUserId();
 
     /*
      *    ------------------------------------------------------------
@@ -109,14 +220,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
      */
 
     const reloadUser = () => {
-        const isImpersonatingUser = isImpersonating();
-        fetchUser(getToken() || '', isImpersonatingUser);
+        const token = TokenManager.getAuthToken();
+        if (!token) return;
+
+        const isImpersonatingUser = TokenManager.isImpersonating();
+        fetchUser(token, isImpersonatingUser);
     };
 
     // Modified fetchUser to handle impersonation more explicitly
     const fetchUser = async (token: string, isImpersonationLoad = false) => {
         try {
-            const impersonateUserId = localStorage.getItem('impersonateUserId');
+            const impersonateUserId = TokenManager.getImpersonateUserId();
             const url = new URL('/api/user/me', window.location.origin);
 
             if (isImpersonationLoad && impersonateUserId) {
@@ -150,11 +264,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     const login = (token: string, customer_id: string, impersonateUserId?: string) => {
-        localStorage.setItem('authToken', token);
-        // add it to cokies also, make it secure with secure: true
-        document.cookie = `authToken=${token}; path=/; secure; samesite=strict;`;
-
-        localStorage.setItem('customerId', customer_id);
+        TokenManager.setAuthToken(token);
+        TokenManager.setCustomerId(customer_id);
 
         if (impersonateUserId) {
             startImpersonating(impersonateUserId);
@@ -164,17 +275,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     const logout = () => {
-        // Clear client-side storage
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('customerId');
-
-        // Clear cookie
-        document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-        // clear impersonations cookies
-        document.cookie = 'impersonateUserId=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
-
-        stopImpersonating();
-
+        TokenManager.clearAllAuth();
         setUser(null);
     };
 
@@ -184,7 +285,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         citizenship: string;
         date_of_birth: string;
     }) => {
-        const impersonateUserId = localStorage.getItem('impersonateUserId');
+        const impersonateUserId = TokenManager.getImpersonateUserId();
+        const token = TokenManager.getAuthToken();
+
+        if (!token) {
+            throw new Error('No authentication token available');
+        }
 
         const url = new URL('/api/user/update-me', window.location.origin);
         if (impersonateUserId) {
@@ -194,7 +300,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch(url.toString(), {
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${getToken()}`
+                Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
                 first_name: user.first_name,
@@ -218,7 +324,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
      *    ------------------------------------------------------------
      */
 
-    const getToken = () => localStorage.getItem('authToken');
+    const getToken = () => TokenManager.getAuthToken();
 
     return (
         <UserContext.Provider
