@@ -7,6 +7,9 @@ export async function POST(request: Request) {
         const headersList = await headers();
         const userAgent = headersList.get('user-agent') || '';
 
+        console.log('[GmailState] Creating state');
+        console.log(fbp, fbc, utm_params, customer_id);
+
         const response = await fetch('https://email.ascend.travel/gmail/import/create_state', {
             method: 'POST',
             headers: {

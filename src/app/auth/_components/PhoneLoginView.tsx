@@ -168,6 +168,8 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
             }
 
             if (data.success) {
+                console.log('[PhoneLoginView] Login successful, received token and customer_id');
+
                 if (impersonateId) {
                     login(data.token, data.customer_id, impersonateId);
                 } else {
@@ -175,15 +177,23 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
                 }
 
                 toast.success('Login successful');
-                if (redirectUrl) {
-                    router.push(redirectUrl);
-                } else {
-                    router.push('/user-rps');
-                }
+
+                // Add a small delay to ensure token is properly stored before redirecting
+                setTimeout(() => {
+                    console.log('[PhoneLoginView] Redirecting after login');
+                    if (redirectUrl) {
+                        console.log(`[PhoneLoginView] Redirecting to: ${redirectUrl}`);
+                        router.push(redirectUrl);
+                    } else {
+                        console.log('[PhoneLoginView] Redirecting to default: /user-rps');
+                        router.push('/user-rps');
+                    }
+                }, 500);
             } else {
                 throw new Error(data.message || 'Verification failed');
             }
         } catch (error) {
+            console.error('[PhoneLoginView] Login error:', error);
             toast.error(error instanceof Error ? error.message : 'Verification failed');
         } finally {
             setIsVerifying(false);
