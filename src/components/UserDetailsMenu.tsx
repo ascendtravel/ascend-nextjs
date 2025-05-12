@@ -210,8 +210,8 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
             </MenuItem>
 
             {isImpersonating() && (
-                <MenuItem onClick={handleStopImpersonating} className='absolute bottom-10 left-[50%] text-neutral-50'>
-                    <div className='flex w-fit -translate-x-[50%] flex-row items-center justify-between gap-2 rounded-full border bg-red-400 px-6 py-2 text-nowrap'>
+                <MenuItem onClick={handleStopImpersonating} className='text-neutral-50'>
+                    <div className='flex w-full flex-row items-center justify-between gap-2 rounded-full border bg-red-400 px-6 py-2 text-nowrap'>
                         Stop Impersonating
                         <UserRoundX className='size-5' />
                     </div>

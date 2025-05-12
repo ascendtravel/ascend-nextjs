@@ -1,4 +1,5 @@
 import { QuoteProps } from '@/app/api/rp-trips/route';
+import { Separator } from '@/components/ui/separator';
 import { formatDateNoTZ } from '@/lib/date-formatters';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
@@ -24,6 +25,7 @@ interface UserRpHotelDetailsListProps {
     totalPrice?: string;
     nights?: number;
     quoteData?: QuoteProps;
+    savings?: string;
 }
 
 export default function UserRpHotelDetailsList({
@@ -37,7 +39,8 @@ export default function UserRpHotelDetailsList({
     totalPrice,
     nights,
     nightlyPriceCurrency,
-    quoteData
+    quoteData,
+    savings
 }: UserRpHotelDetailsListProps) {
     function calcTotalPriceForAllNights() {
         if (!nightlyPrice || !nights) return 0;
@@ -107,16 +110,20 @@ export default function UserRpHotelDetailsList({
                     <div className='text-left text-sm font-medium'>
                         Price for {nights} {nights === 1 ? 'Night' : 'Nights'}
                     </div>
-                    <div className='text-right text-sm'>{`${getCurrencyAndAmountText({
-                        amount: calcTotalPriceForAllNights(),
-                        currency: nightlyPriceCurrency || 'USD'
-                    })}`}</div>
+                    <div className='text-right text-sm'>{`${getCurrencyAndAmountText(
+                        {
+                            amount: calcTotalPriceForAllNights(),
+                            currency: nightlyPriceCurrency || 'USD'
+                        },
+                        true,
+                        true
+                    )}`}</div>
                 </div>
             )}
             {localTaxesAndFees && (
                 <div className='flex flex-row items-center justify-between'>
                     <div className='text-left text-sm font-medium'>Local Taxes and Fees</div>
-                    <div className='text-right text-sm'>{localTaxesAndFees}1</div>
+                    <div className='text-right text-sm'>{localTaxesAndFees}</div>
                 </div>
             )}
             {totalPrice && (
@@ -124,6 +131,15 @@ export default function UserRpHotelDetailsList({
                     <div className='text-left text-sm font-medium'>Total</div>
                     <div className='text-right text-sm'>{totalPrice}</div>
                 </div>
+            )}
+            {savings && (
+                <>
+                    <Separator />
+                    <div className='flex flex-row items-center justify-between font-semibold text-[#1DC167]'>
+                        <div className='text-left text-sm font-medium'>Savings</div>
+                        <div className='text-right text-sm'>{savings}</div>
+                    </div>
+                </>
             )}
         </div>
     );

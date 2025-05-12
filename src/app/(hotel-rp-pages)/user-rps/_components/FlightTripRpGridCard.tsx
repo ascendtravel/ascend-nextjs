@@ -1,6 +1,7 @@
 'use client';
 
 import { Booking, FlightPayload } from '@/app/api/rp-trips/route';
+import { formatDateNoTZ } from '@/lib/date-formatters';
 
 import { DotIcon, PlaneIcon } from 'lucide-react';
 
@@ -20,7 +21,7 @@ export default function FlightTripRpGridCard({ trip }: FlightTripRpGridCardProps
                         {hasSavings && <DotIcon className='absolute -right-6 -bottom-1.5 z-50 size-8 text-[#1DC167]' />}
                     </div>
                 </div>
-                <div className='text-xs text-neutral-200'>{trip.payload.departure_date}</div>
+                <div className='text-xs text-neutral-200'>{formatDateNoTZ(trip.payload.departure_date)}</div>
                 <div className='flex items-center justify-start gap-2'>
                     <PlaneIcon className='h-3 w-3 text-neutral-200' />
                     <div className='text-xs text-neutral-200'>{trip.payload.airline}</div>

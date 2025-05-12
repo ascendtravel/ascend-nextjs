@@ -35,7 +35,7 @@ export default function AddTripsView() {
     return (
         <div className='mt-2 h-full w-full rounded-t-xl bg-neutral-50 transition-all duration-300'>
             <div className='flex flex-row items-center justify-between pt-4 pl-4'>
-                <BackGreenButton />
+                <BackGreenButton onClick={() => router.push('/user-rps')} preventNavigation={true} />
             </div>
 
             {/* Current User Card - Restoring the original implementation */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
+import { formatDateNoTZ } from '@/lib/date-formatters';
 
 import { DotIcon, MapPinIcon } from 'lucide-react';
 
@@ -19,7 +20,7 @@ export default function HotelStayRPGridCard({ trip }: HotelStayRPGridCardProps) 
                         {trip.payload.hotel_name}
                         {hasSavings && <DotIcon className='absolute -right-6 -bottom-1.5 z-50 size-8 text-[#1DC167]' />}
                     </span>
-                    <div className='text-xs text-neutral-300'>{trip.payload.check_in_date} </div>
+                    <div className='text-xs text-neutral-300'>{formatDateNoTZ(trip.payload.check_in_date)} </div>
                 </div>
                 <div className='flex items-center justify-start gap-2'>
                     <MapPinIcon className='h-3 w-3 text-neutral-100' />

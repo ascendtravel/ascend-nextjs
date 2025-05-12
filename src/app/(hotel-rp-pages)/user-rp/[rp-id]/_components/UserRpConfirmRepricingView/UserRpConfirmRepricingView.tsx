@@ -29,7 +29,7 @@ export default function UserRpConfirmRepricingView({ rpId }: UserRpConfirmRepric
                 <BackGreenButton
                     onClick={() => {
                         user && ValidateProfileCompleted(user)
-                            ? router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`)
+                            ? router.push(`/user-rps`)
                             : router.push(`/user-rp/${rpId}?view-state=ConfirmUserInfo`);
                     }}
                     preventNavigation={true}

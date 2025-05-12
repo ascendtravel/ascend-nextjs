@@ -88,7 +88,9 @@ export default function RpGridCardWrapper({
                     <div className='flex w-full items-center justify-center text-xs font-semibold text-white'>
                         Tap to save{' '}
                         {getCurrencyAndAmountText(
-                            trip?.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' }
+                            trip?.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' },
+                            true,
+                            false
                         )}
                     </div>
                 </div>

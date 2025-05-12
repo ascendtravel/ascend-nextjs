@@ -69,7 +69,7 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
     return (
         <div className='flex flex-col pb-16'>
             <div className='px-6 text-lg font-semibold'>
-                Review the details below, and pay to confirm your new booking. We'll handle cancelling your current
+                Review the details below, and confirm your new booking. We'll handle cancelling your old, more expensive
                 reservation.
             </div>
             <div className='relative mt-4 ml-[5%] flex h-[200px] w-[90%] flex-row items-center justify-between overflow-hidden rounded-lg'>
@@ -87,8 +87,8 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                     hotelPayload.price_per_night_cents.amount ? hotelPayload.price_per_night_cents.amount / 100 : 0
                 }
                 nightlyPriceCurrency={hotelPayload.price_per_night_cents.currency || 'USD'}
-                localTaxesAndFees={getCurrencyAndAmountText(hotelPayload.local_tax_and_fees_cents)}
-                totalPrice={getCurrencyAndAmountText(hotelPayload.total_price_cents)}
+                localTaxesAndFees={getCurrencyAndAmountText(hotelPayload.local_tax_and_fees_cents, true, true)}
+                totalPrice={getCurrencyAndAmountText(hotelPayload.total_price_cents, true, true)}
                 // These fields aren't in the new API, so using defaults or removing
                 totalGuests={1}
                 roomsPersonCombos={[
@@ -113,6 +113,7 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                           }
                         : hotelPayload.quote_props
                 }
+                savings={getCurrencyAndAmountText(hotelPayload.potential_savings_cents, true, true)}
             />
             <div className='mt-4 flex w-full flex-col items-center justify-center px-8'>
                 <div

@@ -196,6 +196,13 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
         }
     };
 
+    // Add a useEffect to auto-submit when OTP is complete
+    useEffect(() => {
+        if (otpValue.length === 6 && isFlipped && !isVerifying) {
+            handleVerifyOtp();
+        }
+    }, [otpValue]);
+
     return (
         <div
             className={cn(
@@ -289,7 +296,9 @@ export function PhoneRegisterView({ redirectUrl, state_id }: PhoneRegisterViewPr
                                 <InputOTP
                                     maxLength={6}
                                     value={otpValue}
-                                    onChange={setOtpValue}
+                                    onChange={(value) => {
+                                        setOtpValue(value);
+                                    }}
                                     containerClassName='justify-center gap-2'>
                                     <InputOTPGroup>
                                         {Array.from({ length: 6 }).map((_, i) => (

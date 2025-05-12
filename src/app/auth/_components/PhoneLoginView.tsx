@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useUser } from '@/contexts/UserContext';
@@ -45,10 +44,9 @@ const cardVariants = {
 
 interface PhoneLoginViewProps {
     redirectUrl: string;
-    showImpersonate?: boolean;
 }
 
-export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewProps) {
+export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
     const router = useRouter();
     const [isFlipped, setIsFlipped] = useState(false);
     const [selectedCountry, setSelectedCountry] = useState('US');
@@ -58,7 +56,6 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
     const [isLoading, setIsLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [cooldown, setCooldown] = useState(0);
-    const [impersonateId, setImpersonateId] = useState('');
 
     const { login, stopImpersonating, logout } = useUser();
 
@@ -169,13 +166,7 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
 
             if (data.success) {
                 console.log('[PhoneLoginView] Login successful, received token and customer_id');
-
-                if (impersonateId) {
-                    login(data.token, data.customer_id, impersonateId);
-                } else {
-                    login(data.token, data.customer_id);
-                }
-
+                login(data.token, data.customer_id);
                 toast.success('Login successful');
 
                 // Add a small delay to ensure token is properly stored before redirecting
@@ -200,14 +191,19 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
         }
     };
 
+    // Add a useEffect to auto-submit when OTP is complete
+    useEffect(() => {
+        if (otpValue.length === 6 && isFlipped && !isVerifying) {
+            handleVerifyOtp();
+        }
+    }, [otpValue]);
+
     return (
         <div
             className={cn(
                 'perspective-1000 relative',
                 isFlipped && 'h-[350px]',
                 !isFlipped && 'h-[270px]',
-                showImpersonate && isFlipped && 'h-[380px]',
-
                 'w-full max-w-[400px] transition-all duration-500'
             )}>
             <div className='relative top-2 left-1/2 -mt-36 flex max-w-[250px] -translate-x-1/2 items-center gap-2 pb-18'>
@@ -264,7 +260,9 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
                                 <InputOTP
                                     maxLength={6}
                                     value={otpValue}
-                                    onChange={setOtpValue}
+                                    onChange={(value) => {
+                                        setOtpValue(value);
+                                    }}
                                     containerClassName='justify-center gap-2'>
                                     <InputOTPGroup>
                                         {Array.from({ length: 6 }).map((_, i) => (
@@ -273,16 +271,7 @@ export function PhoneLoginView({ redirectUrl, showImpersonate }: PhoneLoginViewP
                                     </InputOTPGroup>
                                 </InputOTP>
                             </div>
-                            {/* Show impersonate input if enabled */}
-                            {showImpersonate && (
-                                <Input
-                                    type='text'
-                                    placeholder='Impersonate User Id'
-                                    value={impersonateId}
-                                    onChange={(e) => setImpersonateId(e.target.value)}
-                                    className='mt-4 h-16 rounded-md border border-neutral-300 p-2 px-4 text-sm'
-                                />
-                            )}
+
                             <Button
                                 onClick={handleVerifyOtp}
                                 disabled={otpValue.length !== 6 || isVerifying}

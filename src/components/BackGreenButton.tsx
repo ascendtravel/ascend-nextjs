@@ -8,6 +8,11 @@ import { cn } from '@/lib/utils';
 
 import { ArrowLeft } from 'lucide-react';
 
+/**
+ * @param onClick - Optional callback function to handle click events
+ * @param className - Optional className for custom styling
+ * @param preventNavigation - Optional boolean to prevent default back navigation behaviour and use onClick instead
+ */
 interface BackGreenButtonProps {
     onClick?: () => void;
     className?: string;
