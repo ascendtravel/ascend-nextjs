@@ -1,3 +1,4 @@
+import { QuoteProps } from '@/app/api/rp-trips/route';
 import { formatDateNoTZ } from '@/lib/date-formatters';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
@@ -22,6 +23,7 @@ interface UserRpHotelDetailsListProps {
     localTaxesAndFees?: string;
     totalPrice?: string;
     nights?: number;
+    quoteData?: QuoteProps;
 }
 
 export default function UserRpHotelDetailsList({
@@ -34,7 +36,8 @@ export default function UserRpHotelDetailsList({
     localTaxesAndFees,
     totalPrice,
     nights,
-    nightlyPriceCurrency
+    nightlyPriceCurrency,
+    quoteData
 }: UserRpHotelDetailsListProps) {
     function calcTotalPriceForAllNights() {
         if (!nightlyPrice || !nights) return 0;
@@ -71,7 +74,13 @@ export default function UserRpHotelDetailsList({
                     <div className='flex flex-col gap-2'>
                         {roomsPersonCombos?.map((combo) => (
                             <div key={combo.roomType} className='text-right text-sm'>
-                                <div className='text-right font-semibold'>{combo.roomType}</div>
+                                <div
+                                    className={`${quoteData?.quote_room_type ? 'text-neutral-600 line-through' : 'font-semibold'}`}>
+                                    {combo.roomType}
+                                </div>
+                                {quoteData && (
+                                    <div className='text-right font-semibold'>{quoteData.quote_room_type}</div>
+                                )}
                                 <div className='text-right'>
                                     {combo.adults} adult{combo.adults > 1 ? 's' : ''}, {combo.children} child
                                     {combo.children > 1 ? 'ren' : ''}
