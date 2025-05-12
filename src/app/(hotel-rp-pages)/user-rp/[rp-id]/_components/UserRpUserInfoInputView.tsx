@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { CitizenshipSelector } from '@/components/ui/updated-citizenship-selector';
 import { useTripsRp } from '@/contexts/TripsRpContext';
 import { useUser } from '@/contexts/UserContext';
-import { getTripSavingsString } from '@/lib/money';
+import { getCurrencyAndAmountText } from '@/lib/money';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useForm } from 'react-hook-form';
@@ -125,7 +125,15 @@ export default function UserRpUserInfoInputView({ initialData, rpId }: UserRpUse
                     }}
                     preventNavigation={true}
                 />
-                <div className='text-xl font-bold'>How to get {getTripSavingsString(trip, true)} back:</div>
+                <div className='text-xl font-bold'>
+                    How to get{' '}
+                    {getCurrencyAndAmountText(
+                        trip?.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' },
+                        true,
+                        false
+                    )}{' '}
+                    back:
+                </div>
                 <div className='mb-6 text-sm'>First, confirm your traveler information to continue:</div>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className='flex h-full flex-col'>

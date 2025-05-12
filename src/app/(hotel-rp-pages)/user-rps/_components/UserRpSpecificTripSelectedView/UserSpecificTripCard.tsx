@@ -8,7 +8,7 @@ import IconHotelBed from '@/components/Icon/IconHotelBed';
 import IconPlaneCircleTilt from '@/components/Icon/IconPlaneCircleTilt';
 import { Button } from '@/components/ui/button';
 import { formatDateNoTZ } from '@/lib/date-formatters';
-import { getCurrencyAndAmountText, getTripSavingsString } from '@/lib/money';
+import { getCurrencyAndAmountText } from '@/lib/money';
 
 import { format, isFuture, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
@@ -136,7 +136,12 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
                     <Button
                         className='mt-4 w-full rounded-full bg-[#1DC167] font-bold text-white'
                         onClick={handleRepriceClick}>
-                        Reprice and get {getCurrencyAndAmountText(trip.payload.potential_savings_cents)}
+                        Reprice and get{' '}
+                        {getCurrencyAndAmountText(
+                            trip.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' },
+                            true,
+                            false
+                        )}
                     </Button>
                 </>
             )}

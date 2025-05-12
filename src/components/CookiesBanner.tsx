@@ -3,18 +3,30 @@
 import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 
 import { CookieIcon } from 'lucide-react';
 
+// in these urls, we don't show the cookie banner
+const blackListedUrls = [
+    '/gmail-link-landing',
+    '/gmail-link_b',
+    '/auth/phone-login',
+    '/auth/phone-register',
+    '/gmail-link_b/success'
+];
+
 export function CookiesBanner() {
     const [showBanner, setShowBanner] = useState(false);
+
+    const pathname = usePathname();
 
     useEffect(() => {
         // Check if user has already made a choice
         const cookieChoice = localStorage.getItem('cookie-consent');
-        if (!cookieChoice) {
+        if (!cookieChoice || !blackListedUrls.includes(pathname)) {
             setShowBanner(true);
         }
     }, []);
