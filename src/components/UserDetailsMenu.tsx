@@ -20,7 +20,7 @@ import { useUser } from '@/contexts/UserContext';
 
 import { Skeleton } from './ui/skeleton';
 import { format, parseISO } from 'date-fns';
-import { PencilIcon, X } from 'lucide-react';
+import { PencilIcon, UserRoundX, X } from 'lucide-react';
 
 export default function UserDetailsMenu({ loading }: { loading?: boolean }) {
     const { user } = useUser();
@@ -106,9 +106,6 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
             window.location.reload();
         }
     };
-
-    // Only show impersonation features if user is currently impersonating
-    const showImpersonation = isImpersonating();
 
     const userFields = [
         { key: 'first_name', label: 'First' },
@@ -202,11 +199,6 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
                             <MenuItem className='cursor-default text-xs opacity-50'>
                                 {localStorage.getItem('impersonateUserId')}
                             </MenuItem>
-                            {isImpersonating() && (
-                                <MenuItem onClick={handleStopImpersonating} className='text-yellow-600'>
-                                    Stop Impersonating
-                                </MenuItem>
-                            )}
                         </>
                     )}
                 </>
@@ -216,6 +208,15 @@ function UserMenuContent({ isMobile }: { isMobile: boolean }) {
             <MenuItem onClick={handleLogout} className='cursor-pointer px-2 text-[#006DBC] hover:text-[#006DBC]/80'>
                 Log out
             </MenuItem>
+
+            {isImpersonating() && (
+                <MenuItem onClick={handleStopImpersonating} className='absolute bottom-10 left-[50%] text-neutral-50'>
+                    <div className='flex w-fit -translate-x-[50%] flex-row items-center justify-between gap-2 rounded-full border bg-red-400 px-6 py-2 text-nowrap'>
+                        Stop Impersonating
+                        <UserRoundX className='size-5' />
+                    </div>
+                </MenuItem>
+            )}
         </div>
     );
 }

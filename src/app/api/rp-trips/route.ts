@@ -26,6 +26,11 @@ interface RoomPersonCombination {
     child_list: number[];
 }
 
+export interface QuoteProps {
+    quote_id: string;
+    quote_room_type: string;
+}
+
 export interface HotelPayload extends CommonBookingPayload {
     hotel_name: string;
     city: string;
@@ -44,6 +49,7 @@ export interface HotelPayload extends CommonBookingPayload {
     price_per_night_cents: MoneyAmount;
     local_tax_and_fees_cents: MoneyAmount;
     room_person_combinations: RoomPersonCombination[];
+    quote_props: QuoteProps;
 }
 
 export interface FlightPayload extends CommonBookingPayload {

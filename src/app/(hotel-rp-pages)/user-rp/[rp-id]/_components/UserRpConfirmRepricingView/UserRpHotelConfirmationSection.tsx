@@ -105,6 +105,14 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                     }
                 ]}
                 nights={hotelPayload.nights}
+                quoteData={
+                    hotelPayload.booking_id === 'fake'
+                        ? {
+                              quote_id: '',
+                              quote_room_type: 'Deluxe Fake Room For Test'
+                          }
+                        : hotelPayload.quote_props
+                }
             />
             <div className='mt-4 flex w-full flex-col items-center justify-center px-8'>
                 <div
