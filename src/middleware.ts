@@ -28,16 +28,22 @@ export function middleware(request: NextRequest) {
      * (including the blocks themselves) once the backend changes are merged.
      * ========================================================================
      */
-    if (pathname === '/user-rps/welcome') {
+    if (pathname.startsWith('/user-rps/welcome')) {
+        // Get the base URL from the request
+        const baseUrl = new URL(request.url).origin;
+
+        // Create absolute redirect URL
+        const redirectUrl = new URL('/user-rps', baseUrl);
+
         // Preserve all query parameters in the redirect
-        const redirectUrl = new URL('/user-rps', url);
         searchParams.forEach((value, key) => {
             redirectUrl.searchParams.append(key, value);
         });
 
-        console.log(`WELCOME PAGE PATCH: Redirecting ${pathname} to /user-rps`);
+        console.log(`WELCOME PAGE PATCH: Redirecting ${pathname} to ${redirectUrl.toString()}`);
 
-        return NextResponse.redirect(redirectUrl);
+        // Use temporary redirect (307) to ensure proper handling
+        return NextResponse.redirect(redirectUrl.toString(), 307);
     }
     /**
      * ========================================================================
@@ -89,5 +95,17 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths the middleware will run on
 export const config = {
-    matcher: ['/', '/pick/:path*', '/picksV2/:path*', '/flight/:path*', '/flights/:path*']
+    matcher: [
+        '/',
+        '/pick/:path*',
+        '/picksV2/:path*',
+        '/flight/:path*',
+        '/flights/:path*',
+        '/gmail-link_b',
+        '/gmail-link-landing',
+        '/auth/phone-register',
+        '/gmail-link_b/success',
+        '/user-rps/welcome',
+        '/user-rps/welcome/:path*'
+    ]
 };
