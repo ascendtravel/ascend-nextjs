@@ -15,42 +15,6 @@ export function middleware(request: NextRequest) {
     const { pathname, searchParams } = request.nextUrl;
     const url = request.nextUrl.clone();
 
-    /**
-     * ========================================================================
-     * WELCOME PAGE PATCH
-     *
-     * TEMPORARY REDIRECT - TO BE REMOVED AFTER BACKEND CHANGES ARE MERGED
-     * This patch ensures the welcome page works in production while backend
-     * changes are being integrated.
-     *
-     * REMOVAL INSTRUCTIONS:
-     * Delete everything between the "WELCOME PAGE PATCH" comment blocks
-     * (including the blocks themselves) once the backend changes are merged.
-     * ========================================================================
-     */
-    if (pathname.startsWith('/user-rps/welcome')) {
-        // Get the base URL from the request
-        const baseUrl = new URL(request.url).origin;
-
-        // Create absolute redirect URL
-        const redirectUrl = new URL('/user-rps', baseUrl);
-
-        // Preserve all query parameters in the redirect
-        searchParams.forEach((value, key) => {
-            redirectUrl.searchParams.append(key, value);
-        });
-
-        console.log(`WELCOME PAGE PATCH: Redirecting ${pathname} to ${redirectUrl.toString()}`);
-
-        // Use temporary redirect (307) to ensure proper handling
-        return NextResponse.redirect(redirectUrl.toString(), 307);
-    }
-    /**
-     * ========================================================================
-     * END OF WELCOME PAGE PATCH
-     * ========================================================================
-     */
-
     // Determine environment using the custom env var
     const isLocalDev = process.env.NEXT_PUBLIC_IS_LOCAL_DEV === 'true';
 
@@ -77,17 +41,58 @@ export function middleware(request: NextRequest) {
 
     // Redirect old picks paths to app URL
     if (pathname.startsWith('/picksV2') || pathname.startsWith('/pick')) {
-        return NextResponse.redirect(`https://app.ascend.travel${pathname}`);
+        return redirectWithParams(`${baseAppUrl}${pathname}`);
     }
 
-    // Redirect flight paths to app.ascend.travel
+    // Redirect flight paths to app URL
     if (pathname.startsWith('/flight') || pathname.startsWith('/flights')) {
-        return NextResponse.redirect(`https://app.ascend.travel${pathname}`);
+        return redirectWithParams(`${baseAppUrl}${pathname}`);
     }
 
-    // Redirect root path to heyascend.com
+    // Redirect root path to marketing site
     if (pathname === '/') {
-        return NextResponse.redirect('https://heyascend.com');
+        return redirectWithParams(baseMarketingUrl);
+    }
+
+    // Gmail link redirects with query param preservation
+    if (pathname === '/gmail-link_b' || pathname === '/gmail-link-landing') {
+        return redirectWithParams(`${baseMainUrl}/onboarding`);
+    }
+
+    if (pathname === '/auth/phone-register') {
+        // Create URL with the mandatory step parameter and preserve existing params
+        const newUrl = new URL(`${baseMainUrl}/onboarding`);
+        newUrl.searchParams.append('step', 'phone-confirmation');
+
+        // Copy all search params from the original URL
+        searchParams.forEach((value, key) => {
+            // Skip if it's the step parameter we already added
+            if (key !== 'step') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+
+        console.log(`Redirecting to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b/success') {
+        // Create URL with the mandatory step parameter and preserve existing params
+        const newUrl = new URL(`${baseMainUrl}/onboarding`);
+        newUrl.searchParams.append('step', 'subscription');
+
+        // Copy all search params from the original URL
+        searchParams.forEach((value, key) => {
+            // Skip if it's the step parameter we already added
+            if (key !== 'step') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+
+        console.log(`Redirecting to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
     }
 
     return NextResponse.next();
@@ -104,8 +109,6 @@ export const config = {
         '/gmail-link_b',
         '/gmail-link-landing',
         '/auth/phone-register',
-        '/gmail-link_b/success',
-        '/user-rps/welcome',
-        '/user-rps/welcome/:path*'
+        '/gmail-link_b/success'
     ]
 };

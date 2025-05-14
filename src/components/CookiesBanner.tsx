@@ -15,7 +15,9 @@ const blackListedUrls = [
     '/gmail-link_b',
     '/auth/phone-login',
     '/auth/phone-register',
-    '/gmail-link_b/success'
+    '/gmail-link_b/success',
+    '/onboarding',
+    '/user-rps/welcome'
 ];
 
 export function CookiesBanner() {
