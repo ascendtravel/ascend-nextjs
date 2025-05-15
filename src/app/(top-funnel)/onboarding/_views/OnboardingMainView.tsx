@@ -185,7 +185,7 @@ export default function OnboardingMainView({
             <OnboardingHeader step={currentStep} />
 
             {/* Fixed navigation controls */}
-            <div className='fixed inset-x-3 top-4 z-50 flex flex-row justify-between'>
+            {/* <div className='fixed inset-x-3 top-4 z-50 flex flex-row justify-between'>
                 <div
                     className={cn(
                         'size-7 cursor-pointer rounded-full bg-neutral-50 p-1.5 drop-shadow-xl',
@@ -202,7 +202,7 @@ export default function OnboardingMainView({
                     onClick={handleNextStep}>
                     <ArrowRightIcon className='size-4 text-neutral-900' />
                 </div>
-            </div>
+            </div> */}
 
             {/* Fixed stepper that stays visible while scrolling */}
             <div className='fixed inset-x-0 top-14 z-30 flex flex-row items-center justify-center bg-gradient-to-t px-4 sm:top-24'>
