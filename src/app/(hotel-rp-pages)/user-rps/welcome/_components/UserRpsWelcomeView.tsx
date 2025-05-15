@@ -210,7 +210,7 @@ export function UserRpsWelcomeView() {
                             Your membership includes members-only deals on hotels and flights, just message us your
                             destination and we'll handle the rest!
                         </div>
-                        <Link href='/onboarding-landing/gmail-link'>
+                        <Link href='https://wa.me/14257280395' target='_blank'>
                             <Button className='rounded-full bg-[#1DC167] !px-12 py-3'>Message Us</Button>
                         </Link>
                     </div>
