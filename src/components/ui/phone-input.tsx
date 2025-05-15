@@ -23,7 +23,7 @@ interface Country {
 interface PhoneInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     control: any;
     name: string;
-    label?: string;
+    label?: string | React.ReactNode;
     onCountryChange?: (countryCode: string) => void;
     showWhatsAppIcon?: boolean;
 }
