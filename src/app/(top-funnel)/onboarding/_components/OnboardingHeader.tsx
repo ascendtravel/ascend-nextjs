@@ -166,15 +166,10 @@ export default function OnboardingHeader({ step }: OnboardingHeaderProps) {
                         animate='animate'
                         exit='exit'>
                         <h1 className='text-figtree text-lg font-bold'>Ascend is Backed by </h1>
-                        <Image
-                            src='/images/img-assets/Y-Comb.png'
-                            alt='Y Combinator Logo'
-                            width={120}
-                            height={120}
-                            quality={100}
-                            className='object-contain'
-                            priority
-                        />
+                        <div className='flex flex-row items-center justify-center gap-1'>
+                            <div className='size-7 bg-[#f26522] text-center text-xl font-bold'>Y</div>
+                            <div className='text-figtree text-lg font-semibold text-[#f26522]'>Combinator</div>
+                        </div>
                     </motion.div>
                 )}
 

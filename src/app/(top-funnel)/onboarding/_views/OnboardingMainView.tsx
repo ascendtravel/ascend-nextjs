@@ -205,7 +205,7 @@ export default function OnboardingMainView({
             </div>
 
             {/* Fixed stepper that stays visible while scrolling */}
-            <div className='fixed inset-x-0 top-14 z-30 flex flex-row items-center justify-center bg-gradient-to-t px-4'>
+            <div className='fixed inset-x-0 top-14 z-30 flex flex-row items-center justify-center bg-gradient-to-t px-4 sm:top-24'>
                 <OnboardingStepper
                     steps={Object.values(OnboardingSteps).map((step, index) => '')}
                     currentStep={mapStepToNumbers[currentStep]}
@@ -213,7 +213,7 @@ export default function OnboardingMainView({
             </div>
 
             {/* Content area with top padding to account for header and stepper */}
-            <div className='relative flex flex-1 items-center justify-center overflow-hidden pt-[8rem]'>
+            <div className='relative flex flex-1 items-center justify-center overflow-hidden pt-[8rem] sm:pt-[10rem]'>
                 <AnimatePresence initial={false} mode='wait' custom={direction}>
                     {currentStep === OnboardingSteps.Step1 && (
                         <motion.div

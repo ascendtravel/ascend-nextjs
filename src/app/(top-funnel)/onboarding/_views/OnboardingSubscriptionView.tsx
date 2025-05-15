@@ -61,7 +61,7 @@ export default function OnboardingSubscriptionView({ state_id }: { state_id?: st
         <div className='mt-12 h-full w-full'>
             {/* Scrollable content area */}
             <div className='flex h-[calc(100vh-6rem)] flex-col items-center justify-start overflow-y-auto'>
-                <div className='flex flex-col items-center justify-center px-4 py-4 pt-6'>
+                <div className='flex flex-col items-center justify-center px-4 py-4 pt-6 sm:pt-24'>
                     <p className='font-figtree max-w-md px-6 text-center text-[24px] leading-[28px] font-extrabold tracking-[-0.02em] text-white'>
                         Ascend works for you, not Big Travel
                     </p>

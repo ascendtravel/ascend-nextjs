@@ -6,7 +6,7 @@ import OnboardingGmailCheckCta from '../_components/OnboardingGmailCheckCta';
 
 export default function OnboardingGmailLinkView({ stateId }: { stateId: string }) {
     return (
-        <div className='flex h-full w-full flex-col items-center justify-start pt-18'>
+        <div className='flex h-full w-full flex-col items-center justify-start pt-18 sm:pt-36'>
             <div className='mb-4 flex flex-col items-center justify-center gap-4 px-2'>
                 <p className='font-figtree max-w-md px-6 text-center text-[24px] leading-[28px] font-extrabold tracking-[-0.02em] text-white'>
                     Use Gmail to automatically import your reservations

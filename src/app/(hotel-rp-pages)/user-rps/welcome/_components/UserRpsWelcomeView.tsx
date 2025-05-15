@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import Link from 'next/link';
+
 import IconHotelBed from '@/components/Icon/IconHotelBed';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
@@ -181,7 +183,9 @@ export function UserRpsWelcomeView() {
 
                 {/* Sheet Content Container - Fixed position relative to sheet */}
                 <div
-                    className={`absolute inset-x-0 top-12 bottom-0 flex flex-col items-center justify-start gap-2 ${isFullyExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}
+                    className={`scrollbar-hide absolute inset-x-0 top-12 bottom-0 flex flex-col items-center justify-start gap-2 ${
+                        isFullyExpanded ? 'overflow-y-auto' : 'overflow-hidden'
+                    }`}
                     ref={contentRef}>
                     <WelcomeWhatsNext
                         componenHeader="Here's what to expect next:"
@@ -192,7 +196,7 @@ export function UserRpsWelcomeView() {
                             },
                             {
                                 content:
-                                    'We’ll notify you when we find an opportunity, and our team will keep you posted as we work to get a refund.'
+                                    "We'll notify you when we find an opportunity, and our team will keep you posted as we work to get a refund."
                             },
                             {
                                 content: "You'll get your money back"
@@ -206,7 +210,9 @@ export function UserRpsWelcomeView() {
                             Your membership includes members-only deals on hotels and flights, just message us your
                             destination and we'll handle the rest!
                         </div>
-                        <Button className='rounded-full bg-[#1DC167] !px-12 py-3'>Message Us</Button>
+                        <Link href='/onboarding-landing/gmail-link'>
+                            <Button className='rounded-full bg-[#1DC167] !px-12 py-3'>Message Us</Button>
+                        </Link>
                     </div>
 
                     <div className='w-full'>
