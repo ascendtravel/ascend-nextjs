@@ -7,6 +7,7 @@ import Link from 'next/link';
 import IconHotelBed from '@/components/Icon/IconHotelBed';
 import { Button } from '@/components/ui/button';
 import { useUser } from '@/contexts/UserContext';
+import Intercom from '@intercom/messenger-js-sdk';
 
 import RpFooterSection from '../../_components/RpFooterSection';
 import { UserRpsWelcomeMap } from './UserRpsWelcomeMap';
@@ -26,6 +27,13 @@ export function UserRpsWelcomeView() {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const startY = useRef(0);
     const currentY = useRef(0);
+
+    Intercom({
+        app_id: process.env.NEXT_PUBLIC_INTERCOM_APP_ID ?? '',
+        user_id: user?.id ?? '',
+        name: user?.first_name ?? 'Traveler',
+        ...(user?.main_email && { email: user?.main_email })
+    });
 
     useEffect(() => {
         setWelcomeAnimationActive(true);
@@ -210,9 +218,12 @@ export function UserRpsWelcomeView() {
                             Your membership includes members-only deals on hotels and flights, just message us your
                             destination and we'll handle the rest!
                         </div>
-                        <Link href='https://wa.me/14257280395' target='_blank'>
+                        {/* <Link href='https://wa.me/14257280395' target='_blank'>
                             <Button className='rounded-full bg-[#1DC167] !px-12 py-3'>Message Us</Button>
-                        </Link>
+                        </Link> */}
+                        <div className='rounded-full py-3 text-center text-sm font-semibold text-neutral-700 drop-shadow-md'>
+                            Touch the chat icon in the bottom right corner to message us!
+                        </div>
                     </div>
 
                     <div className='w-full'>
