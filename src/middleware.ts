@@ -56,7 +56,8 @@ export function middleware(request: NextRequest) {
 
     // Gmail link redirects with query param preservation
     if (pathname === '/gmail-link_b' || pathname === '/gmail-link-landing') {
-        return redirectWithParams(`${baseMainUrl}/onboarding`);
+        // /Users/jesuslopez/Sprout/ascend-nextjs/src/app/(top-funnel)/onboarding-landing/page.tsx
+        return redirectWithParams(`${baseMainUrl}/onboarding-landing`);
     }
 
     if (pathname === '/auth/phone-register') {

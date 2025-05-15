@@ -33,12 +33,12 @@ export default function OnboardingLandingView() {
                 </p>
             </div>
             <Link href='/onboarding'>
-                <div className='mt-2 gap-6 rounded-full bg-white px-8 py-4 text-center text-lg font-bold text-neutral-700 shadow-md'>
+                <div className='text-md mt-2 gap-6 rounded-full bg-white px-8 py-3 text-center font-bold text-neutral-700 shadow-lg'>
                     Import my travel bookings
                 </div>
             </Link>
 
-            <div className='fixed bottom-12 flex w-full max-w-6xl flex-col items-center px-6 text-center md:flex-col md:justify-between'>
+            <div className='fixed bottom-8 flex w-full max-w-6xl flex-col items-center px-6 text-center md:flex-col md:justify-between'>
                 <div className='flex items-center justify-center gap-2'>
                     <a
                         href={FRAMER_LINKS.privacy}
