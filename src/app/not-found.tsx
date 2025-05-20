@@ -9,8 +9,6 @@ import GradientShadowHeading from './(signup-funnel)/_components/GradientShadowH
 export default function NotFound() {
     return (
         <div className='relative min-h-screen bg-neutral-900'>
-            <AnimatedCloudsBackground />
-
             <div className='flex min-h-screen flex-col items-center px-4 py-6'>
                 <IconNewWhite className='mt-6 h-9 w-auto max-w-md md:mt-0' />
 

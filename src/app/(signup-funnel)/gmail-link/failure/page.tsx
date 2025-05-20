@@ -9,7 +9,6 @@ import { FailureView } from './_components/FailureView';
 export default function GmailLinkFailurePage() {
     return (
         <div className='relative min-h-screen bg-neutral-900'>
-            <AnimatedCloudsBackground />
             <Suspense fallback={<LoadingSkeleton />}>
                 <FailureView />
             </Suspense>

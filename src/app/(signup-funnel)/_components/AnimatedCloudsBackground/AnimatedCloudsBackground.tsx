@@ -7,21 +7,6 @@ import styles from './styles.module.css';
 const AnimatedCloudsBackground = () => {
     const [imagesLoaded, setImagesLoaded] = useState(false);
 
-    useEffect(() => {
-        const preloadImages = () => {
-            const img = new Image();
-            img.onload = () => setImagesLoaded(true);
-            // Try WebP first
-            img.src = '/images/clouds-bg.webp';
-            img.onerror = () => {
-                // Fallback to PNG if WebP not supported
-                img.src = '/images/clouds-bg.png';
-            };
-        };
-
-        preloadImages();
-    }, []);
-
     return (
         <div className='fixed inset-0 h-screen w-full overflow-hidden bg-[rgb(160,200,238)]'>
             {/* Static background for mobile */}

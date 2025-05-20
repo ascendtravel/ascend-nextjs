@@ -54,44 +54,71 @@ export function middleware(request: NextRequest) {
         return redirectWithParams(baseMarketingUrl);
     }
 
-    // Gmail link redirects with query param preservation
-    if (pathname === '/gmail-link_b' || pathname === '/gmail-link-landing') {
-        // /Users/jesuslopez/Sprout/ascend-nextjs/src/app/(top-funnel)/onboarding-landing/page.tsx
-        return redirectWithParams(`${baseMainUrl}/onboarding-landing`);
+    // Gmail link redirects
+    if (pathname === '/gmail-link-landing') {
+        // Redirect to /welcome, preserving existing query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        searchParams.forEach((value, key) => {
+            newUrl.searchParams.append(key, value);
+        });
+        console.log(`Redirecting /gmail-link-landing to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
     }
 
-    if (pathname === '/auth/phone-register') {
-        // Create URL with the mandatory step parameter and preserve existing params
-        const newUrl = new URL(`${baseMainUrl}/onboarding`);
-        newUrl.searchParams.append('step', 'phone-confirmation');
-
-        // Copy all search params from the original URL
+    if (pathname === '/gmail-link_b') {
+        // Redirect to /welcome?step=1, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '1');
         searchParams.forEach((value, key) => {
-            // Skip if it's the step parameter we already added
             if (key !== 'step') {
                 newUrl.searchParams.append(key, value);
             }
         });
+        console.log(`Redirecting /gmail-link_b to: ${newUrl.toString()}`);
 
-        console.log(`Redirecting to: ${newUrl.toString()}`);
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/auth/phone-register') {
+        // Redirect to /welcome?step=2, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '2');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /auth/phone-register to: ${newUrl.toString()}`);
 
         return NextResponse.redirect(newUrl);
     }
 
     if (pathname === '/gmail-link_b/success') {
-        // Create URL with the mandatory step parameter and preserve existing params
-        const newUrl = new URL(`${baseMainUrl}/onboarding`);
-        newUrl.searchParams.append('step', 'subscription');
-
-        // Copy all search params from the original URL
+        // Redirect to /welcome?step=3, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '3');
         searchParams.forEach((value, key) => {
-            // Skip if it's the step parameter we already added
             if (key !== 'step') {
                 newUrl.searchParams.append(key, value);
             }
         });
+        console.log(`Redirecting /gmail-link_b/success to: ${newUrl.toString()}`);
 
-        console.log(`Redirecting to: ${newUrl.toString()}`);
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b/failure') {
+        // Redirect to /welcome?step=2&failure=true, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '1');
+        newUrl.searchParams.append('failure', 'true');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step' && key !== 'failure') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /gmail-link_b/failure to: ${newUrl.toString()}`);
 
         return NextResponse.redirect(newUrl);
     }
@@ -110,6 +137,7 @@ export const config = {
         '/gmail-link_b',
         '/gmail-link-landing',
         '/auth/phone-register',
-        '/gmail-link_b/success'
+        '/gmail-link_b/success',
+        '/gmail-link_b/failure'
     ]
 };

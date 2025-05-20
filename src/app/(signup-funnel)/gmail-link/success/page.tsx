@@ -8,7 +8,6 @@ import { SuccessViewSkeleton } from './_components/SuccessViewSkeleton';
 export default function GmailLinkSuccessPage() {
     return (
         <div className='relative min-h-screen bg-neutral-900'>
-            <AnimatedCloudsBackground />
             <Suspense fallback={<SuccessViewSkeleton />}>
                 <SuccessView />
             </Suspense>

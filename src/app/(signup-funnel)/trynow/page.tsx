@@ -44,7 +44,6 @@ export default async function TryNowPage(props: PageProps) {
 
     return (
         <div className='relative min-h-screen bg-neutral-900'>
-            <AnimatedCloudsBackground />
             <Suspense fallback={<LoadingSkeleton />}>
                 <TryNowView initialData={customerInfo} />
             </Suspense>
