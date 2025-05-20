@@ -72,7 +72,7 @@ export default function UserDetailsMenu({ loading }: { loading?: boolean }) {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <button className='outline-none'>
-                    <UserAvatar variant='md' showName={true} darkMode={true} />
+                    <UserAvatar variant='md' showName={false} darkMode={true} />
                 </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-64'>

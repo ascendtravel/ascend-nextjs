@@ -1,7 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import UserDetailsMenu from '@/components/UserDetailsMenu';
+import { useUser } from '@/contexts/UserContext';
+import Intercom from '@intercom/messenger-js-sdk';
 
 import IntercomIcon from '../IntercomIcon';
 import MobileMoreFooter from '../MobileMoreFooter';
@@ -11,6 +15,17 @@ import { WelcomeWhatsNext } from '../WelcomeWhatsNext';
 import { motion } from 'framer-motion';
 
 export default function MobileContentTrips() {
+    const { user } = useUser();
+
+    useEffect(() => {
+        Intercom({
+            app_id: process.env.NEXT_PUBLIC_INTERCOM_APP_ID ?? '',
+            user_id: user?.id ?? '',
+            name: user?.first_name ?? 'Traveler',
+            ...(user?.main_email && { email: user?.main_email })
+        });
+    }, [user]);
+
     return (
         <div className='relative h-screen overflow-hidden bg-[#006DBC] text-center'>
             <div className='fixed top-0 right-0 left-0 z-30 flex h-16 w-full flex-row items-center justify-between bg-[#006DBC] px-4'>

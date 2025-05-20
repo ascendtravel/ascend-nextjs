@@ -5,8 +5,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { Button } from '@/components/ui/button';
-
 import { OnboardingSteps } from '../_types';
 import GoogleWhiteIcon from './GoogleWhiteIcon';
 import MobileContentGmailLink from './MobileContentSteps/MobileContentGmailLink';
@@ -18,39 +16,115 @@ import MobilePhoneVerificationCard from './MobilePhoneVerificationCard';
 import MobileStepContentAnimator from './MobileStepContentAnimator';
 import OnboardingHeader from './OnboardingHeader';
 import OnboardingStepper from './OnboardingStepper';
+import { AnimatePresence, motion } from 'framer-motion';
+import Cookies from 'js-cookie';
+import ReactConfetti from 'react-confetti';
 
 // The new animator bar
-const MobileSheetStep0Content = ({ onNext }: { onNext?: () => void }) => (
-    <div className='flex h-full flex-col items-center justify-center rounded-full p-4 text-center'>
-        <div
-            className='w-full max-w-xs rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'
-            onClick={onNext}>
-            Import my travel bookings
-        </div>
-    </div>
-);
-
-// Placeholder Content Components for inside the animator bar (Steps 1, 2, 3)
-const MobileSheetStep1Content = ({ onNext }: { onNext?: () => void }) => {
+const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => void }) => {
     const searchParams = useSearchParams();
-    const state_id = searchParams.get('state_id');
+    const [stateId, setStateId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const getUtmParams = useCallback(() => {
+        const utmParams = new URLSearchParams();
+        const utmParamsObject: { [key: string]: string } = {};
+
+        searchParams.forEach((value, key) => {
+            if (key.startsWith('utm_')) {
+                utmParams.append(key, value);
+            }
+        });
+
+        const utmParamsString = utmParams.toString();
+        const utmParamsArray = utmParamsString.split('&');
+
+        utmParamsArray.forEach((param) => {
+            if (param) {
+                const [key, value] = param.split('=');
+                if (key) {
+                    utmParamsObject[key] = value;
+                }
+            }
+        });
+        console.log(utmParamsObject);
+
+        return utmParamsObject;
+    }, [searchParams]);
+
+    const getStateId = useCallback(async () => {
+        setIsLoading(true);
+        setError('');
+        try {
+            const fbp = Cookies.get('_fbp');
+            const fbc = Cookies.get('_fbc');
+            const utmParams = getUtmParams();
+
+            const response = await fetch('/api/gmail/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...(fbp ? { fbp } : {}),
+                    ...(fbc ? { fbc } : {}),
+                    ...(Object.keys(utmParams).length > 0 ? { utm_params: utmParams } : {})
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to get state ID');
+            const data = await response.json();
+            setStateId(data.state_id);
+        } catch (err) {
+            setError('Failed to initialize. Please try again.');
+            setStateId(null); // Clear stateId on error
+        } finally {
+            setIsLoading(false);
+        }
+    }, [getUtmParams, setIsLoading, setError, setStateId]);
+
+    useEffect(() => {
+        getStateId();
+    }, [getStateId]);
+
+    const handleNextClick = () => {
+        if (onNext && stateId && !isLoading && !error) {
+            onNext(stateId);
+        } else if (error) {
+            // Retry fetching stateId if there was an error
+            getStateId();
+        }
+    };
 
     return (
+        <div className='flex h-full flex-col items-center justify-center rounded-full p-4 text-center'>
+            <div
+                className='w-full max-w-xs rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1DC167]/80 disabled:cursor-not-allowed disabled:opacity-50'
+                onClick={handleNextClick}>
+                Import my travel bookings
+            </div>
+        </div>
+    );
+};
+
+// Placeholder Content Components for inside the animator bar (Steps 1, 2, 3)
+const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; stateId: string }) => {
+    return (
         <div className='flex h-full flex-col items-center justify-center p-4 text-center'>
-            <Link href={`https://gmail.heyascend.com/gmail/import/start/${state_id}`}>
-                <div
-                    onClick={onNext}
-                    className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
-                    <GoogleWhiteIcon /> Continue with Google
-                </div>
-            </Link>
+            {stateId ? (
+                <Link href={`https://gmail.heyascend.com/gmail/import/start/${stateId}`}>
+                    <div className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
+                        <GoogleWhiteIcon /> Continue with Google
+                    </div>
+                </Link>
+            ) : (
+                <p className='text-sm text-neutral-600'>Initializing link...</p>
+            )}
         </div>
     );
 };
 
 const MobileSheetStep2Content = ({
     onNext,
-    onPrev,
     forceHeight
 }: {
     onNext?: () => void;
@@ -64,7 +138,7 @@ const MobileSheetStep2Content = ({
 
 const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNext?: () => void }) => {
     const searchParams = useSearchParams();
-    const state_id = searchParams.get('state_id');
+    const state_id = searchParams.get('state_id'); // This should be correctly populated by the URL sync logic
     const [isLoading, setIsLoading] = useState(true);
     const [stripeUrl, setStripeUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -72,7 +146,7 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
     useEffect(() => {
         async function getStripeUrl() {
             if (!state_id) {
-                setError('Please contact hey@ascend.travel for assistance');
+                setError('Session ID missing. Please go back and try again.');
                 setIsLoading(false);
 
                 return;
@@ -87,24 +161,20 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
 
                 const data = await response.json();
 
-                if (data?.signup_link_code) {
+                if (response.ok && data?.signup_link_code) {
                     setStripeUrl(`https://payments.heyascend.com/${data.signup_link_code}`);
                 } else {
-                    setError('Please contact hey@ascend.travel for assistance');
+                    setError(data?.message || 'Failed to get payment link. Please contact support.');
                 }
             } catch (err) {
                 console.error('Error getting Stripe signup URL:', err);
-                setError('Please contact hey@ascend.travel for assistance');
+                setError('An error occurred. Please contact support.');
             } finally {
                 setIsLoading(false);
             }
         }
 
-        if (state_id) {
-            getStripeUrl();
-        } else {
-            setIsLoading(false);
-        }
+        getStripeUrl();
     }, [state_id]);
 
     const handleStripeSignup = () => {
@@ -116,15 +186,16 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
     return (
         <div className='flex h-full flex-col items-center justify-center rounded-full p-4 text-center'>
             <button
+                type='button'
                 onClick={handleStripeSignup}
-                disabled={isLoading || !!error}
-                className='w-full rounded-full bg-[#1DC167] px-12 py-3 font-semibold text-white transition-all hover:bg-[#1DC167]/90 disabled:opacity-50'>
+                disabled={isLoading || !!error || !stripeUrl}
+                className='w-full rounded-full bg-[#1DC167] px-12 py-3 font-semibold text-white transition-all hover:bg-[#1DC167]/90 disabled:cursor-not-allowed disabled:opacity-50'>
                 {error ? (
                     <a href='mailto:hey@ascend.travel' className='text-white hover:text-white/90'>
-                        Contact hey@ascend.travel
+                        {error} (Contact Support)
                     </a>
                 ) : isLoading ? (
-                    'Loading...'
+                    'Loading Payment Link...'
                 ) : (
                     'Start saving now'
                 )}
@@ -152,7 +223,7 @@ const getStepString = (step: OnboardingSteps): string => {
     if (step === OnboardingSteps.Step3) return '3';
     if (step === OnboardingSteps.Step4) return '4';
 
-    return '0';
+    return '0'; // For Step0 or default
 };
 
 interface MobileWelcomeViewProps {
@@ -163,58 +234,93 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const [showWelcome, setShowWelcome] = useState(true);
     const [forceSheetHeight, setForceSheetHeight] = useState<number | null>(0);
+    const [showConfetti, setShowConfetti] = useState(true);
 
-    const [currentStep, setCurrentStep] = useState<OnboardingSteps>(() =>
-        predefinedStep !== undefined ? predefinedStep : getStepFromQuery(searchParams)
-    );
+    const initialStepFromQueryOrProp = predefinedStep !== undefined ? predefinedStep : getStepFromQuery(searchParams);
+    const [currentStep, setCurrentStep] = useState<OnboardingSteps>(initialStepFromQueryOrProp);
+    const [appStateId, setAppStateId] = useState<string | null>(() => searchParams.get('state_id'));
     const [animationDirection, setAnimationDirection] = useState<number>(0);
-    // isSheetOpen and handleSheetOpenChange are no longer needed
 
-    // Effect 1: Update internal step state when URL (searchParams) changes
+    // Effect 1: Sync currentStep and appStateId with URL searchParams
     useEffect(() => {
         const stepFromQuery = getStepFromQuery(searchParams);
+        const stateIdFromQuery = searchParams.get('state_id');
+
         if (stepFromQuery !== currentStep) {
-            // Determine animation direction based on the change. This assumes enum values are ordered.
-            // A more robust way might be to store previous step if complex non-linear flow is needed.
             setAnimationDirection(stepFromQuery > currentStep ? 1 : -1);
             setCurrentStep(stepFromQuery);
         }
-    }, [searchParams]); // Only depends on searchParams
+        // Ensure appStateId is also synced from URL if it changes there
+        if (stateIdFromQuery !== appStateId) {
+            setAppStateId(stateIdFromQuery);
+        }
+    }, [searchParams]); // Rerun when searchParams change
 
-    // Effect 2: Update URL when internal currentStep state changes
+    useEffect(() => {
+        if (currentStep === OnboardingSteps.Step4) {
+            setTimeout(() => {
+                setShowWelcome(false);
+                setShowConfetti(false);
+            }, 5000);
+        }
+    }, [currentStep]);
+
+    // Effect 2: Update URL to reflect currentStep and appStateId
     useEffect(() => {
         const newParams = new URLSearchParams(searchParams.toString());
         const stepStringForUrl = getStepString(currentStep);
         const currentStepInUrl = searchParams.get('step');
+        const currentStateIdInUrl = searchParams.get('state_id');
 
         let shouldUpdateUrl = false;
 
+        // Handle 'step' parameter
         if (currentStep === OnboardingSteps.Step0) {
-            // For Step0, ensure 'step' param is removed or is '0' (if you prefer ?step=0 for Step0)
-            // Let's aim to remove it for a cleaner URL for Step0.
-            if (currentStepInUrl !== null) {
-                // If any step param exists
+            // For Step0, remove 'step' param for a cleaner URL, or ensure it is '0' if preferred.
+            // Current behavior: remove if not '0'.
+            if (currentStepInUrl && currentStepInUrl !== '0') {
                 newParams.delete('step');
                 shouldUpdateUrl = true;
+            } else if (!currentStepInUrl && stepStringForUrl !== '0') {
+                // If no step param, but we want step=0 (or just clean), this logic might need adjustment
+                // For now, if it's step 0, we try to remove `step` or ensure it is `0`.
             }
         } else {
-            // For Steps 1, 2, 3, ensure URL reflects the step number
             if (currentStepInUrl !== stepStringForUrl) {
                 newParams.set('step', stepStringForUrl);
                 shouldUpdateUrl = true;
             }
         }
 
+        // Handle 'state_id' parameter
+        if (currentStep === OnboardingSteps.Step0 || currentStep === OnboardingSteps.Step4) {
+            // Remove state_id for Step0 (before it's generated) and Step4 (after it's used)
+            if (currentStateIdInUrl) {
+                newParams.delete('state_id');
+                shouldUpdateUrl = true;
+            }
+        } else {
+            // For steps 1, 2, 3, ensure state_id is in URL if appStateId has it
+            if (appStateId && currentStateIdInUrl !== appStateId) {
+                newParams.set('state_id', appStateId);
+                shouldUpdateUrl = true;
+            } else if (!appStateId && currentStateIdInUrl) {
+                // If URL has state_id but app doesn't (e.g. direct nav to /welcome?step=1&state_id=XXX)
+                // The other useEffect (Effect 1) should set appStateId from URL.
+                // So, no action needed here for this specific sub-case.
+            }
+        }
+
         const newQueryString = newParams.toString();
 
         if (shouldUpdateUrl) {
-            // Check current full query string to avoid pushing same URL
             if (searchParams.toString() !== newQueryString) {
                 router.replace(`${pathname}${newQueryString ? '?' : ''}${newQueryString}`, { scroll: false });
             }
         }
-    }, [currentStep, pathname, router, searchParams]);
+    }, [currentStep, appStateId, pathname, router, searchParams]);
 
     const handleStepChange = (newStep: OnboardingSteps, direction: number) => {
         setAnimationDirection(direction);
@@ -239,9 +345,22 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
 
     let stepContentInAnimator: React.ReactNode = null;
     if (currentStep === OnboardingSteps.Step0) {
-        stepContentInAnimator = <MobileSheetStep0Content onNext={goToNextStep} />;
+        stepContentInAnimator = (
+            <MobileSheetStep0Content
+                onNext={(generatedStateId) => {
+                    setAppStateId(generatedStateId);
+                    goToNextStep();
+                }}
+            />
+        );
     } else if (currentStep === OnboardingSteps.Step1) {
-        stepContentInAnimator = <MobileSheetStep1Content onNext={goToNextStep} />;
+        stepContentInAnimator = appStateId ? (
+            <MobileSheetStep1Content onNext={goToNextStep} stateId={appStateId} />
+        ) : (
+            <div className='flex h-full items-center justify-center p-4 text-sm text-neutral-600'>
+                Loading session details...
+            </div>
+        );
     } else if (currentStep === OnboardingSteps.Step2) {
         stepContentInAnimator = (
             <MobileSheetStep2Content
@@ -257,8 +376,42 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
         stepContentInAnimator = <MobileSheetStep3Content onPrev={goToPrevStep} onNext={goToNextStep} />;
     }
 
+    const bannerVariants = {
+        hidden: { y: '-100%', opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: { type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }
+        },
+        exit: { y: '-100%', opacity: 0, transition: { duration: 0.4 } }
+    };
+
     return (
         <div className='md:hidden'>
+            {currentStep === OnboardingSteps.Step4 && showWelcome && (
+                <>
+                    <AnimatePresence mode='wait'>
+                        <motion.div
+                            key='step4Banner'
+                            className='fixed top-4 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#003A64] px-12 py-4 text-center text-lg font-semibold text-nowrap text-white shadow-lg'
+                            variants={bannerVariants}
+                            initial='hidden'
+                            animate='visible'
+                            exit='exit'>
+                            Welcome to Ascend!
+                        </motion.div>
+                    </AnimatePresence>
+                    <div className='fixed inset-0 z-50 flex flex-row justify-center px-4'>
+                        <ReactConfetti
+                            recycle={showConfetti}
+                            numberOfPieces={800}
+                            width={window.innerWidth}
+                            height={window.innerHeight}
+                        />
+                    </div>
+                </>
+            )}
+
             {currentStep !== OnboardingSteps.Step0 && currentStep !== OnboardingSteps.Step4 && (
                 <div className='fixed inset-x-0 top-0 z-10 flex flex-col items-center justify-center'>
                     <OnboardingHeader step={currentStep} />
@@ -270,7 +423,6 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
             )}
 
             {currentStep === OnboardingSteps.Step0 && (
-                // Pass goToNextStep to MobileContentWelcome for its CTA button
                 <MobileContentWelcome predefinedStep={OnboardingSteps.Step0} onNextStep={goToNextStep} />
             )}
             {(currentStep === OnboardingSteps.Step1 || currentStep === OnboardingSteps.Step2) && (

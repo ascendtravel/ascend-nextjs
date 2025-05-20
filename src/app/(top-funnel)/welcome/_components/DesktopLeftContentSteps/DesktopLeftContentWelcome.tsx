@@ -1,14 +1,75 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { FRAMER_LINKS } from '@/config/navigation';
 
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
+import Cookies from 'js-cookie';
 
 export default function DesktopLeftContentWelcome() {
+    const [stateId, setStateId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const searchParams = useSearchParams();
+
+    const getUtmParams = () => {
+        const utmParams = new URLSearchParams();
+        const utmParamsObject: { [key: string]: string } = {};
+
+        searchParams.forEach((value, key) => {
+            if (key.startsWith('utm_')) {
+                utmParams.append(key, value);
+            }
+        });
+
+        const utmParamsString = utmParams.toString();
+        const utmParamsArray = utmParamsString.split('&');
+
+        utmParamsArray.forEach((param) => {
+            const [key, value] = param.split('=');
+            utmParamsObject[key] = value;
+        });
+        console.log(utmParamsObject);
+
+        return utmParamsObject;
+    };
+
+    useEffect(() => {
+        async function getStateId() {
+            try {
+                const fbp = Cookies.get('_fbp');
+                const fbc = Cookies.get('_fbc');
+
+                const utmParams = getUtmParams();
+                const response = await fetch('/api/gmail/state', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...(fbp ? { fbp } : {}),
+                        ...(fbc ? { fbc } : {}),
+                        ...(utmParams ? { utm_params: utmParams } : {})
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to get state ID');
+                const data = await response.json();
+                setStateId(data.state_id);
+            } catch (err) {
+                setError('Failed to initialize. Please try again.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        getStateId();
+    }, [searchParams]);
+
     const panelVariants = {
         hidden: { x: '-100%', opacity: 0 },
         visible: {
@@ -69,7 +130,7 @@ export default function DesktopLeftContentWelcome() {
                             <div>Become a member to start saving</div>
                         </div>
                     </div>
-                    <Link href='/onboarding'>
+                    <Link href={`/welcome?step=1&state_id=${stateId}`}>
                         <div className='text-md my-[2rem] gap-6 rounded-full bg-white px-8 py-3 text-center font-bold text-neutral-700 shadow-lg'>
                             Import my travel bookings
                         </div>

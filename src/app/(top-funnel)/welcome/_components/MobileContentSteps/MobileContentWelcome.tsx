@@ -3,8 +3,6 @@
 // Keep this if StickyScrollList or its context uses client features
 import React from 'react';
 
-import Link from 'next/link';
-
 // For footer
 
 import FeedCard, { FeedCardData } from '@/components/FeedCard/FeedCard';

@@ -50,6 +50,14 @@ export default function DesktopLeftContent() {
     const [direction, setDirection] = useState<number>(0);
     const [showConfetti, setShowConfetti] = useState(false);
     const [showWelcome, setShowWelcome] = useState(true);
+    const [stateId, setStateId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const stateId = searchParams.get('state_id');
+        if (stateId) {
+            setStateId(stateId);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (currentStep === OnboardingSteps.Step4) {
@@ -167,12 +175,17 @@ export default function DesktopLeftContent() {
 
             {currentStep === OnboardingSteps.Step4 && (
                 <div className='fixed inset-x-3 z-20 flex flex-row justify-center px-4'>
-                    <ReactConfetti recycle={showConfetti} numberOfPieces={800} />
+                    <ReactConfetti
+                        recycle={showConfetti}
+                        numberOfPieces={800}
+                        width={window.innerWidth}
+                        height={window.innerHeight}
+                    />
                 </div>
             )}
 
-            {/* <AnimatePresence mode='wait'>
-                {showWelcome && (
+            <AnimatePresence mode='wait'>
+                {currentStep === OnboardingSteps.Step4 && showWelcome && (
                     <motion.div
                         key='step4Banner'
                         className='fixed top-4 left-1/2 z-30 -translate-x-1/2 rounded-full bg-[#003A64] px-12 py-4 text-center text-lg font-semibold text-white shadow-lg'
@@ -183,7 +196,7 @@ export default function DesktopLeftContent() {
                         Welcome to Ascend!
                     </motion.div>
                 )}
-            </AnimatePresence> */}
+            </AnimatePresence>
 
             {currentStep === OnboardingSteps.Step0 && <DesktopLeftContentWelcome />}
             {currentStep === OnboardingSteps.Step1 && <DesktopLeftContentGmailLink />}
@@ -192,6 +205,8 @@ export default function DesktopLeftContent() {
                     onVerify={() => {
                         const newParams = new URLSearchParams(searchParams.toString());
                         newParams.set('step', getStepString(OnboardingSteps.Step3));
+                        newParams.set('state_id', stateId || '');
+
                         router.replace(`${pathname}${newParams.toString() ? '?' : ''}${newParams.toString()}`, {
                             scroll: false
                         });

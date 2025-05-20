@@ -51,7 +51,6 @@ interface OnboardingPhoneRegisterFlipCardProps {
 }
 
 export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: OnboardingPhoneRegisterFlipCardProps) {
-    const router = useRouter();
     const [isFlipped, setIsFlipped] = useState(false);
     const [selectedCountry, setSelectedCountry] = useState('US');
     const [otpValue, setOtpValue] = useState('');
