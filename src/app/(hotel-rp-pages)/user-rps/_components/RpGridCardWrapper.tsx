@@ -61,6 +61,18 @@ export default function RpGridCardWrapper({
 
     const defaultImage = 'https://cdn.worldota.net/t/1024x768/c/76/da/76daa523375daf6deb793635b63dc245ada00b04.jpeg';
 
+    // TODO: remove this
+    const BrokenBeHotelImageReplacement =
+        'https://wudrimnxppqgkzspblvr.supabase.co/storage/v1/object/public/images/misc/hotel.png';
+
+    const getImageUrl = () => {
+        if (trip?.payload.image_url?.includes('https://example.com/')) {
+            return BrokenBeHotelImageReplacement;
+        }
+
+        return trip?.payload.image_url || defaultImage;
+    };
+
     return (
         <div
             className={`relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm drop-shadow-xl transition-transform duration-300 hover:rotate-6 ${
@@ -72,12 +84,7 @@ export default function RpGridCardWrapper({
                     <span className='text-xs font-semibold text-[#1DC167]'>Price drop protection</span>
                 </div>
             )}
-            <Image
-                src={trip?.payload.image_url || defaultImage}
-                alt={getAltText(trip) || 'Trip image '}
-                fill
-                className='object-cover'
-            />
+            <Image src={getImageUrl()} alt={getAltText(trip) || 'Trip image '} fill className='object-cover' />
             {/* TODO: remove this */}
             {/* <Image src={'https://cataas.com/cat'} alt={getAltText(trip)} fill className='object-cover' /> */}
 
