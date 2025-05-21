@@ -38,22 +38,44 @@ export default function MobileStepContentAnimator({
         })
     };
 
+    // Variants for the sheet itself when it's Step 0
+    const sheetStep0Variants = {
+        initial: { y: '100%', opacity: 0 }, // Start off-screen bottom
+        animate: {
+            y: '0%',
+            opacity: 1,
+            transition: { delay: 2, type: 'spring', stiffness: 70, damping: 20 }
+        }
+        // No exit needed here as it doesn't unmount, just its content/style changes
+    };
+
+    // Determine if this is the initial appearance of Step 0 for mount animation
+    // This simple check works if currentStep starts at something other than Step0 and then transitions to it.
+    // If it can load directly onto Step0, the animation will apply on mount.
+    const isStep0InitialMount = currentStep === OnboardingSteps.Step0;
+
     return (
         <>
             {/* Create a shwwt only for step 2, its special will only be used in this step and shoudl darken the BG  */}
             {currentStep === OnboardingSteps.Step2 && <div className='fixed inset-0 z-10 bg-black opacity-50' />}
 
-            <div
+            <motion.div
                 className={cn(
-                    'shadow-t-2xl fixed right-0 bottom-0 left-0 z-20 overflow-hidden rounded-t-2xl bg-white p-2 drop-shadow-2xl transition-all md:hidden',
+                    'shadow-t-2xl fixed right-0 bottom-0 left-0 z-20 overflow-hidden rounded-t-2xl p-2 drop-shadow-2xl transition-all md:hidden',
                     currentStep === OnboardingSteps.Step0 && 'h-[100px]',
                     currentStep === OnboardingSteps.Step1 && 'h-[100px]',
-                    currentStep === OnboardingSteps.Step3 && 'h-[100px]'
+                    currentStep === OnboardingSteps.Step3 && 'h-[100px]',
+                    currentStep !== OnboardingSteps.Step0 && 'bg-white',
+                    currentStep === OnboardingSteps.Step0 && 'shadow-2xl backdrop-blur-2xl'
                 )}
-                // This height needs to change to fit the content of the step, but this step has t 2side steps that need to be accounted for
                 style={
                     currentStep === OnboardingSteps.Step2 ? { height: forceHeight ? forceHeight + 'px' : '350px' } : {}
-                }>
+                }
+                // Apply animation only for Step 0 initial appearance
+                initial={isStep0InitialMount ? 'initial' : false} // 'false' prevents initial animation for non-Step0
+                animate={isStep0InitialMount ? 'animate' : 'center'} // Use 'center' or a static state for non-Step0
+                variants={isStep0InitialMount ? sheetStep0Variants : { center: { y: '0%', opacity: 1 } }} // Provide variants
+            >
                 <div className='relative h-full w-full'>
                     {/* Relative container for absolute positioning of motion.div */}
                     <AnimatePresence initial={false} custom={direction} mode='wait'>
@@ -70,7 +92,7 @@ export default function MobileStepContentAnimator({
                         </motion.div>
                     </AnimatePresence>
                 </div>
-            </div>
+            </motion.div>
         </>
     );
 }

@@ -98,7 +98,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     };
 
     return (
-        <div className='flex h-full flex-col items-center justify-center rounded-full p-4 text-center'>
+        <div className='flex h-fit flex-col items-center justify-center rounded-full text-center shadow-2xl'>
             <div
                 className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 onClick={handleNextClick}>
@@ -111,7 +111,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
 // Placeholder Content Components for inside the animator bar (Steps 1, 2, 3)
 const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; stateId: string }) => {
     return (
-        <div className='flex h-full flex-col items-center justify-center p-4 text-center'>
+        <div className='flex h-fit flex-col items-center justify-center text-center shadow-2xl'>
             {stateId ? (
                 <Link href={`https://gmail.heyascend.com/gmail/import/start/${stateId}`}>
                     <div className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
@@ -186,7 +186,7 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
     };
 
     return (
-        <div className='flex h-full flex-col items-center justify-center rounded-full p-4 text-center'>
+        <div className='flex h-fit flex-col items-center justify-center rounded-full text-center drop-shadow-2xl'>
             <button
                 type='button'
                 onClick={handleStripeSignup}
@@ -463,22 +463,11 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
             )}
 
             {/* Wrap conditional content rendering with AnimatePresence */}
+
             {currentStep === OnboardingSteps.Step0 && (
-                <div className='fixed inset-x-0 top-0 z-50 flex w-full flex-row items-center justify-center bg-[#00345A]'>
-                    <YcombBanner />
-                </div>
+                <MobileContentWelcome predefinedStep={OnboardingSteps.Step0} onNextStep={goToNextStep} />
             )}
             <AnimatePresence mode='wait'>
-                {currentStep === OnboardingSteps.Step0 && (
-                    <motion.div
-                        key='content-step0'
-                        variants={mainContentVariants}
-                        initial='initial'
-                        animate='animate'
-                        exit='exit'>
-                        <MobileContentWelcome predefinedStep={OnboardingSteps.Step0} onNextStep={goToNextStep} />
-                    </motion.div>
-                )}
                 {(currentStep === OnboardingSteps.Step1 || currentStep === OnboardingSteps.Step2) && (
                     <motion.div
                         key='content-step1or2' // Key changes if the condition changes too drastically
