@@ -22,10 +22,9 @@ export function middleware(request: NextRequest) {
 
     // Base URLs based on environment
     const localRedirectUrl = process.env.NEXT_PUBLIC_LOCAL_REDIRECT_URL || 'http://localhost:3003';
-    const baseAppUrl = isLocalDev ? localRedirectUrl : 'https://app.ascend.travel';
-    const baseMainUrl = isLocalDev ? localRedirectUrl : 'https://ascend.travel';
+    const baseAppUrl = isLocalDev ? localRedirectUrl : 'https://heyascend.com';
     const baseMarketingUrl = isLocalDev ? localRedirectUrl : 'https://heyascend.com';
-
+    const legacyUrl = isLocalDev ? localRedirectUrl : 'https://app.ascend.travel';
     // Helper function to preserve query parameters
     const redirectWithParams = (baseUrl: string) => {
         // Create the new URL with the base destination
@@ -43,12 +42,12 @@ export function middleware(request: NextRequest) {
 
     // Redirect old picks paths to app URL
     if (pathname.startsWith('/picksV2') || pathname.startsWith('/pick')) {
-        return redirectWithParams(`${baseAppUrl}${pathname}`);
+        return redirectWithParams(`${legacyUrl}${pathname}`);
     }
 
     // Redirect flight paths to app URL
     if (pathname.startsWith('/flight') || pathname.startsWith('/flights')) {
-        return redirectWithParams(`${baseAppUrl}${pathname}`);
+        return redirectWithParams(`${legacyUrl}${pathname}`);
     }
 
     // Redirect root path to marketing site
@@ -152,6 +151,7 @@ export const config = {
         '/picksV2/:path*',
         '/flight/:path*',
         '/flights/:path*',
+
         '/gmail-link_b',
         '/gmail-link-landing',
         '/auth/phone-register',
