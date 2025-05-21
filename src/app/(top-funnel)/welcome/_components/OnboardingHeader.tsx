@@ -1,10 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-// List of different saving examples with various amounts and airport pairs
 const savingExamplesSeed = [
     { amount: '$289', route: 'JFK to CDG' },
     { amount: '$217', route: 'LAX to LHR' },
@@ -38,76 +37,76 @@ const savingExamplesSeed = [
     { amount: '$301', route: 'IND to VIE' }
 ];
 
-const UPDATE_INTERVAL_MS = 30000; // 30 seconds
+const NUM_ITEMS_IN_MARQUEE = 5; // Number of items to form the base of the marquee
+const SCROLL_SPEED_PX_PER_SEC = 50; // Adjust for desired speed
 
 // Function to get a random saving example from the seed
 const getRandomSavingExample = () => {
     const randomIndex = Math.floor(Math.random() * savingExamplesSeed.length);
 
-    return savingExamplesSeed[randomIndex];
+    return { ...savingExamplesSeed[randomIndex], id: Math.random().toString(36).substring(7) }; // Add unique id
+};
+
+// Function to generate an initial set of items
+const generateInitialMarqueeItems = (count: number) => {
+    return Array.from({ length: count }, getRandomSavingExample);
 };
 
 export default function OnboardingHeader() {
-    // Initialize currentSaving with a random example to avoid SSR/hydration mismatch for the very first item
-    // Subsequent items will be client-side driven.
-    const [currentSaving, setCurrentSaving] = useState(() => getRandomSavingExample());
-    const [nextSaving, setNextSaving] = useState(() => getRandomSavingExample());
-    const [animationDirection, setAnimationDirection] = useState(1); // 1 for right to left, -1 for left to right
+    const [marqueeItems, setMarqueeItems] = useState(() => generateInitialMarqueeItems(NUM_ITEMS_IN_MARQUEE));
 
-    const updateSavingExample = useCallback(() => {
-        setAnimationDirection(1); // New item comes from the right
-        setCurrentSaving(nextSaving);
-        setNextSaving(getRandomSavingExample());
-    }, [nextSaving]);
+    // Duplicate items for seamless looping
+    const duplicatedItems = useMemo(() => [...marqueeItems, ...marqueeItems], [marqueeItems]);
 
+    // This effect will periodically refresh the base items to introduce new content
+    // For a true infinite feel with constantly new items, this logic would be more complex,
+    // involving adding to one end and removing from other while animation is running.
+    // This simpler version refreshes the set periodically.
     useEffect(() => {
-        // Set up the interval to update the saving example
-        const intervalId = setInterval(updateSavingExample, UPDATE_INTERVAL_MS);
+        const intervalId = setInterval(() => {
+            setMarqueeItems(generateInitialMarqueeItems(NUM_ITEMS_IN_MARQUEE));
+        }, 15000); // Refresh content every 15 seconds, for example
 
-        // Clear interval on component unmount
         return () => clearInterval(intervalId);
-    }, [updateSavingExample]);
+    }, []);
 
-    // Animation variants for the text
-    const textVariants = {
-        initial: (direction: number) => ({
-            x: direction > 0 ? '100%' : '-100%',
-            opacity: 0
-        }),
+    const marqueeWidth = NUM_ITEMS_IN_MARQUEE * 350; // Approximate width of one set of items (adjust itemWidth if needed)
+    const animationDuration = marqueeWidth / SCROLL_SPEED_PX_PER_SEC;
+
+    const marqueeVariants = {
         animate: {
-            x: '0%',
-            opacity: 1,
+            x: [0, -marqueeWidth], // Animate from 0 to -width for left-to-right scroll of content
             transition: {
-                x: { type: 'spring', stiffness: 200, damping: 25 },
-                opacity: { duration: 0.3, ease: 'easeIn' }
+                x: {
+                    repeat: Infinity,
+                    repeatType: 'loop', // Loop back to start
+                    duration: animationDuration,
+                    ease: 'linear'
+                }
             }
-        },
-        exit: (direction: number) => ({
-            x: direction > 0 ? '-100%' : '100%', // Current item exits to the left if new comes from right
-            opacity: 0,
-            transition: {
-                x: { type: 'spring', stiffness: 200, damping: 25 },
-                opacity: { duration: 0.3, ease: 'easeOut' }
-            }
-        })
+        }
     };
 
     return (
-        <div className='z-30 flex h-14 w-full flex-col items-center justify-center overflow-hidden bg-[#00345A]'>
-            <AnimatePresence initial={false} mode='wait' custom={animationDirection}>
-                <motion.div
-                    key={currentSaving.route + currentSaving.amount} // Unique key for AnimatePresence to detect change
-                    className='flex w-full flex-row items-center justify-center gap-2 p-2 py-3 text-white'
-                    custom={animationDirection}
-                    variants={textVariants}
-                    initial='initial'
-                    animate='animate'
-                    exit='exit'>
-                    <h1 className='text-figtree text-lg font-bold'>
-                        {currentSaving.amount} saved on a trip from {currentSaving.route}
-                    </h1>
-                </motion.div>
-            </AnimatePresence>
+        <div className='z-30 flex h-14 w-full flex-row items-center overflow-hidden bg-[#00345A] text-white'>
+            <motion.div
+                className='flex flex-nowrap' // Ensure items stay in a single line
+                variants={marqueeVariants}
+                animate='animate'>
+                {duplicatedItems.map((item, index) => (
+                    <div
+                        key={`${item.id}-${index}`}
+                        className='flex flex-shrink-0 flex-row items-center px-3 whitespace-nowrap'>
+                        <span className='text-figtree text-lg font-bold'>
+                            {item.amount} saved on a trip from {item.route}
+                        </span>
+                        {/* Add separator, ensuring it's not after the very last item of the duplicated list if it looks odd */}
+                        {index < duplicatedItems.length - 1 && (
+                            <span className='-mr-4 ml-3 text-lg text-white/80'>•</span>
+                        )}
+                    </div>
+                ))}
+            </motion.div>
         </div>
     );
 }

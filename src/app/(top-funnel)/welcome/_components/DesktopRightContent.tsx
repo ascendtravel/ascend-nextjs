@@ -86,9 +86,17 @@ const routeParse = (row: string[]): Partial<Route> => ({
     equipment: row[8]
 });
 
-export default function DesktopRightContent() {
+interface DesktopRightContentProps {
+    skipInitialGlobeAnimation?: boolean; // Make it optional in case it's used elsewhere without it
+}
+
+export default function DesktopRightContent({ skipInitialGlobeAnimation = false }: DesktopRightContentProps) {
     const globeRef = useRef<GlobeMethods | undefined>(undefined);
     const rotationTimerIdRef = useRef<NodeJS.Timeout | null>(null);
+    const globeContainerRef = useRef<HTMLDivElement | null>(null); // Ref for the globe container
+
+    const [globeWidth, setGlobeWidth] = useState(0);
+    const [globeHeight, setGlobeHeight] = useState(0);
 
     const [airports, setAirports] = useState<Airport[]>([]);
     const [routes, setRoutes] = useState<Route[]>([]);
@@ -138,25 +146,33 @@ export default function DesktopRightContent() {
         // rotationTimerIdRef.current is managed by the main useEffect cleanup
 
         if (globeRef.current && isGlobeReady) {
-            // Set initial camera without animation
-            globeRef.current.pointOfView(START_CAMERA_POV, 0);
-
-            animationTimerId = setTimeout(() => {
-                if (globeRef.current) {
-                    globeRef.current.pointOfView(TARGET_CAMERA_POV, POV_ANIMATION_DURATION_MS);
-                    if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current); // Clear previous before setting new
-                    rotationTimerIdRef.current = setTimeout(() => {
-                        setIsInitialAnimationComplete(true);
-                    }, POV_ANIMATION_DURATION_MS);
-                }
-            }, INITIAL_ANIMATION_DELAY_MS);
+            if (skipInitialGlobeAnimation) {
+                // Skip animation: directly set to target POV and enable rotation
+                globeRef.current.pointOfView(TARGET_CAMERA_POV, 0); // 0 duration for immediate set
+                setIsInitialAnimationComplete(true);
+                // Clear any stray timers if they were somehow set
+                if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
+                if (animationTimerId) clearTimeout(animationTimerId); // animationTimerId is local to this effect
+            } else {
+                // Perform the standard animation
+                globeRef.current.pointOfView(START_CAMERA_POV, 0);
+                animationTimerId = setTimeout(() => {
+                    if (globeRef.current) {
+                        globeRef.current.pointOfView(TARGET_CAMERA_POV, POV_ANIMATION_DURATION_MS);
+                        if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
+                        rotationTimerIdRef.current = setTimeout(() => {
+                            setIsInitialAnimationComplete(true);
+                        }, POV_ANIMATION_DURATION_MS);
+                    }
+                }, INITIAL_ANIMATION_DELAY_MS);
+            }
         }
 
         return () => {
             if (animationTimerId) clearTimeout(animationTimerId);
             if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
         };
-    }, [isGlobeReady]); // Depend on isGlobeReady
+    }, [isGlobeReady, skipInitialGlobeAnimation]);
 
     useEffect(() => {
         if (globeRef.current && isGlobeReady) {
@@ -175,11 +191,36 @@ export default function DesktopRightContent() {
             const controls = globeRef.current.controls();
             controls.enableZoom = true;
             controls.enableRotate = true;
-            // react-globe.gl uses minDistance/maxDistance for zoom limits with OrbitControls
-            controls.minDistance = 100; // Corresponds to minZoomRadius
-            controls.maxDistance = 500; // Corresponds to maxZoomRadius
+            controls.minDistance = 100;
+            controls.maxDistance = 500;
         }
     }, [isGlobeReady]);
+
+    // Effect to handle responsive resizing of the globe
+    useEffect(() => {
+        const container = globeContainerRef.current;
+        if (!container) return;
+
+        // Set initial dimensions
+        setGlobeWidth(container.offsetWidth);
+        setGlobeHeight(container.offsetHeight);
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (!entries || entries.length === 0) {
+                return;
+            }
+            const { width, height } = entries[0].contentRect;
+            setGlobeWidth(width);
+            setGlobeHeight(height);
+        });
+
+        resizeObserver.observe(container);
+
+        return () => {
+            resizeObserver.unobserve(container);
+            resizeObserver.disconnect();
+        };
+    }, []); // Run once on mount to set up observer
 
     const handleGlobeReady = useCallback(() => {
         setIsGlobeReady(true);
@@ -188,43 +229,33 @@ export default function DesktopRightContent() {
 
     return (
         <div
+            ref={globeContainerRef}
             className='fixed inset-0 z-0 backdrop-blur-md'
-            // LIGHT MODE
-            style={{ backgroundColor: '#00356B' }} // Set the desired background color
-            // DARK MODE
-            // style={{ backgroundColor: 'black' }} // Set the desired background color
-        >
-            <Globe
-                ref={globeRef}
-                // LIGHT MODE
-                globeImageUrl='/earth-day.jpg'
-                // DARK MODE
-                // globeImageUrl='/earth-night.jpg'
-                backgroundColor='rgba(0,0,0,0)' // Transparent background for the globe canvas
-                onGlobeReady={handleGlobeReady}
-                atmosphereColor='lightblue' // Color of the atmosphere/halo
-                atmosphereAltitude={0.25} // Thickness of the atmosphere/halo
-                arcsData={routes}
-                arcLabel={(d: any) => `${d.airline} </br>${d.srcIata} &rarr; ${d.dstIata}`}
-                arcStartLat={(d: any) => +d.srcAirport!.lat}
-                arcStartLng={(d: any) => +d.srcAirport!.lng}
-                arcEndLat={(d: any) => +d.dstAirport!.lat}
-                arcEndLng={(d: any) => +d.dstAirport!.lng}
-                arcDashLength={0.25}
-                arcDashGap={1}
-                arcDashInitialGap={() => Math.random()}
-                arcDashAnimateTime={4000}
-                arcColor={(d: any) => [`rgba(0, 255, 0, ${ARC_OPACITY})`, `rgba(255, 0, 0, ${ARC_OPACITY})`]}
-                arcsTransitionDuration={0}
-                // Airport points (optional, can be performance intensive with many points)
-                // pointsData={airports.filter(ap => ap.country === TARGET_COUNTRY)} // Example: only US airports
-                // pointColor={() => 'gold'}
-                // pointAltitude={0.01} // Slight altitude to avoid z-fighting if globe is not perfectly smooth
-                // pointRadius={0.05}
-                // pointsMerge={true}
-
-                // controlsOptions prop is removed, settings are applied via useEffect
-            />
+            style={{ backgroundColor: '#00356B' }}>
+            {globeWidth > 0 && globeHeight > 0 && (
+                <Globe
+                    ref={globeRef}
+                    width={globeWidth}
+                    height={globeHeight}
+                    globeImageUrl='/earth-day.jpg'
+                    backgroundColor='rgba(0,0,0,0)'
+                    onGlobeReady={handleGlobeReady}
+                    atmosphereColor='lightblue'
+                    atmosphereAltitude={0.25}
+                    arcsData={routes}
+                    arcLabel={(d: any) => `${d.airline} </br>${d.srcIata} &rarr; ${d.dstIata}`}
+                    arcStartLat={(d: any) => +d.srcAirport!.lat}
+                    arcStartLng={(d: any) => +d.srcAirport!.lng}
+                    arcEndLat={(d: any) => +d.dstAirport!.lat}
+                    arcEndLng={(d: any) => +d.dstAirport!.lng}
+                    arcDashLength={0.25}
+                    arcDashGap={1}
+                    arcDashInitialGap={() => Math.random()}
+                    arcDashAnimateTime={4000}
+                    arcColor={(d: any) => [`rgba(0, 255, 0, ${ARC_OPACITY})`, `rgba(255, 0, 0, ${ARC_OPACITY})`]}
+                    arcsTransitionDuration={0}
+                />
+            )}
         </div>
     );
 }

@@ -94,6 +94,18 @@ export default function DesktopLeftContentMembership() {
                     <div className='flex w-full max-w-[400px] justify-center pb-12'>
                         <div className='flex w-full flex-col items-start justify-center gap-4 rounded-2xl bg-neutral-50 p-6'>
                             <h2 className='text-2xl font-bold'>Ascend Membership</h2>
+                            <div className='flex flex-row gap-3'>
+                                <div className='flex items-start justify-start gap-1'>
+                                    <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
+                                        $
+                                    </span>
+                                    <span className='text-3xl font-bold'>25</span>
+                                    <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
+                                </div>
+                            </div>
+                            <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-sm'>
+                                <span className='font-semibold'>Less than $2.99 per month</span>
+                            </div>
                             <OnboardingMembershipCardRow
                                 title='Flight Refunds'
                                 description='We get airlines to give you the credits you are entitled to based on their policy.'
@@ -108,19 +120,6 @@ export default function DesktopLeftContentMembership() {
                                 title='Members-Only Deals'
                                 description="Tell us where you're going, we'll find you the best price."
                             />
-
-                            <div className='flex flex-row gap-3'>
-                                <div className='flex items-start justify-start gap-1'>
-                                    <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
-                                        $
-                                    </span>
-                                    <span className='text-3xl font-bold'>25</span>
-                                    <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
-                                </div>
-                            </div>
-                            <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-sm'>
-                                <span className='font-semibold'>Less than $2.99 per month</span>
-                            </div>
                         </div>
                     </div>
                     <button

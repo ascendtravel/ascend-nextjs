@@ -3,7 +3,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 // Assuming this is the correct path
 import OnboardingMembershipCheckSvg from './OnboardingMembershipCheckSvg';
 
-export default function OnboardingMembershipCardRow({ title, description }: { title: string; description?: string }) {
+export default function OnboardingMembershipCardRow({
+    title,
+    description,
+    isInitiallyOpen = false
+}: {
+    title: string;
+    description?: string;
+    isInitiallyOpen?: boolean;
+}) {
     if (!description) {
         // No description, render simple layout
         return (
@@ -13,6 +21,8 @@ export default function OnboardingMembershipCardRow({ title, description }: { ti
             </div>
         );
     }
+
+    const itemValue = `item-${title.replace(/\s+/g, '-').toLowerCase()}`;
 
     // Description exists, prepare for conditional rendering
     return (
@@ -31,8 +41,12 @@ export default function OnboardingMembershipCardRow({ title, description }: { ti
             {/* The Accordion itself needs a unique value for multi-item accordions, but for a single item, it's less critical unless it's part of a larger group. */}
             {/* Using title as a simple key here, ensure it is unique if multiple rows are in one Accordion root not shown here.*/}
             <div className='block md:hidden'>
-                <Accordion type='single' collapsible className='w-full'>
-                    <AccordionItem value={`item-${title.replace(/\s+/g, '-').toLowerCase()}`}>
+                <Accordion
+                    type='single'
+                    collapsible
+                    className='w-full'
+                    defaultValue={isInitiallyOpen ? itemValue : undefined}>
+                    <AccordionItem value={itemValue}>
                         <AccordionTrigger className='py-2 text-lg font-bold hover:no-underline'>
                             <div className='flex flex-row items-center gap-2'>
                                 <OnboardingMembershipCheckSvg />

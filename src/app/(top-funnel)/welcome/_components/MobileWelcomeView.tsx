@@ -166,7 +166,7 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
                 if (response.ok && data?.signup_link_code) {
                     setStripeUrl(`https://payments.heyascend.com/${data.signup_link_code}`);
                 } else {
-                    setError(data?.message || 'Failed to get payment link. Please contact support.');
+                    setError('');
                 }
             } catch (err) {
                 console.error('Error getting Stripe signup URL:', err);
@@ -191,7 +191,7 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
                 type='button'
                 onClick={handleStripeSignup}
                 disabled={isLoading || !!error || !stripeUrl}
-                className='w-full rounded-full bg-[#17AA59] px-12 py-3 font-semibold text-white transition-all hover:bg-[#17AA59]/90 disabled:cursor-not-allowed disabled:opacity-50'>
+                className='w-full rounded-full bg-[#17AA59] px-24 py-3 font-semibold text-nowrap text-white shadow-2xl transition-all hover:bg-[#17AA59]/90 disabled:cursor-not-allowed disabled:opacity-50'>
                 {error ? (
                     <a href='mailto:hey@ascend.travel' className='text-white hover:text-white/90'>
                         {error} (Contact Support)

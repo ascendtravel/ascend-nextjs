@@ -75,9 +75,12 @@ export default function DesktopWelcomeView() {
     const searchParams = useSearchParams();
     const currentUrlStep = getStepFromQuery(searchParams);
 
+    // Determine if the initial globe animation should be skipped
+    const skipInitialGlobeAnimation = currentUrlStep !== OnboardingSteps.Step0;
+
     return (
         <div className='relative hidden h-screen overflow-hidden md:flex'>
-            <DesktopRightContent /> {/* Map background, z-0 */}
+            <DesktopRightContent skipInitialGlobeAnimation={skipInitialGlobeAnimation} /> {/* Map background, z-0 */}
             <DesktopLeftContent />
             {currentUrlStep !== OnboardingSteps.Step4 && (
                 <div className='fixed top-1/2 left-[50%] z-10 flex w-fit -translate-y-1/2 items-center justify-start p-8'>
