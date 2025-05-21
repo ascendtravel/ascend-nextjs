@@ -385,12 +385,12 @@ export default function MobileContentWelcome({
 
             {/* Top Bar (Logo/Login) - Animates from Top */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 top-2 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl px-4 py-2'
+                className='pointer-events-auto fixed inset-x-0 -top-3 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl px-4 py-2'
                 initial={{ y: '-100%', opacity: 0 }}
                 animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '-100%', opacity: 0 }}
                 transition={{ delay: 0, type: 'spring', stiffness: 80, damping: 15 }} // Base delay removed, controlled by startUIAnimations
             >
-                <IconNewWhite className='size-24 rounded-2xl bg-[#5AA6DA]/20 px-2 backdrop-blur-sm' />
+                <IconNewWhite className='size-16 rounded-2xl' />
                 <Link href='/auth/phone-login' className='pointer-events-auto'>
                     <div className='cursor-pointer rounded-full bg-[#5AA6DA]/20 px-6 py-2 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/20'>
                         Login
