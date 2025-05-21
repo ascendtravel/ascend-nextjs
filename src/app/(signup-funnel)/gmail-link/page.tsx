@@ -43,7 +43,6 @@ export default async function GmailLinkPage() {
 
     return (
         <div className='relative min-h-screen bg-neutral-900'>
-            <AnimatedCloudsBackground />
             <GmailLinkView initialStateId={stateId} />
             <CopyrightFooter />
         </div>

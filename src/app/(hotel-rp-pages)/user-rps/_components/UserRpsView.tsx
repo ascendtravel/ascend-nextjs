@@ -55,14 +55,6 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
         );
     }
 
-    // if (error) {
-    //     return (
-    //         <div className='flex h-full w-full items-center justify-center'>
-    //             <div>Error: {error}</div>
-    //         </div>
-    //     );
-    // }
-
     const handleTripClick = (trip: Booking) => {
         setTimeout(() => {
             // Target the main content wrapper with overflow-scroll

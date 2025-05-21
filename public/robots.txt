@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
-Allow: /gmail-link
-Allow: /new-gmail-tips
+Allow: /welcome
+Allow: /welcome?step=1
+Allow: /auth/phone-login
 
 # Sitemaps
-Sitemap: https://ascend.travel/sitemap.xml 
+Sitemap: https://app.heyascend.com/sitemap.xml 

@@ -67,7 +67,7 @@ export default function UserAvatar({ variant = 'md', showName = false, className
             return `Stranger (+${user.main_phone})`;
         }
 
-        return 'Stranger';
+        return '';
     };
 
     return (

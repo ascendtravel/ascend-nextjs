@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server';
 
 import * as Sentry from '@sentry/nextjs';
 
+import { LINK_FAILURE_PARAM, PERMISSIONS_FAILURE_PARAM } from './app/(top-funnel)/welcome/_types';
+
 export function middleware(request: NextRequest) {
     // Initialize Sentry
     Sentry.init({
@@ -14,42 +16,6 @@ export function middleware(request: NextRequest) {
 
     const { pathname, searchParams } = request.nextUrl;
     const url = request.nextUrl.clone();
-
-    /**
-     * ========================================================================
-     * WELCOME PAGE PATCH
-     *
-     * TEMPORARY REDIRECT - TO BE REMOVED AFTER BACKEND CHANGES ARE MERGED
-     * This patch ensures the welcome page works in production while backend
-     * changes are being integrated.
-     *
-     * REMOVAL INSTRUCTIONS:
-     * Delete everything between the "WELCOME PAGE PATCH" comment blocks
-     * (including the blocks themselves) once the backend changes are merged.
-     * ========================================================================
-     */
-    if (pathname.startsWith('/user-rps/welcome')) {
-        // Get the base URL from the request
-        const baseUrl = new URL(request.url).origin;
-
-        // Create absolute redirect URL
-        const redirectUrl = new URL('/user-rps', baseUrl);
-
-        // Preserve all query parameters in the redirect
-        searchParams.forEach((value, key) => {
-            redirectUrl.searchParams.append(key, value);
-        });
-
-        console.log(`WELCOME PAGE PATCH: Redirecting ${pathname} to ${redirectUrl.toString()}`);
-
-        // Use temporary redirect (307) to ensure proper handling
-        return NextResponse.redirect(redirectUrl.toString(), 307);
-    }
-    /**
-     * ========================================================================
-     * END OF WELCOME PAGE PATCH
-     * ========================================================================
-     */
 
     // Determine environment using the custom env var
     const isLocalDev = process.env.NEXT_PUBLIC_IS_LOCAL_DEV === 'true';
@@ -77,17 +43,102 @@ export function middleware(request: NextRequest) {
 
     // Redirect old picks paths to app URL
     if (pathname.startsWith('/picksV2') || pathname.startsWith('/pick')) {
-        return NextResponse.redirect(`https://app.ascend.travel${pathname}`);
+        return redirectWithParams(`${baseAppUrl}${pathname}`);
     }
 
-    // Redirect flight paths to app.ascend.travel
+    // Redirect flight paths to app URL
     if (pathname.startsWith('/flight') || pathname.startsWith('/flights')) {
-        return NextResponse.redirect(`https://app.ascend.travel${pathname}`);
+        return redirectWithParams(`${baseAppUrl}${pathname}`);
     }
 
-    // Redirect root path to heyascend.com
+    // Redirect root path to marketing site
     if (pathname === '/') {
-        return NextResponse.redirect('https://heyascend.com');
+        return redirectWithParams(baseMarketingUrl);
+    }
+
+    // Gmail link redirects
+    if (pathname === '/gmail-link-landing') {
+        // Redirect to /welcome, preserving existing query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        searchParams.forEach((value, key) => {
+            newUrl.searchParams.append(key, value);
+        });
+        console.log(`Redirecting /gmail-link-landing to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b') {
+        // Redirect to /welcome?step=1, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '1');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /gmail-link_b to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/auth/phone-register') {
+        // Redirect to /welcome?step=2, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '2');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /auth/phone-register to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b/success') {
+        // Redirect to /welcome?step=3, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '3');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step') {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /gmail-link_b/success to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b/failure') {
+        // Redirect to /welcome?step=2&failure=true, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '1');
+        newUrl.searchParams.append(LINK_FAILURE_PARAM, 'true');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step' && key !== LINK_FAILURE_PARAM) {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /gmail-link_b/failure to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b/permissions-failure') {
+        // Redirect to /welcome?step=2&failure=true, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '1');
+
+        newUrl.searchParams.append(PERMISSIONS_FAILURE_PARAM, 'true');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step' && key !== PERMISSIONS_FAILURE_PARAM) {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /gmail-link_b/permissions-failure to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
     }
 
     return NextResponse.next();
@@ -105,7 +156,11 @@ export const config = {
         '/gmail-link-landing',
         '/auth/phone-register',
         '/gmail-link_b/success',
-        '/user-rps/welcome',
-        '/user-rps/welcome/:path*'
+
+        // Failure paths
+        '/gmail-link_b/failure',
+        '/gmail-link_b/permissions-failure'
     ]
 };
+// http://localhost:3003/gmail-link_b/permissions-failure?state_id=state_id=5d252757-fe8d-48f6-a777-1fe6ec401256
+// http://localhost:3003/gmail-link_b/failure?state_id=state_id=5d252757-fe8d-48f6-a777-1fe6ec401256

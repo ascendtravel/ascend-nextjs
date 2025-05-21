@@ -99,25 +99,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* PWA manifest */}
                 <link rel='manifest' href='/site.webmanifest' />
 
-                {/* Preload critical images */}
-                <link
-                    rel='preload'
-                    href='/images/clouds-bg.webp'
-                    as='image'
-                    type='image/webp'
-                    fetchPriority='high'
-                    imageSizes='(max-width: 768px) 100vw, 1920px'
-                />
-                {/* Fallback preload for browsers without WebP support */}
-                <link
-                    rel='preload'
-                    href='/images/clouds-bg.png'
-                    as='image'
-                    type='image/png'
-                    fetchPriority='high'
-                    imageSizes='(max-width: 768px) 100vw, 1920px'
-                />
-
                 {/* PWA essentials */}
                 <meta
                     name='viewport'

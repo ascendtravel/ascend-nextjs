@@ -15,7 +15,11 @@ const blackListedUrls = [
     '/gmail-link_b',
     '/auth/phone-login',
     '/auth/phone-register',
-    '/gmail-link_b/success'
+    '/gmail-link_b/success',
+    '/onboarding',
+    '/user-rps/welcome',
+    '/onboarding-landing',
+    '/welcome'
 ];
 
 export function CookiesBanner() {
@@ -54,7 +58,7 @@ export function CookiesBanner() {
                                         <Link
                                             href='/cookies-info'
                                             className='ml-1 text-xs text-neutral-600 underline hover:text-neutral-900'>
-                                            Learn more
+                                            Cookies info
                                         </Link>
                                     </p>
                                 </div>
@@ -94,7 +98,7 @@ export function CookiesBanner() {
                             <Link
                                 href='/cookies-info'
                                 className='text-sm text-neutral-600 underline hover:text-neutral-900'>
-                                Learn more
+                                Cookies info
                             </Link>
                         </div>
                     </div>
