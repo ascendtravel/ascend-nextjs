@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
 
     // Base URLs based on environment
     const localRedirectUrl = process.env.NEXT_PUBLIC_LOCAL_REDIRECT_URL || 'http://localhost:3003';
-    const baseAppUrl = isLocalDev ? localRedirectUrl : 'https://heyascend.com';
+    const baseAppUrl = isLocalDev ? localRedirectUrl : 'https://app.heyascend.com';
     const baseMarketingUrl = isLocalDev ? localRedirectUrl : 'https://heyascend.com';
     const legacyUrl = isLocalDev ? localRedirectUrl : 'https://app.ascend.travel';
     // Helper function to preserve query parameters
