@@ -3,6 +3,8 @@
 // Keep this if StickyScrollList or its context uses client features
 import React from 'react';
 
+import Link from 'next/link';
+
 // For footer
 
 import FeedCard, { FeedCardData } from '@/components/FeedCard/FeedCard';
@@ -129,66 +131,49 @@ interface MobileContentWelcomeProps {
 }
 
 export default function MobileContentWelcome({ predefinedStep, onNextStep }: MobileContentWelcomeProps) {
-    // Use the generated initial recent items
-    // const listProviderItems = feedCardExampleData.map( ... ); // Old mapping removed
-
     return (
         <div className='flex min-h-screen flex-col items-center justify-between bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC] text-white md:hidden'>
-            <div className='flex w-full flex-col items-center justify-start pt-16'>
-                <div className='fixed inset-x-0 top-0 z-50 flex w-full flex-col items-center justify-center bg-[#00345A]'>
-                    <YcombBanner />
+            <div className='flex w-full flex-1 flex-col items-center justify-start gap-6 pt-16'>
+                <div className='fixed inset-x-0 top-0 z-50 flex h-24 w-full flex-row items-center justify-center'></div>
+                <div className='flex w-full flex-row items-center justify-between px-4'>
+                    <IconNewWhite className='size-18' />
+                    <Link href='/auth/phone-login'>
+                        <div className='cursor-pointer rounded-full px-6 py-2 text-base font-semibold text-white hover:bg-gray-200/20'>
+                            Login
+                        </div>
+                    </Link>
                 </div>
-                <IconNewWhite className='size-24' />
-                <div className='h-[180px] w-full max-w-sm'>
-                    <StickyScrollListProvider
-                        initialItemsData={initialMobileFeedItems} // Provide generated initial items
-                        mockFeed // Enable the live feed
-                        feedOptions={{
-                            intervalMs: 3500,
-                            minAmount: 60,
-                            maxAmount: 480
-                        }}
-                        itemHeight={70}
-                        initialAlignment='center'>
-                        <StickyScrollList
-                            renderItem={(stickyProps: StickyCardRenderProps<ContextListItem>) => {
-                                const itemFromContext = stickyProps.item;
-                                const feedCardData: FeedCardData = {
-                                    id: String(itemFromContext.id),
-                                    userName: itemFromContext.userName || 'User',
-                                    creationDateTime: itemFromContext.creationDateTime || new Date(),
-                                    destination: itemFromContext.destination || 'Place',
-                                    type: (itemFromContext.type as 'hotel' | 'flight') || 'hotel',
-                                    amount: itemFromContext.amount || 0,
-                                    currency: itemFromContext.currency || '$'
-                                };
 
-                                return (
-                                    <FeedCard
-                                        {...feedCardData}
-                                        itemHeight={stickyProps.itemHeight}
-                                        alignment={stickyProps.alignment}
-                                        isCenter={stickyProps.isCenter}
-                                    />
-                                );
-                            }}
-                            visibleItemsCount={3}
-                        />
-                    </StickyScrollListProvider>
-                </div>
-                <div className='my-14 flex max-w-xs flex-col items-center justify-center space-y-4 px-4 text-center'>
-                    <p className='font-figtree max-w-[254px] text-center text-[30px] leading-tight font-extrabold tracking-[-0.02em] sm:text-[32px]'>
-                        Smart travelers don't overpay
-                    </p>
-                    <p className='font-figtree text-base leading-snug font-medium sm:text-[17px]'>
-                        Ascend watches your bookings and gets you money back when Big Travel drops prices.
-                    </p>
-                </div>
-                {/* <div onClick={handleGetStartedClick} className='mb-20 w-full max-w-xs cursor-pointer px-4'>
-                    <div className='text-md w-full rounded-full bg-white px-8 py-3.5 text-center font-bold text-neutral-700 shadow-lg transition-colors hover:bg-gray-100'>
-                        Get Started for Free
+                <div className='flex h-full flex-1 flex-col items-center justify-center gap-6 pb-24'>
+                    <div className='flex flex-row items-center justify-start gap-2 p-2 text-white'>
+                        <h1 className='text-figtree text-base font-bold'>Backed by </h1>
+                        <div className='flex flex-row items-center justify-center gap-1'>
+                            <div className='size-6 bg-[#f26522] text-center text-base font-bold'>Y</div>
+                        </div>
                     </div>
-                </div> */}
+
+                    <h1 className='text-figtree mx-4 max-w-[300px] text-center text-[40.96px] leading-[34.14px] font-bold tracking-[-2%] text-white drop-shadow-xl sm:max-w-none sm:text-[60px]'>
+                        Smart travelers don't overpay
+                    </h1>
+                    <h2 className='text-figtree max-w-[272px] text-center text-[14px] leading-[20px] font-semibold text-white drop-shadow-sm'>
+                        Ascend watches your bookings and gets you money back when <b>Big Travel</b> drops prices. Get
+                        start in just 3 steps.
+                    </h2>
+                    <div className='my-[2rem] flex flex-col items-start justify-center gap-2 text-sm font-bold text-white'>
+                        <div className='flex flex-row items-center justify-center gap-2'>
+                            <div className='size-6'>📧</div>
+                            <div>Connect your email to import travel bookings</div>
+                        </div>
+                        <div className='flex flex-row items-center justify-center gap-2 opacity-50'>
+                            <div className='size-6'>☎️</div>
+                            <div>Add your phone number to get notified</div>
+                        </div>
+                        <div className='flex flex-row items-center justify-center gap-2 opacity-50'>
+                            <div className='size-6'>🎉</div>
+                            <div>Become a member to start saving</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

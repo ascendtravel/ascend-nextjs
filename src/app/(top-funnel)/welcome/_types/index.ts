@@ -21,3 +21,6 @@ export const mapNumberToStep = {
     3: OnboardingSteps.Step3,
     4: OnboardingSteps.Step4
 };
+
+export const LINK_FAILURE_PARAM = 'link_failure';
+export const PERMISSIONS_FAILURE_PARAM = 'permissions_failure';

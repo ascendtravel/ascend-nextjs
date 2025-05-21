@@ -42,7 +42,7 @@ export default function DesktopLeftContentTrips() {
                 <div className='flex-grow overflow-y-auto py-4'>
                     <div className='relative flex flex-col items-center justify-start gap-4'>
                         <WelcomeWhatsNext
-                            componenHeader="Here's what to expect next:"
+                            componenHeader="We're importing your trips..."
                             rowsInfo={[
                                 {
                                     content:

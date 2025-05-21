@@ -61,7 +61,7 @@ export default function MobileContentMembership() {
         <div className='flex h-screen w-full flex-col items-center justify-start bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC] pt-20 sm:pt-36'>
             {/* Scrollable content area */}
             <div className='flex h-[calc(100vh-6rem)] flex-col items-center justify-start overflow-y-auto'>
-                <div className='flex flex-col items-center justify-center px-4 py-4 pt-6 sm:pt-24'>
+                <div className='flex flex-col items-center justify-center px-4 py-4 pt-[4vh]'>
                     <p className='font-figtree max-w-md px-6 text-center text-[24px] leading-[28px] font-extrabold tracking-[-0.02em] text-white'>
                         Ascend works for you, not Big Travel
                     </p>
@@ -73,12 +73,18 @@ export default function MobileContentMembership() {
                 <div className='flex w-full max-w-lg justify-center px-4 pb-24'>
                     <div className='flex w-full flex-col items-start justify-center gap-4 rounded-2xl bg-neutral-50 p-6'>
                         <h2 className='text-2xl font-bold'>Ascend Membership</h2>
-                        <OnboardingMembershipCardRow title='Flight Refunds' />
-                        <Separator className='w-full' />
-                        <OnboardingMembershipCardRow title='Hotel Refunds' />
-                        <Separator className='w-full' />
-                        <OnboardingMembershipCardRow title='Members-Only Deals' />
-
+                        <OnboardingMembershipCardRow
+                            title='Flight Refunds'
+                            description='We get airlines to give you the credits you are entitled to based on their policy.'
+                        />
+                        <OnboardingMembershipCardRow
+                            title='Hotel Refunds'
+                            description="Tell us where you're going, we'll find you the best price."
+                        />
+                        <OnboardingMembershipCardRow
+                            title='Members-Only Deals'
+                            description='We get members-only deals on travel.'
+                        />
                         <div className='flex flex-row gap-3'>
                             <div className='flex items-start justify-start gap-1'>
                                 <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>$</span>

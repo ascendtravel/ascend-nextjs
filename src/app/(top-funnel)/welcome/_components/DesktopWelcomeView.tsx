@@ -90,7 +90,7 @@ export default function DesktopWelcomeView() {
                                 minAmount: 75,
                                 maxAmount: 550
                             }}
-                            itemHeight={70}
+                            itemHeight={80}
                             initialAlignment='left'>
                             <StickyScrollList
                                 renderItem={(stickyProps: StickyCardRenderProps<ContextListItem>) => {

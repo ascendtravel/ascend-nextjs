@@ -1,185 +1,230 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import mapboxgl, { LngLatLike } from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+// Ensure you have installed react-globe.gl
+import { csvParseRows } from 'd3-dsv';
+// Ensure you have installed d3-dsv
+import indexBy from 'index-array-by';
+import Globe, { GlobeMethods } from 'react-globe.gl';
 
-// Animation Start Parameters (Antarctica)
-const ANIM_START_CENTER: LngLatLike = [0, -75];
-const ANIM_START_ZOOM = 1;
-const ANIM_START_PITCH = 30;
-const ANIM_START_BEARING = 0;
+// Ensure you have installed index-array-by
 
-// Final Destination Parameters: View focused on Pacific, US to rotate in
-const FINAL_DESTINATION_CENTER: LngLatLike = [-150, 25]; // Initial center in the Pacific Ocean
-const FINAL_DESTINATION_ZOOM = 3; // Zoom level for globe view (was 2.0, adjusted to see landmasses better)
-const FINAL_DESTINATION_PITCH = 15; // Slight pitch for 3D effect
-const FINAL_DESTINATION_BEARING = 0;
+const AIRPORTS_DATA_URL = 'https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat';
+const ROUTES_DATA_URL = 'https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat';
 
-// Animation duration
-const ANIMATION_DURATION = 1000;
-const ANIMATION_DELAY = 200;
-const GLOBE_SPIN_SPEED = 0.1; // Degrees of longitude per frame
+const TARGET_COUNTRY = 'United States';
+const ARC_OPACITY = 0.22;
 
-const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+// Camera Animation Parameters
+const START_CAMERA_POV = { lat: 0, lng: 0, altitude: 3.5 }; // Zoomed out, centered view
+const TARGET_CAMERA_POV = { lat: 39.6, lng: -98.5, altitude: 1.5 }; // Focused on continental US
+const POV_ANIMATION_DURATION_MS = 2500;
+const INITIAL_ANIMATION_DELAY_MS = 500;
 
-if (!mapboxToken) {
-    console.warn(
-        'Mapbox token NEXT_PUBLIC_MAPBOX_TOKEN is not configured. Map will not load correctly.' +
-            ' Please add it to your .env.local file (e.g., NEXT_PUBLIC_MAPBOX_TOKEN=your_token_here)'
-    );
+const SLOW_ROTATION_SPEED = 0.3; // Degrees per second (adjust as needed)
+
+// Helper types for data parsing (based on example)
+interface Airport {
+    airportId: string;
+    name: string;
+    city: string;
+    country: string;
+    iata: string;
+    icao: string;
+    lat: string;
+    lng: string;
+    alt: string;
+    timezone: string;
+    dst: string;
+    tz: string;
+    type: string;
+    source: string;
 }
 
+interface Route {
+    airline: string;
+    airlineId: string;
+    srcIata: string;
+    srcAirportId: string;
+    dstIata: string;
+    dstAirportId: string;
+    codeshare: string;
+    stops: string;
+    equipment: string;
+    srcAirport?: Airport; // Populated after processing
+    dstAirport?: Airport; // Populated after processing
+}
+
+const airportParse = (row: string[]): Airport => ({
+    airportId: row[0],
+    name: row[1],
+    city: row[2],
+    country: row[3],
+    iata: row[4],
+    icao: row[5],
+    lat: row[6],
+    lng: row[7],
+    alt: row[8],
+    timezone: row[9],
+    dst: row[10],
+    tz: row[11],
+    type: row[12],
+    source: row[13]
+});
+
+const routeParse = (row: string[]): Partial<Route> => ({
+    // Partial initially as src/dstAirport are added later
+    airline: row[0],
+    airlineId: row[1],
+    srcIata: row[2],
+    srcAirportId: row[3],
+    dstIata: row[4],
+    dstAirportId: row[5],
+    codeshare: row[6],
+    stops: row[7],
+    equipment: row[8]
+});
+
 export default function DesktopRightContent() {
-    const mapContainerRef = useRef<HTMLDivElement>(null);
-    const mapRef = useRef<mapboxgl.Map | null>(null);
-    const animationFrameIdRef = useRef<number | null>(null);
-    const shouldAutoRotateRef = useRef<boolean>(true);
+    const globeRef = useRef<GlobeMethods | undefined>(undefined);
+    const rotationTimerIdRef = useRef<NodeJS.Timeout | null>(null);
+
+    const [airports, setAirports] = useState<Airport[]>([]);
+    const [routes, setRoutes] = useState<Route[]>([]);
+    const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
+    const [isGlobeReady, setIsGlobeReady] = useState(false);
 
     useEffect(() => {
-        if (!mapboxToken || !mapContainerRef.current) {
-            // Log an error or display a fallback if the token or container is missing
-            if (!mapboxToken) console.error('Mapbox token is missing. Map cannot be initialized.');
+        // Load data
+        Promise.all([
+            fetch(AIRPORTS_DATA_URL)
+                .then((res) => res.text())
+                .then((d) => csvParseRows(d, airportParse as (row: string[]) => Airport)),
+            fetch(ROUTES_DATA_URL)
+                .then((res) => res.text())
+                .then((d) => csvParseRows(d, routeParse as (row: string[]) => Route))
+        ])
+            .then(([loadedAirports, loadedRoutes]) => {
+                const byIata = indexBy(loadedAirports, 'iata', false) as { [key: string]: Airport };
 
-            return;
+                const filteredRoutes = loadedRoutes
+                    .filter(
+                        (d) =>
+                            Object.prototype.hasOwnProperty.call(byIata, d.srcIata!) &&
+                            Object.prototype.hasOwnProperty.call(byIata, d.dstIata!)
+                    ) // Exclude unknown airports
+                    .filter((d) => d.stops === '0') // Non-stop flights only
+                    .map((d) =>
+                        Object.assign(d, {
+                            srcAirport: byIata[d.srcIata!],
+                            dstAirport: byIata[d.dstIata!]
+                        })
+                    )
+                    .filter(
+                        (d) => d.srcAirport?.country === TARGET_COUNTRY && d.dstAirport?.country !== TARGET_COUNTRY
+                    ); // International routes from country
+
+                setAirports(loadedAirports);
+                setRoutes(filteredRoutes as Route[]);
+
+                return null; // Satisfy linter rule: Each then() should return a value or throw
+            })
+            .catch((error) => console.error('Error loading flight data:', error));
+    }, []);
+
+    useEffect(() => {
+        let animationTimerId: NodeJS.Timeout | undefined;
+        // rotationTimerIdRef.current is managed by the main useEffect cleanup
+
+        if (globeRef.current && isGlobeReady) {
+            // Set initial camera without animation
+            globeRef.current.pointOfView(START_CAMERA_POV, 0);
+
+            animationTimerId = setTimeout(() => {
+                if (globeRef.current) {
+                    globeRef.current.pointOfView(TARGET_CAMERA_POV, POV_ANIMATION_DURATION_MS);
+                    if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current); // Clear previous before setting new
+                    rotationTimerIdRef.current = setTimeout(() => {
+                        setIsInitialAnimationComplete(true);
+                    }, POV_ANIMATION_DURATION_MS);
+                }
+            }, INITIAL_ANIMATION_DELAY_MS);
         }
 
-        mapboxgl.accessToken = mapboxToken;
-
-        const map = new mapboxgl.Map({
-            container: mapContainerRef.current,
-            style: 'mapbox://styles/mapbox/streets-v12',
-            projection: { name: 'globe' },
-            center: ANIM_START_CENTER,
-            zoom: ANIM_START_ZOOM,
-            pitch: ANIM_START_PITCH,
-            bearing: ANIM_START_BEARING,
-            attributionControl: false,
-            dragPan: true, // Keep dragPan enabled by default
-            dragRotate: true, // Keep dragRotate enabled by default
-            touchZoomRotate: true // Keep touchZoomRotate enabled by default
-        });
-        mapRef.current = map;
-
-        const startGlobeSpin = () => {
-            if (!mapRef.current || animationFrameIdRef.current || !shouldAutoRotateRef.current) return;
-            console.log('Attempting to start globe spin.');
-
-            function spin() {
-                if (!mapRef.current || !shouldAutoRotateRef.current) {
-                    if (animationFrameIdRef.current) cancelAnimationFrame(animationFrameIdRef.current);
-                    animationFrameIdRef.current = null;
-                    console.log('Globe spin loop stopped.');
-
-                    return;
-                }
-                const currentCenter = mapRef.current.getCenter();
-                let newLng = currentCenter.lng + GLOBE_SPIN_SPEED;
-                // Wrap longitude
-                if (newLng > 180) newLng -= 360;
-                if (newLng < -180) newLng += 360;
-
-                mapRef.current.setCenter([newLng, currentCenter.lat]);
-                animationFrameIdRef.current = requestAnimationFrame(spin);
-            }
-            spin();
-        };
-
-        const stopGlobeSpin = (permanently = false) => {
-            if (animationFrameIdRef.current) {
-                cancelAnimationFrame(animationFrameIdRef.current);
-                animationFrameIdRef.current = null;
-                console.log('Globe spin stopped.');
-            }
-            if (permanently) {
-                shouldAutoRotateRef.current = false;
-                console.log('Globe auto-spin permanently disabled.');
-            }
-        };
-
-        map.on('load', () => {
-            console.log('Map loaded');
-            if (!mapRef.current) return;
-
-            // Stop globe spin on any user interaction that changes camera
-            mapRef.current.on('dragstart', () => {
-                stopGlobeSpin();
-            });
-            mapRef.current.on('zoomstart', () => {
-                stopGlobeSpin();
-            });
-            mapRef.current.on('rotatestart', () => {
-                stopGlobeSpin(true);
-            }); // Permanent stop on user rotate
-            mapRef.current.on('pitchstart', () => {
-                stopGlobeSpin();
-            });
-
-            // Resume globe spin after drag or zoom ends, if not permanently stopped
-            mapRef.current.on('dragend', () => {
-                if (shouldAutoRotateRef.current) startGlobeSpin();
-            });
-            mapRef.current.on('zoomend', () => {
-                if (shouldAutoRotateRef.current) startGlobeSpin();
-            });
-            mapRef.current.on('pitchend', () => {
-                if (shouldAutoRotateRef.current) startGlobeSpin();
-            });
-            // No auto-resume after 'rotateend' as user has set a specific orientation
-
-            setTimeout(() => {
-                console.log('Starting easeTo animation to initial view.');
-                mapRef.current?.easeTo({
-                    center: FINAL_DESTINATION_CENTER,
-                    zoom: FINAL_DESTINATION_ZOOM,
-                    pitch: FINAL_DESTINATION_PITCH,
-                    bearing: FINAL_DESTINATION_BEARING,
-                    duration: ANIMATION_DURATION
-                });
-
-                mapRef.current?.once('moveend', (e) => {
-                    console.log('easeTo initial view moveend event fired');
-                    if (mapRef.current) {
-                        const finalCenterArray = FINAL_DESTINATION_CENTER as [number, number];
-                        const currentCenter = mapRef.current.getCenter();
-                        const currentZoom = mapRef.current.getZoom();
-                        const atFinalDestination =
-                            Math.abs(currentCenter.lng - finalCenterArray[0]) < 0.01 &&
-                            Math.abs(currentCenter.lat - finalCenterArray[1]) < 0.01 &&
-                            Math.abs(currentZoom - FINAL_DESTINATION_ZOOM) < 0.1;
-
-                        if (atFinalDestination && shouldAutoRotateRef.current) {
-                            console.log('Met condition, starting initial globe spin.');
-                            startGlobeSpin();
-                        }
-                    }
-                });
-            }, ANIMATION_DELAY);
-        });
-
         return () => {
-            stopGlobeSpin();
-            mapRef.current?.remove();
-            mapRef.current = null;
+            if (animationTimerId) clearTimeout(animationTimerId);
+            if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
         };
+    }, [isGlobeReady]); // Depend on isGlobeReady
+
+    useEffect(() => {
+        if (globeRef.current && isGlobeReady) {
+            if (isInitialAnimationComplete) {
+                globeRef.current.controls().autoRotate = true;
+                globeRef.current.controls().autoRotateSpeed = SLOW_ROTATION_SPEED;
+            } else {
+                globeRef.current.controls().autoRotate = false;
+            }
+        }
+    }, [isGlobeReady, isInitialAnimationComplete]);
+
+    // New useEffect to configure controls once globe is ready
+    useEffect(() => {
+        if (globeRef.current && isGlobeReady) {
+            const controls = globeRef.current.controls();
+            controls.enableZoom = true;
+            controls.enableRotate = true;
+            // react-globe.gl uses minDistance/maxDistance for zoom limits with OrbitControls
+            controls.minDistance = 100; // Corresponds to minZoomRadius
+            controls.maxDistance = 500; // Corresponds to maxZoomRadius
+        }
+    }, [isGlobeReady]);
+
+    const handleGlobeReady = useCallback(() => {
+        setIsGlobeReady(true);
+        console.log('Globe is ready.');
     }, []);
 
     return (
-        // This div is fixed to the viewport, covers it, and sits at z-index 0 (background)
-        <div className='fixed inset-0 z-0'>
-            <div ref={mapContainerRef} className='h-full w-full' />
-            {/* Minimal CSS to hide the Mapbox logo if it appears despite attributionControl:false */}
-            <style jsx global>{`
-                .mapboxgl-ctrl-logo {
-                    display: none !important;
-                }
-                /* Ensure map canvas is focusable to receive keyboard events for panning/zooming if needed,
-                   though primary interaction here is touch/mouse. */
-                .mapboxgl-canvas {
-                    outline: none;
-                }
-            `}</style>
+        <div
+            className='fixed inset-0 z-0 backdrop-blur-md'
+            // LIGHT MODE
+            style={{ backgroundColor: '#00356B' }} // Set the desired background color
+            // DARK MODE
+            // style={{ backgroundColor: 'black' }} // Set the desired background color
+        >
+            <Globe
+                ref={globeRef}
+                // LIGHT MODE
+                globeImageUrl='/earth-day.jpg'
+                // DARK MODE
+                // globeImageUrl='/earth-night.jpg'
+                backgroundColor='rgba(0,0,0,0)' // Transparent background for the globe canvas
+                onGlobeReady={handleGlobeReady}
+                atmosphereColor='lightblue' // Color of the atmosphere/halo
+                atmosphereAltitude={0.25} // Thickness of the atmosphere/halo
+                arcsData={routes}
+                arcLabel={(d: any) => `${d.airline} </br>${d.srcIata} &rarr; ${d.dstIata}`}
+                arcStartLat={(d: any) => +d.srcAirport!.lat}
+                arcStartLng={(d: any) => +d.srcAirport!.lng}
+                arcEndLat={(d: any) => +d.dstAirport!.lat}
+                arcEndLng={(d: any) => +d.dstAirport!.lng}
+                arcDashLength={0.25}
+                arcDashGap={1}
+                arcDashInitialGap={() => Math.random()}
+                arcDashAnimateTime={4000}
+                arcColor={(d: any) => [`rgba(0, 255, 0, ${ARC_OPACITY})`, `rgba(255, 0, 0, ${ARC_OPACITY})`]}
+                arcsTransitionDuration={0}
+                // Airport points (optional, can be performance intensive with many points)
+                // pointsData={airports.filter(ap => ap.country === TARGET_COUNTRY)} // Example: only US airports
+                // pointColor={() => 'gold'}
+                // pointAltitude={0.01} // Slight altitude to avoid z-fighting if globe is not perfectly smooth
+                // pointRadius={0.05}
+                // pointsMerge={true}
+
+                // controlsOptions prop is removed, settings are applied via useEffect
+            />
         </div>
     );
 }

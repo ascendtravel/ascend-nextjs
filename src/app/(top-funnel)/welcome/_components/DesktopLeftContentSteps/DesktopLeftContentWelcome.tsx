@@ -80,14 +80,14 @@ export default function DesktopLeftContentWelcome() {
                 stiffness: 60,
                 damping: 20,
                 duration: 0.7,
-                delay: 1.3
+                delay: 3
             }
         }
     };
 
     return (
         <motion.div
-            className='relative z-10 flex w-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 backdrop-blur-md'
+            className='relative z-10 flex w-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 pl-14 backdrop-blur-md'
             variants={panelVariants}
             initial='hidden'
             animate='visible'>

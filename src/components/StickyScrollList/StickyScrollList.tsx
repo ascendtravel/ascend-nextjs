@@ -72,15 +72,13 @@ export default function StickyScrollList<ItemType extends BaseStickyListItem = B
             <div
                 className={`relative flex w-full max-w-md justify-center overflow-hidden rounded-lg`}
                 style={{
-                    height: itemHeight * visibleItemsCount, // Used prop here
-                    paddingRight: SCROLLBAR_COMPENSATION
+                    height: itemHeight * visibleItemsCount // Used prop here
                 }}>
                 <div
                     ref={scrollContainerRef}
-                    className={`relative flex h-full justify-center overflow-y-scroll scroll-smooth`}
+                    className={`relative -mr-8 flex h-full justify-center overflow-x-hidden overflow-y-scroll scroll-smooth pr-6`}
                     style={{
                         width: '100%',
-                        marginRight: `-${SCROLLBAR_COMPENSATION}`,
                         scrollSnapType: 'y mandatory'
                     }}>
                     <div

@@ -5,7 +5,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { OnboardingSteps } from '../_types';
+import { YcombBanner } from '@/components/YcombBanner/YcombBanner';
+
+import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../_types';
 import GoogleWhiteIcon from './GoogleWhiteIcon';
 import MobileContentGmailLink from './MobileContentSteps/MobileContentGmailLink';
 import MobileContentMembership from './MobileContentSteps/MobileContentMembership';
@@ -386,6 +388,43 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
         exit: { y: '-100%', opacity: 0, transition: { duration: 0.4 } }
     };
 
+    // Variants for main content area sliding in from bottom
+    const mainContentVariants = {
+        initial: {
+            y: '50vh', // Start further down for a more noticeable slide
+            opacity: 0
+        },
+        animate: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                type: 'spring',
+                stiffness: 80,
+                damping: 20,
+                duration: 0.5 // Added duration for spring if needed, or rely on stiffness/damping
+            }
+        },
+        exit: {
+            y: '50vh',
+            opacity: 0,
+            transition: {
+                duration: 0.3
+            }
+        }
+    };
+
+    const getFailedSteps = () => {
+        if (currentStep === OnboardingSteps.Step0) return [];
+
+        const PermissionsFailure = searchParams.get(PERMISSIONS_FAILURE_PARAM);
+        const LinkFailure = searchParams.get(LINK_FAILURE_PARAM);
+
+        if (currentStep === OnboardingSteps.Step1 && (PermissionsFailure || LinkFailure))
+            return [OnboardingSteps.Step1];
+
+        return [];
+    };
+
     return (
         <div className='md:hidden'>
             {currentStep === OnboardingSteps.Step4 && showWelcome && (
@@ -414,23 +453,63 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
 
             {currentStep !== OnboardingSteps.Step0 && currentStep !== OnboardingSteps.Step4 && (
                 <div className='fixed inset-x-0 top-0 z-10 flex flex-col items-center justify-center'>
-                    <OnboardingHeader step={currentStep} />
+                    <OnboardingHeader />
                     <OnboardingStepper
                         steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
                         currentStep={currentStep}
+                        failedSteps={getFailedSteps()}
                     />
                 </div>
             )}
 
+            {/* Wrap conditional content rendering with AnimatePresence */}
             {currentStep === OnboardingSteps.Step0 && (
-                <MobileContentWelcome predefinedStep={OnboardingSteps.Step0} onNextStep={goToNextStep} />
+                <div className='fixed inset-x-0 top-0 z-50 flex w-full flex-row items-center justify-center bg-[#00345A]'>
+                    <YcombBanner />
+                </div>
             )}
-            {(currentStep === OnboardingSteps.Step1 || currentStep === OnboardingSteps.Step2) && (
-                <MobileContentGmailLink />
-            )}
-            {currentStep === OnboardingSteps.Step3 && <MobileContentMembership />}
-
-            {currentStep === OnboardingSteps.Step4 && <MobileContentTrips />}
+            <AnimatePresence mode='wait'>
+                {currentStep === OnboardingSteps.Step0 && (
+                    <motion.div
+                        key='content-step0'
+                        variants={mainContentVariants}
+                        initial='initial'
+                        animate='animate'
+                        exit='exit'>
+                        <MobileContentWelcome predefinedStep={OnboardingSteps.Step0} onNextStep={goToNextStep} />
+                    </motion.div>
+                )}
+                {(currentStep === OnboardingSteps.Step1 || currentStep === OnboardingSteps.Step2) && (
+                    <motion.div
+                        key='content-step1or2' // Key changes if the condition changes too drastically
+                        variants={mainContentVariants}
+                        initial='initial'
+                        animate='animate'
+                        exit='exit'>
+                        <MobileContentGmailLink />
+                    </motion.div>
+                )}
+                {currentStep === OnboardingSteps.Step3 && (
+                    <motion.div
+                        key='content-step3'
+                        variants={mainContentVariants}
+                        initial='initial'
+                        animate='animate'
+                        exit='exit'>
+                        <MobileContentMembership />
+                    </motion.div>
+                )}
+                {currentStep === OnboardingSteps.Step4 && (
+                    <motion.div
+                        key='content-step4'
+                        variants={mainContentVariants}
+                        initial='initial'
+                        animate='animate'
+                        exit='exit'>
+                        <MobileContentTrips />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {currentStep !== OnboardingSteps.Step4 && (
                 <MobileStepContentAnimator

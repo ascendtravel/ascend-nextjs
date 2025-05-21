@@ -75,7 +75,7 @@ export default function DesktopLeftContentMembership() {
     };
 
     return (
-        <div className='relative z-10 flex w-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 backdrop-blur-md transition-all'>
+        <div className='relative z-10 flex w-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 pl-14 backdrop-blur-md transition-all'>
             <motion.div
                 className='flex flex-1 flex-col items-center justify-center gap-4'
                 variants={contentVariants}
@@ -91,14 +91,23 @@ export default function DesktopLeftContentMembership() {
                         </p>
                     </div>
 
-                    <div className='flex w-full max-w-sm justify-center pb-12'>
+                    <div className='flex w-full max-w-[400px] justify-center pb-12'>
                         <div className='flex w-full flex-col items-start justify-center gap-4 rounded-2xl bg-neutral-50 p-6'>
                             <h2 className='text-2xl font-bold'>Ascend Membership</h2>
-                            <OnboardingMembershipCardRow title='Flight Refunds' />
+                            <OnboardingMembershipCardRow
+                                title='Flight Refunds'
+                                description='We get airlines to give you the credits you are entitled to based on their policy.'
+                            />
                             <Separator className='w-full' />
-                            <OnboardingMembershipCardRow title='Hotel Refunds' />
+                            <OnboardingMembershipCardRow
+                                title='Hotel Refunds'
+                                description='We rebook you automatically when you could get the same room for less.'
+                            />
                             <Separator className='w-full' />
-                            <OnboardingMembershipCardRow title='Members-Only Deals' />
+                            <OnboardingMembershipCardRow
+                                title='Members-Only Deals'
+                                description="Tell us where you're going, we'll find you the best price."
+                            />
 
                             <div className='flex flex-row gap-3'>
                                 <div className='flex items-start justify-start gap-1'>

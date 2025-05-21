@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server';
 
 import * as Sentry from '@sentry/nextjs';
 
+import { LINK_FAILURE_PARAM, PERMISSIONS_FAILURE_PARAM } from './app/(top-funnel)/welcome/_types';
+
 export function middleware(request: NextRequest) {
     // Initialize Sentry
     Sentry.init({
@@ -112,13 +114,29 @@ export function middleware(request: NextRequest) {
         // Redirect to /welcome?step=2&failure=true, preserving other query parameters
         const newUrl = new URL(`${baseAppUrl}/welcome`);
         newUrl.searchParams.append('step', '1');
-        newUrl.searchParams.append('failure', 'true');
+        newUrl.searchParams.append(LINK_FAILURE_PARAM, 'true');
         searchParams.forEach((value, key) => {
-            if (key !== 'step' && key !== 'failure') {
+            if (key !== 'step' && key !== LINK_FAILURE_PARAM) {
                 newUrl.searchParams.append(key, value);
             }
         });
         console.log(`Redirecting /gmail-link_b/failure to: ${newUrl.toString()}`);
+
+        return NextResponse.redirect(newUrl);
+    }
+
+    if (pathname === '/gmail-link_b/permissions-failure') {
+        // Redirect to /welcome?step=2&failure=true, preserving other query parameters
+        const newUrl = new URL(`${baseAppUrl}/welcome`);
+        newUrl.searchParams.append('step', '1');
+
+        newUrl.searchParams.append(PERMISSIONS_FAILURE_PARAM, 'true');
+        searchParams.forEach((value, key) => {
+            if (key !== 'step' && key !== PERMISSIONS_FAILURE_PARAM) {
+                newUrl.searchParams.append(key, value);
+            }
+        });
+        console.log(`Redirecting /gmail-link_b/permissions-failure to: ${newUrl.toString()}`);
 
         return NextResponse.redirect(newUrl);
     }
@@ -138,6 +156,11 @@ export const config = {
         '/gmail-link-landing',
         '/auth/phone-register',
         '/gmail-link_b/success',
-        '/gmail-link_b/failure'
+
+        // Failure paths
+        '/gmail-link_b/failure',
+        '/gmail-link_b/permissions-failure'
     ]
 };
+// http://localhost:3003/gmail-link_b/permissions-failure?state_id=state_id=5d252757-fe8d-48f6-a777-1fe6ec401256
+// http://localhost:3003/gmail-link_b/failure?state_id=state_id=5d252757-fe8d-48f6-a777-1fe6ec401256

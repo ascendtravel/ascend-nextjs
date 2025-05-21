@@ -98,7 +98,7 @@ export default function FeedCard({
                 )}
             </div>
             <div className={`min-w-0 flex-grow ${textAlignContainerClasses}`}>
-                <div className={`text-xs text-neutral-400 ${alignment === 'right' ? 'text-left' : 'text-right'}`}>
+                <div className={`text-left text-xs text-neutral-400`}>
                     {timeAgo !== null ? timeAgo : ''} {/* Render timeAgo if available, or empty/placeholder */}
                 </div>{' '}
                 {/* Adjust timeAgo based on overall card alignment for balance */}

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 import { OnboardingSteps, mapNumberToStep, mapStepToNumbers } from '../_types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, CircleX } from 'lucide-react';
 
 interface OnboardingStepperProps {
     steps: string[];
@@ -15,6 +15,7 @@ interface OnboardingStepperProps {
     backgroundColor?: string;
     textColor?: string;
     nonCompletedTextColor?: string;
+    failedSteps: OnboardingSteps[];
     onChange?: (step: OnboardingSteps) => void;
 }
 
@@ -25,6 +26,7 @@ export default function OnboardingStepper({
     backgroundColor = 'bg-gray-200',
     textColor = 'text-white',
     nonCompletedTextColor = 'text-[#016DBC]',
+    failedSteps = [],
     onChange
 }: OnboardingStepperProps) {
     const [activeStep, setActiveStep] = useState(currentStep);
@@ -89,8 +91,11 @@ export default function OnboardingStepper({
                     isActive || isCompleted ? primaryColorClass : backgroundColorClass,
                     isActive || isCompleted ? textColorClass : nonCompletedTextColorClass,
                     isActive && !isCompleted && 'bg-[#016DBC]',
-                    isCompleted && 'bg-white',
-                    'transition-colors duration-300'
+                    isCompleted &&
+                        !failedSteps.includes(mapNumberToStep[stepNumber as keyof typeof mapNumberToStep]) &&
+                        'bg-white',
+                    'transition-colors duration-300',
+                    failedSteps.includes(mapNumberToStep[stepNumber as keyof typeof mapNumberToStep]) && 'bg-[#F66834]'
                 )}
                 onClick={() => handleStepClick(mapNumberToStep[stepNumber as keyof typeof mapNumberToStep])}
                 whileTap={{ scale: 0.95 }}
@@ -131,6 +136,14 @@ export default function OnboardingStepper({
                             animate='animate'
                             exit='exit'>
                             <div className='size-2 rounded-full bg-[#016DBC]' />
+                        </motion.div>
+                    )}
+
+                    {failedSteps.includes(mapNumberToStep[stepNumber as keyof typeof mapNumberToStep]) && (
+                        <motion.div
+                            key='failed'
+                            className='absolute inset-0 flex items-center justify-center bg-[#F66834]'>
+                            <span className='text-lg font-bold text-white'>!</span>
                         </motion.div>
                     )}
                 </AnimatePresence>

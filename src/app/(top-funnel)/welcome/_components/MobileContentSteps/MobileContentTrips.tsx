@@ -28,7 +28,7 @@ export default function MobileContentTrips() {
 
     return (
         <div className='relative h-screen overflow-hidden bg-[#006DBC] text-center'>
-            <div className='fixed top-0 right-0 left-0 z-30 flex h-16 w-full flex-row items-center justify-between bg-[#006DBC] px-4'>
+            <div className='fixed top-0 right-0 left-0 z-30 flex h-16 w-full flex-row items-center justify-between bg-[#006DBC]/60 px-4 backdrop-blur-md'>
                 <IconNewWhite className='size-16' />
                 <UserDetailsMenu />
             </div>
@@ -40,7 +40,7 @@ export default function MobileContentTrips() {
             <div className='absolute inset-0 z-20 overflow-y-auto'>
                 <div className='h-[calc(16px+50vh+16px)]'></div>
 
-                <div className='flex min-h-[60vh] flex-col items-center justify-start gap-6 rounded-t-2xl bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC] p-2 text-left'>
+                <div className='flex min-h-[60vh] flex-col items-center justify-start gap-6 rounded-t-2xl bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC] p-4 text-left'>
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -49,8 +49,11 @@ export default function MobileContentTrips() {
                             delay: 0.2,
                             ease: 'easeOut'
                         }}>
+                        <div className='-mt-2 mb-3 flex w-full flex-row items-center justify-center'>
+                            <div className='h-1 w-1/3 rounded-full bg-neutral-50/50 drop-shadow-md' />
+                        </div>
                         <WelcomeWhatsNext
-                            componenHeader="Here's what to expect next:"
+                            componenHeader="We're importing your trips..."
                             rowsInfo={[
                                 {
                                     content:

@@ -7,7 +7,13 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
 
-import { OnboardingSteps, mapNumberToStep, mapStepToNumbers } from '../_types';
+import {
+    LINK_FAILURE_PARAM,
+    OnboardingSteps,
+    PERMISSIONS_FAILURE_PARAM,
+    mapNumberToStep,
+    mapStepToNumbers
+} from '../_types';
 import DesktopLeftContentGmailLink from './DesktopLeftContentSteps/DesktopLeftContentGmailLink';
 import DesktopLeftContentMembership from './DesktopLeftContentSteps/DesktopLeftContentMembership';
 import DesktopLeftContentPhoneRegister from './DesktopLeftContentSteps/DesktopLeftContentPhoneRegister';
@@ -84,6 +90,22 @@ export default function DesktopLeftContent() {
         }
     }, [searchParams]);
 
+    // Function to determine failed steps based on URL parameters
+    const getFailedSteps = (): OnboardingSteps[] => {
+        if (currentStep === OnboardingSteps.Step0) return []; // No steps to fail at step 0
+
+        const permissionsFailure = searchParams.get(PERMISSIONS_FAILURE_PARAM) === 'true';
+        const linkFailure = searchParams.get(LINK_FAILURE_PARAM) === 'true';
+
+        // If on Step 1 and either failure parameter is true, mark Step 1 as failed
+        if (currentStep === OnboardingSteps.Step1 && (permissionsFailure || linkFailure)) {
+            return [OnboardingSteps.Step1];
+        }
+        // Add logic for other steps if they can also have distinct failure states reflected in the stepper
+
+        return []; // No failed steps by default
+    };
+
     // Helper function to safely get previous step
     const getPreviousStep = (step: OnboardingSteps): OnboardingSteps => {
         const currentStepNumber = mapStepToNumbers[step];
@@ -143,7 +165,7 @@ export default function DesktopLeftContent() {
     return (
         <>
             {/* Fixed navigation controls */}
-            <div className='fixed inset-x-3 top-4 z-50 flex flex-row justify-between'>
+            {/* <div className='fixed inset-x-3 top-4 z-50 flex flex-row justify-between'>
                 <div
                     className={cn(
                         'size-7 cursor-pointer rounded-full bg-neutral-50 p-1.5 drop-shadow-xl',
@@ -160,15 +182,16 @@ export default function DesktopLeftContent() {
                     onClick={handleNextStep}>
                     <ArrowRightIcon className='size-4 text-neutral-900' />
                 </div>
-            </div>
+            </div> */}
 
             {currentStep !== OnboardingSteps.Step0 && currentStep !== OnboardingSteps.Step4 && (
-                <div className='fixed inset-x-3 top-8 z-20 flex flex-row justify-between'>
+                <div className='fixed inset-x-3 top-8 z-20 flex flex-row justify-between pl-8'>
                     <OnboardingStepper
                         steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
                         currentStep={
                             currentStep as OnboardingSteps.Step1 | OnboardingSteps.Step2 | OnboardingSteps.Step3
                         }
+                        failedSteps={getFailedSteps()}
                     />
                 </div>
             )}

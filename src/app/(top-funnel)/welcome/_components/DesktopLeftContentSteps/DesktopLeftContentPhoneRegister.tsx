@@ -28,7 +28,7 @@ export default function DesktopLeftContentPhoneRegister({ onVerify }: { onVerify
     };
 
     return (
-        <div className='relative z-10 flex w-1/2 items-center justify-start rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 backdrop-blur-md'>
+        <div className='relative z-10 flex w-1/2 items-center justify-start rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 pl-14 backdrop-blur-md'>
             <div className='flex h-full flex-col items-start justify-between gap-4'>
                 <motion.div
                     className='flex flex-1 flex-col items-center justify-center gap-4'

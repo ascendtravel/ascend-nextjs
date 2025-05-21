@@ -13,7 +13,9 @@ export function WelcomeWhatsNext({ componenHeader, rowsInfo }: WelcomeWhatsNextP
     return (
         <div className='flex max-w-md flex-col gap-2 rounded-2xl bg-neutral-50 py-8'>
             <div className='ml-2 flex items-center justify-center'>
-                <h2 className='text-xl font-bold text-neutral-900'>{componenHeader}</h2>
+                <h2 className='mr-4 max-w-[194px] text-center text-xl font-bold text-neutral-900 md:max-w-none'>
+                    {componenHeader}
+                </h2>
             </div>
             <div className='mt-4 flex flex-col'>
                 {rowsInfo.map((row, index) => (
