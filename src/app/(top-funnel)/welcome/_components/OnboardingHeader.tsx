@@ -38,7 +38,8 @@ const savingExamplesSeed = [
 ];
 
 const NUM_ITEMS_IN_MARQUEE = 5; // Number of items to form the base of the marquee
-const SCROLL_SPEED_PX_PER_SEC = 50; // Adjust for desired speed
+const SCROLL_SPEED_PX_PER_SEC = 12; // Reduced speed
+const INITIAL_PAUSE_DURATION_SEC = 2; // Pause for 4 seconds before scroll starts
 
 // Function to get a random saving example from the seed
 const getRandomSavingExample = () => {
@@ -73,26 +74,43 @@ export default function OnboardingHeader() {
     const marqueeWidth = NUM_ITEMS_IN_MARQUEE * 350; // Approximate width of one set of items (adjust itemWidth if needed)
     const animationDuration = marqueeWidth / SCROLL_SPEED_PX_PER_SEC;
 
+    // The initial position for the pause: try to place the start of the content far right.
+    // This might need to be a pixel value if percentages behave unexpectedly relative to the animated `x` values.
+    // Let's use a large positive percentage to push it right, assuming parent is overflow:hidden.
+    const initialXPositionForPause = 'calc(100% - 100px)'; // Example: start with first item near right edge. Adjust 100px based on item width.
+    // Or, for simplicity, a large fixed value like '300px' if you know an item won't exceed that.
+    // A more robust way is to measure parent width and set dynamically, but trying simpler first.
+
     const marqueeVariants = {
-        animate: {
-            x: [0, -marqueeWidth], // Animate from 0 to -width for left-to-right scroll of content
+        // This animate state is for the *looping* part
+        animateLoop: {
+            x: [0, -marqueeWidth],
             transition: {
                 x: {
+                    // The delay here applies *after* it has reached the 'animateLoop' state from 'initialPauseState'
+                    // So, the actual pause is handled by the transition from initialPauseState to animateLoop.
                     repeat: Infinity,
-                    repeatType: 'loop', // Loop back to start
+                    repeatType: 'loop',
                     duration: animationDuration,
                     ease: 'linear'
                 }
             }
+        },
+        // This is the state for the initial pause
+        initialPauseState: {
+            x: 0, // Default to x:0 for the start of the strip, let parent div padding/margin handle centering for first item if needed
+            opacity: 1
         }
     };
 
     return (
-        <div className='z-30 flex h-14 w-full flex-row items-center overflow-hidden bg-[#00345A] text-white'>
+        <div className='z-30 flex h-14 w-full flex-row items-center justify-start overflow-hidden bg-[#00345A] pl-40 text-white'>
             <motion.div
-                className='flex flex-nowrap' // Ensure items stay in a single line
+                className='flex flex-nowrap'
                 variants={marqueeVariants}
-                animate='animate'>
+                initial='initialPauseState'
+                animate='animateLoop'
+                transition={{ delay: INITIAL_PAUSE_DURATION_SEC }}>
                 {duplicatedItems.map((item, index) => (
                     <div
                         key={`${item.id}-${index}`}
