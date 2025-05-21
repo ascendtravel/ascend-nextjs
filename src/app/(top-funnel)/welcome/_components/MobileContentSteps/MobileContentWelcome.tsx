@@ -38,10 +38,10 @@ const ROUTES_DATA_URL = 'https://raw.githubusercontent.com/jpatokal/openflights/
 const TARGET_COUNTRY = 'United States';
 const ARC_OPACITY = 0.22;
 const START_CAMERA_POV = { lat: 0, lng: 0, altitude: 3.5 };
-const TARGET_CAMERA_POV = { lat: 39.6, lng: -98.5, altitude: 1.5 };
+const TARGET_CAMERA_POV = { lat: 39.648194, lng: -42.941194, altitude: 1.5 };
 const POV_ANIMATION_DURATION_MS = 2500;
 const INITIAL_ANIMATION_DELAY_MS = 500;
-const SLOW_ROTATION_SPEED = 0.2;
+const SLOW_ROTATION_SPEED = 0.16;
 
 // Animation delays for floating content
 const UI_ANIMATION_BASE_DELAY_MS = 3000; // Base delay after globe likely starts its animation
@@ -228,6 +228,7 @@ export default function MobileContentWelcome({
     const [routes, setRoutes] = useState<Route[]>([]);
     const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
     const [isGlobeReady, setIsGlobeReady] = useState(false);
+    const [startUIAnimations, setStartUIAnimations] = useState(false);
 
     // --- Globe useEffects (copied and adapted from DesktopRightContent) ---
     // Data loading effect
@@ -271,31 +272,18 @@ export default function MobileContentWelcome({
 
     // Camera animation effect
     useEffect(() => {
-        let animationTimerId: NodeJS.Timeout | undefined;
         if (globeRef.current && isGlobeReady) {
-            if (skipInitialGlobeAnimation) {
-                globeRef.current.pointOfView(TARGET_CAMERA_POV, 0);
-                setIsInitialAnimationComplete(true);
-                if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
-            } else {
-                globeRef.current.pointOfView(START_CAMERA_POV, 0);
-                animationTimerId = setTimeout(() => {
-                    if (globeRef.current) {
-                        globeRef.current.pointOfView(TARGET_CAMERA_POV, POV_ANIMATION_DURATION_MS);
-                        if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
-                        rotationTimerIdRef.current = setTimeout(() => {
-                            setIsInitialAnimationComplete(true);
-                        }, POV_ANIMATION_DURATION_MS);
-                    }
-                }, INITIAL_ANIMATION_DELAY_MS);
+            globeRef.current.pointOfView(TARGET_CAMERA_POV, 0);
+            setIsInitialAnimationComplete(true);
+
+            if (rotationTimerIdRef.current) {
+                clearTimeout(rotationTimerIdRef.current);
+                rotationTimerIdRef.current = null;
             }
         }
 
-        return () => {
-            if (animationTimerId) clearTimeout(animationTimerId);
-            if (rotationTimerIdRef.current) clearTimeout(rotationTimerIdRef.current);
-        };
-    }, [isGlobeReady, skipInitialGlobeAnimation]);
+        return () => {};
+    }, [isGlobeReady]);
 
     // Auto-rotation effect
     useEffect(() => {
@@ -343,13 +331,30 @@ export default function MobileContentWelcome({
     const handleGlobeReady = useCallback(() => {
         setIsGlobeReady(true);
         console.log('Mobile globe is ready.');
+        // Consider starting UI animations after globe is ready AND its container has faded in.
+        // The globe container's onAnimationComplete can also be used.
     }, []);
+
+    const onGlobeFadeInComplete = () => {
+        // This will be called when the globe container's fade-in is done.
+        // Now it's safer to start other UI animations.
+        console.log('Globe container fade-in complete, starting UI animations.');
+        setStartUIAnimations(true);
+    };
 
     // --- Original MobileContentWelcome JSX modified for floating content ---
     return (
         <>
             {/* Globe Background Layer */}
-            <div ref={globeContainerRef} className='fixed inset-0 z-0' style={{ backgroundColor: '#00356B' }}>
+            <motion.div
+                ref={globeContainerRef}
+                className='fixed inset-0 z-0'
+                style={{ backgroundColor: '#00356B' }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: globeWidth > 0 && globeHeight > 0 ? 1 : 0 }}
+                transition={{ duration: 1.0, delay: 0.2 }}
+                onAnimationComplete={onGlobeFadeInComplete} // Trigger UI animations after fade-in
+            >
                 {globeWidth > 0 && globeHeight > 0 && (
                     <Globe
                         ref={globeRef}
@@ -373,7 +378,7 @@ export default function MobileContentWelcome({
                         arcsTransitionDuration={0}
                     />
                 )}
-            </div>
+            </motion.div>
 
             {/* Floating Content Overlay Layer - No pointer events on this main overlay */}
             {/* Individual interactive elements below will have pointer-events: auto */}
@@ -382,8 +387,9 @@ export default function MobileContentWelcome({
             <motion.div
                 className='pointer-events-auto fixed inset-x-0 top-0 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl bg-[#5AA6DA]/20 px-4 py-2 backdrop-blur-sm'
                 initial={{ y: '-100%', opacity: 0 }}
-                animate={{ y: '0%', opacity: 1 }}
-                transition={{ delay: UI_ANIMATION_BASE_DELAY_MS / 1000, type: 'spring', stiffness: 80, damping: 15 }}>
+                animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '-100%', opacity: 0 }}
+                transition={{ delay: 0, type: 'spring', stiffness: 80, damping: 15 }} // Base delay removed, controlled by startUIAnimations
+            >
                 <IconNewWhite className='size-12' />
                 <Link href='/auth/phone-login' className='pointer-events-auto'>
                     <div className='cursor-pointer rounded-full px-6 py-2 text-base font-semibold text-white hover:bg-white/20'>
@@ -396,9 +402,9 @@ export default function MobileContentWelcome({
             <motion.div
                 className='fixed inset-x-[10%] top-[40%] z-30 flex h-fit flex-1 translate-y-[-50%] flex-col items-center justify-center gap-4 rounded-xl px-4 py-6 text-center'
                 initial={{ y: '100vh', opacity: 0 }} // Start from bottom of viewport
-                animate={{ y: '0%', opacity: 1 }} // Relative y:0% for centering via translate-y
+                animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '100vh', opacity: 0 }}
                 transition={{
-                    delay: (UI_ANIMATION_BASE_DELAY_MS + UI_ANIMATION_STAGGER_MS) / 1000,
+                    delay: startUIAnimations ? UI_ANIMATION_STAGGER_MS / 1000 : 0, // Stagger if animating
                     type: 'spring',
                     stiffness: 70,
                     damping: 18
@@ -410,7 +416,7 @@ export default function MobileContentWelcome({
                     </span>
                     <span>Combinator</span>
                 </div>
-                <h1 className='text-figtree mx-auto max-w-[320px] text-[45px] leading-tight font-bold tracking-tight text-white drop-shadow-lg'>
+                <h1 className='text-figtree mx-auto max-w-[320px] text-[40px] leading-tight font-bold tracking-tight text-white drop-shadow-lg'>
                     Smart travelers don't overpay
                 </h1>
                 <h2
@@ -423,12 +429,12 @@ export default function MobileContentWelcome({
 
             {/* Bottom Steps - Animates from Bottom with more delay */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 bottom-[15%] z-40 flex flex-col items-start justify-center gap-1 rounded-xl p-4 pl-[10%] text-sm font-semibold text-white'
+                className='pointer-events-auto fixed inset-x-0 bottom-[20%] z-40 flex flex-col items-start justify-center gap-1 rounded-xl p-4 pl-[10%] text-sm font-semibold text-white'
                 // Removed bg/backdrop from here, apply to children if needed to avoid full width block
                 initial={{ y: '100vh', opacity: 0 }}
-                animate={{ y: '0%', opacity: 1 }}
+                animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '100vh', opacity: 0 }}
                 transition={{
-                    delay: (UI_ANIMATION_BASE_DELAY_MS + UI_ANIMATION_STAGGER_MS * 2) / 1000,
+                    delay: startUIAnimations ? (UI_ANIMATION_STAGGER_MS * 2) / 1000 : 0, // Further stagger if animating
                     type: 'spring',
                     stiffness: 60,
                     damping: 15
