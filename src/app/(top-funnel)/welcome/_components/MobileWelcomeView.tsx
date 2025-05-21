@@ -100,7 +100,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     return (
         <div className='flex h-full flex-col items-center justify-center rounded-full p-4 text-center'>
             <div
-                className='w-full max-w-xs rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1DC167]/80 disabled:cursor-not-allowed disabled:opacity-50'
+                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 onClick={handleNextClick}>
                 Import my travel bookings
             </div>
@@ -114,7 +114,7 @@ const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; sta
         <div className='flex h-full flex-col items-center justify-center p-4 text-center'>
             {stateId ? (
                 <Link href={`https://gmail.heyascend.com/gmail/import/start/${stateId}`}>
-                    <div className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
+                    <div className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
                         <GoogleWhiteIcon /> Continue with Google
                     </div>
                 </Link>
@@ -191,7 +191,7 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
                 type='button'
                 onClick={handleStripeSignup}
                 disabled={isLoading || !!error || !stripeUrl}
-                className='w-full rounded-full bg-[#1DC167] px-12 py-3 font-semibold text-white transition-all hover:bg-[#1DC167]/90 disabled:cursor-not-allowed disabled:opacity-50'>
+                className='w-full rounded-full bg-[#17AA59] px-12 py-3 font-semibold text-white transition-all hover:bg-[#17AA59]/90 disabled:cursor-not-allowed disabled:opacity-50'>
                 {error ? (
                     <a href='mailto:hey@ascend.travel' className='text-white hover:text-white/90'>
                         {error} (Contact Support)
