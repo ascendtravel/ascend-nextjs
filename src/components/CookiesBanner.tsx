@@ -20,7 +20,10 @@ const blackListedUrls = [
     '/user-rps/welcome',
     '/onboarding-landing',
     '/welcome',
-    '/welcome?step=0'
+    '/welcome?step=0',
+    '/welcome?step=1',
+    '/welcome?step=2',
+    '/welcome?step=3'
 ];
 
 export function CookiesBanner() {
@@ -33,7 +36,8 @@ export function CookiesBanner() {
         // Check if user has already made a choice
         const cookieChoice = localStorage.getItem('cookie-consent');
         console.log('cookieChoice', cookieChoice);
-        if (!blackListedUrls.includes(pathname) && cookieChoice) {
+        // need to do this smarter, saying if the url contains the text in the blackListedUrls array, then don't show the banner
+        if (!blackListedUrls.some((url) => pathname.includes(url)) && cookieChoice) {
             console.log('showing banner');
             setShowBanner(true);
         }
