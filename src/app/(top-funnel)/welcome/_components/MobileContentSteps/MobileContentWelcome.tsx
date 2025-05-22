@@ -28,7 +28,7 @@ import DesktopRightContent from '../DesktopRightContent';
 
 // Globe imports
 import { csvParseRows } from 'd3-dsv';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import indexBy from 'index-array-by';
 import Globe, { GlobeMethods } from 'react-globe.gl';
 
@@ -44,8 +44,16 @@ const INITIAL_ANIMATION_DELAY_MS = 500;
 const SLOW_ROTATION_SPEED = 0.16;
 
 // Animation delays for floating content
-const UI_ANIMATION_BASE_DELAY_MS = 3000; // Base delay after globe likely starts its animation
-const UI_ANIMATION_STAGGER_MS = 200; // Stagger between middle and bottom content
+const UI_ANIMATION_BASE_DELAY_MS = 700;
+const UI_ANIMATION_STAGGER_MS = 200;
+
+// Data for the cycling steps - MOVED TO MODULE SCOPE
+const cyclingStepsData = [
+    { id: 'email', icon: '📧', text: 'Connect your email to import travel bookings' },
+    { id: 'phone', icon: '☎️', text: 'Add your phone number to get notified' },
+    { id: 'member', icon: '🎉', text: 'Become a member to start saving' }
+];
+const CYCLE_STEP_INTERVAL_MS = 4000; // Change step every 4 seconds
 
 interface Airport {
     airportId: string;
@@ -229,6 +237,7 @@ export default function MobileContentWelcome({
     const [isInitialAnimationComplete, setIsInitialAnimationComplete] = useState(false);
     const [isGlobeReady, setIsGlobeReady] = useState(false);
     const [startUIAnimations, setStartUIAnimations] = useState(false);
+    const [activeStepIndex, setActiveStepIndex] = useState(0);
 
     // --- Globe useEffects (copied and adapted from DesktopRightContent) ---
     // Data loading effect
@@ -342,6 +351,36 @@ export default function MobileContentWelcome({
         setStartUIAnimations(true);
     };
 
+    // Effect for cycling through the active step
+    useEffect(() => {
+        if (!startUIAnimations) return;
+
+        const intervalId = setInterval(() => {
+            setActiveStepIndex((prevIndex) => (prevIndex + 1) % cyclingStepsData.length);
+        }, CYCLE_STEP_INTERVAL_MS);
+
+        return () => clearInterval(intervalId);
+    }, [startUIAnimations]);
+
+    // Variants for individual step items based on active state
+    const stepItemDisplayVariants = {
+        active: {
+            opacity: 1,
+            scale: 0.9,
+            y: 0,
+            marginLeft: 12,
+            transition: { type: 'spring', stiffness: 120, damping: 15 }
+        },
+        inactive: {
+            opacity: 0.6, // Dimmed opacity
+            scale: 0.85, // Slightly smaller
+            y: 0, // Optional: slightly offset inactive items
+            marginLeft: 0,
+
+            transition: { type: 'spring', stiffness: 120, damping: 15 }
+        }
+    };
+
     // --- Original MobileContentWelcome JSX modified for floating content ---
     return (
         <>
@@ -360,7 +399,7 @@ export default function MobileContentWelcome({
                         ref={globeRef}
                         width={globeWidth}
                         height={globeHeight}
-                        globeImageUrl='/earth-day-low-Quality.jpg' // Ensure this path is correct
+                        globeImageUrl='/earth-day-low-res.jpg' // Ensure this path is correct
                         backgroundColor='#0B74C0'
                         onGlobeReady={handleGlobeReady}
                         atmosphereColor='lightblue'
@@ -400,7 +439,7 @@ export default function MobileContentWelcome({
 
             {/* Middle Content (YC, Title, Subtitle) - Animates from Bottom */}
             <motion.div
-                className='fixed inset-x-[10%] top-[40%] z-30 flex h-fit flex-1 translate-y-[-50%] flex-col items-center justify-center gap-4 rounded-xl px-4 py-6 text-center'
+                className='fixed inset-x-[5%] top-[40%] z-30 flex h-fit flex-1 translate-y-[-50%] flex-col items-center justify-center gap-4 rounded-xl px-4 py-6 text-center'
                 initial={{ y: '100vh', opacity: 0 }} // Start from bottom of viewport
                 animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '100vh', opacity: 0 }}
                 transition={{
@@ -409,47 +448,48 @@ export default function MobileContentWelcome({
                     stiffness: 70,
                     damping: 18
                 }}>
-                <div className='pointer-events-auto flex flex-row items-center justify-start gap-2 rounded-sm bg-black/30 px-2 text-xs text-white backdrop-blur-sm'>
+                <div className='pointer-events-auto flex flex-row items-center justify-start gap-2 rounded-sm px-2 text-sm font-bold text-white'>
                     <span>Backed by </span>
-                    <span className='flex size-6 items-center justify-center bg-[#f26522] text-[12px] font-bold'>
+                    <span className='flex size-5 items-center justify-center bg-[#f26522] text-[12px] font-bold'>
                         Y
                     </span>
                     <span>Combinator</span>
                 </div>
-                <h1 className='text-figtree mx-auto max-w-[320px] text-[40px] leading-tight font-bold tracking-tight text-white drop-shadow-lg'>
+                <h1 className='text-figtree font-bolder mx-auto max-w-[650px] text-[48px] leading-[38px] tracking-tighter text-white drop-shadow-lg'>
                     Smart travelers don't overpay
                 </h1>
                 <h2
-                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 py-2 text-[16px] leading-normal font-medium text-white'
+                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-[16px] leading-normal font-bold font-medium text-white'
                     style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.5)' }}>
                     Ascend watches your bookings and gets you money back when <b>Big Travel</b> drops prices. Get
                     started in 3 steps.
                 </h2>
             </motion.div>
 
-            {/* Bottom Steps - Animates from Bottom with more delay */}
+            {/* Bottom Steps - Container animates in, items inside have dynamic styles */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 bottom-[20%] z-40 flex flex-col items-start justify-center gap-1 rounded-xl p-4 pl-[10%] text-sm font-semibold text-white'
-                // Removed bg/backdrop from here, apply to children if needed to avoid full width block
-                initial={{ y: '100vh', opacity: 0 }}
-                animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '100vh', opacity: 0 }}
+                className='pointer-events-auto fixed inset-x-0 bottom-[20%] z-40 flex flex-col items-center justify-center text-sm font-semibold text-white' // Adjusted bottom positioning slightly
+                initial={{ opacity: 0, y: 50 }} // Container slides up and fades in
+                animate={startUIAnimations ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{
-                    delay: startUIAnimations ? (UI_ANIMATION_STAGGER_MS * 2) / 1000 : 0, // Further stagger if animating
+                    delay: startUIAnimations ? (UI_ANIMATION_STAGGER_MS * 2) / 1000 : 0,
                     type: 'spring',
                     stiffness: 60,
-                    damping: 15
+                    damping: 18
                 }}>
-                <div className='flex flex-row items-center gap-3 rounded-sm bg-black/10 px-4 py-0.5 text-xs backdrop-blur-sm'>
-                    <span className='text-lg'>📧</span>
-                    <div className='text-xs'>Connect your email to import travel bookings</div>
-                </div>
-                <div className='flex flex-row items-center gap-3 rounded-sm bg-black/10 px-4 py-0.5 text-xs backdrop-blur-sm'>
-                    <span className='text-lg'>☎️</span>
-                    <div className='text-xs'>Add your phone number to get notified</div>
-                </div>
-                <div className='flex flex-row items-center gap-3 rounded-sm bg-black/10 px-4 py-0.5 backdrop-blur-sm'>
-                    <span className='text-lg'>🎉</span>
-                    <div className='text-xs'>Become a member to start saving</div>
+                <div className='-ml-12 flex w-[calc(100%-20%)] flex-col items-stretch justify-center rounded-xl'>
+                    {cyclingStepsData.map((step, index) => (
+                        <motion.div
+                            key={step.id}
+                            variants={stepItemDisplayVariants}
+                            animate={index === activeStepIndex ? 'active' : 'inactive'}
+                            className='flex flex-row items-center gap-3 rounded-md p-1' // Basic styling for each row
+                            // Add transition prop here if needed, or rely on variant transition
+                        >
+                            <span className='text-xl'>{step.icon}</span>
+                            <div className='font-bolder text-sm text-nowrap'>{step.text}</div>
+                        </motion.div>
+                    ))}
                 </div>
             </motion.div>
         </>
