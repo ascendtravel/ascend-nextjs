@@ -52,7 +52,8 @@ export function middleware(request: NextRequest) {
 
     // Redirect root path to marketing site
     if (pathname === '/') {
-        return redirectWithParams(baseMarketingUrl);
+        // change this to go to / welcome of our app
+        return redirectWithParams(`${baseAppUrl}/welcome`);
     }
 
     // Gmail link redirects
