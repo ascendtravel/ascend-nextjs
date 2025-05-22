@@ -7,6 +7,7 @@ import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 import IconHotelBed from '@/components/Icon/IconHotelBed';
 import IconPlaneCircleTilt from '@/components/Icon/IconPlaneCircleTilt';
 import { Button } from '@/components/ui/button';
+import { trackLuckyOrangeEvent } from '@/lib/analytics';
 import { formatDateNoTZ } from '@/lib/date-formatters';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
@@ -38,6 +39,12 @@ export default function UserSpecificTripCard({ trip }: UserSpecificTripCardProps
     if (!trip) return null;
 
     const handleRepriceClick = () => {
+        trackLuckyOrangeEvent('reprice-btn-clicked', {
+            View: 'user_specific_trip_card',
+            TripType: trip.type,
+            TripId: trip.import_session_id,
+            Description: 'User clicked reprice button on trip card to start repricing review flow'
+        });
         router.push(`/user-rp/${trip.import_session_id}?view-state=ConfirmUserInfo`);
     };
 

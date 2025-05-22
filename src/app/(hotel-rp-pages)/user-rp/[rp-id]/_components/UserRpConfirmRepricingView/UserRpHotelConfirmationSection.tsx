@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
 import { useUser } from '@/contexts/UserContext';
+import { trackLuckyOrangeEvent } from '@/lib/analytics';
 import { getCurrencyAndAmountText } from '@/lib/money';
 
 import UserRpHotelDetailsList from './UserRpHotelDetailsList';
@@ -54,8 +55,13 @@ export default function UserRpHotelConfirmationSection({ trip }: UserRpHotelConf
                 const errorData = await approveResponse.json();
                 throw new Error(errorData.error || 'Failed to approve booking');
             }
-
             toast.success('Booking approved!');
+            trackLuckyOrangeEvent('hotel-rebook-me-btn-clicked', {
+                View: 'hotel_rp_confirmation_section',
+                TripId: trip.import_session_id,
+                TripType: trip.type,
+                Description: 'User clicked rebook me button on hotel rp confirmation section'
+            });
             // Navigate to payment view or next step
         } catch (error) {
             console.error('Error approving booking:', error);

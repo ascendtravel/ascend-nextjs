@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Booking, FlightPayload } from '@/app/api/rp-trips/route';
 import { useUser } from '@/contexts/UserContext';
+import { trackLuckyOrangeEvent } from '@/lib/analytics';
 import { getCurrencyAndAmountText } from '@/lib/money';
 import { Airport } from '@/types/flight-types';
 
@@ -82,6 +83,13 @@ export default function UserRpFlightConfirmationSection({ trip }: UserRpFlightCo
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to confirm booking');
             }
+
+            trackLuckyOrangeEvent('flight-rebook-me-btn-clicked', {
+                View: 'flight_rp_confirmation_section',
+                TripId: trip.import_session_id,
+                TripType: trip.type,
+                Description: 'User clicked rebook me button on flight rp confirmation section'
+            });
 
             toast.success('Booking confirmed!');
         } catch (error) {
