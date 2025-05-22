@@ -19,18 +19,22 @@ const blackListedUrls = [
     '/onboarding',
     '/user-rps/welcome',
     '/onboarding-landing',
-    '/welcome'
+    '/welcome',
+    '/welcome?step=0'
 ];
 
 export function CookiesBanner() {
     const [showBanner, setShowBanner] = useState(false);
 
     const pathname = usePathname();
+    console.log('pathname', pathname);
 
     useEffect(() => {
         // Check if user has already made a choice
         const cookieChoice = localStorage.getItem('cookie-consent');
-        if (!cookieChoice || !blackListedUrls.includes(pathname)) {
+        console.log('cookieChoice', cookieChoice);
+        if (!blackListedUrls.includes(pathname) && cookieChoice) {
+            console.log('showing banner');
             setShowBanner(true);
         }
     }, []);
