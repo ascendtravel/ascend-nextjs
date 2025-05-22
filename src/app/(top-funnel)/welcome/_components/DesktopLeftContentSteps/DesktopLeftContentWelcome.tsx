@@ -126,7 +126,7 @@ export default function DesktopLeftContentWelcome() {
             variants={panelVariants}
             initial='hidden'
             animate='visible'>
-            <div className='-mr-6 flex h-full w-full flex-col justify-between gap-4 overflow-y-auto pt-8 pb-4 pl-8'>
+            <div className='-mr-6 flex h-full w-full flex-col justify-between gap-4 overflow-y-auto pb-4 pl-8'>
                 <div className='flex w-full shrink-0 items-center justify-between'>
                     <div className='flex flex-col items-center justify-start gap-2'>
                         <IconNewWhite className='-ml-2 size-24' />
