@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { FRAMER_LINKS } from '@/config/navigation';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -102,6 +103,12 @@ export default function DesktopLeftContentWelcome() {
         }
     };
 
+    useEffect(() => {
+        trackLuckyOrangeEvent(EventLists.takeoff.name, {
+            description: EventLists.takeoff.description
+        });
+    }, []);
+
     // Variants for individual step items based on active state
     const stepItemDisplayVariants = {
         active: {
@@ -164,7 +171,13 @@ export default function DesktopLeftContentWelcome() {
                         ))}
                     </div>
                     <Link href={`/welcome?step=1&state_id=${stateId || ''}`}>
-                        <div className='text-md my-4 gap-6 rounded-full bg-white px-8 py-3 text-center font-bold text-neutral-700 shadow-lg drop-shadow-md transition-all hover:scale-105 active:scale-95'>
+                        <div
+                            onClick={() => {
+                                trackLuckyOrangeEvent(EventLists.began_boarding.name, {
+                                    description: EventLists.began_boarding.description
+                                });
+                            }}
+                            className='text-md my-4 gap-6 rounded-full bg-white px-8 py-3 text-center font-bold text-neutral-700 shadow-lg drop-shadow-md transition-all hover:scale-105 active:scale-95'>
                             Import my travel bookings
                         </div>
                     </Link>

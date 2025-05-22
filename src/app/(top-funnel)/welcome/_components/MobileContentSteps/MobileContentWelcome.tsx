@@ -18,6 +18,7 @@ import type {
     // ListItem as BaseStickyListItem, // Keep if BaseStickyListItem is distinct and used elsewhere
     StickyCardRenderProps
 } from '@/components/StickyScrollList/StickyScrollListTypes';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 // import { FRAMER_LINKS } from '@/config/navigation';
 
@@ -114,105 +115,8 @@ const routeParse = (row: string[]): Partial<Route> => ({
     stops: row[7],
     equipment: row[8]
 });
-// --- End Globe Logic ---
-
-const now = new Date();
-const feedCardExampleData: FeedCardData[] = [
-    {
-        id: 'feed-1',
-        userName: 'Josh B.',
-        creationDateTime: new Date(now.getTime() - 2 * 60 * 1000),
-        destination: 'Phoenix',
-        type: 'hotel',
-        amount: 283,
-        currency: '$'
-    },
-    {
-        id: 'feed-2',
-        userName: 'Sarah K.',
-        creationDateTime: new Date(now.getTime() - 30 * 60 * 1000),
-        destination: 'London',
-        type: 'flight',
-        amount: 112,
-        currency: '$'
-    },
-    {
-        id: 'feed-3',
-        userName: 'Mike P.',
-        creationDateTime: new Date(now.getTime() - 60 * 60 * 1000),
-        destination: 'Cancun',
-        type: 'hotel',
-        amount: 450,
-        currency: '$'
-    },
-    {
-        id: 'feed-4',
-        userName: 'Linda H.',
-        creationDateTime: new Date(now.getTime() - 5 * 60 * 60 * 1000),
-        destination: 'Paris',
-        type: 'flight',
-        amount: 92,
-        currency: '€'
-    },
-    {
-        id: 'feed-5',
-        userName: 'David S.',
-        creationDateTime: new Date(now.getTime() - 24 * 60 * 60 * 1000),
-        destination: 'Tokyo',
-        type: 'hotel',
-        amount: 305,
-        currency: '¥'
-    },
-    {
-        id: 'feed-6',
-        userName: 'Emily R.',
-        creationDateTime: new Date(now.getTime() - 48 * 60 * 60 * 1000),
-        destination: 'Rome',
-        type: 'flight',
-        amount: 150,
-        currency: '€'
-    },
-    {
-        id: 'feed-7',
-        userName: 'John D.',
-        creationDateTime: new Date(now.getTime() - 72 * 60 * 60 * 1000),
-        destination: 'Barcelona',
-        type: 'hotel',
-        amount: 180,
-        currency: '$'
-    },
-    {
-        id: 'feed-8',
-        userName: 'Sarah K.',
-        creationDateTime: new Date(now.getTime() - 30 * 60 * 1000),
-        destination: 'London',
-        type: 'flight',
-        amount: 112,
-        currency: '$'
-    }
-];
-
-// Modify feedCardExampleData to serve as initial recent items and ensure ContextListItem compatibility
-const initialMobileFeedItems: ContextListItem[] = feedCardExampleData.slice(0, 5).map((item, index) => {
-    const minutesAgo = Math.floor(Math.random() * 30); // Within last 30 minutes
-    const creationDateTime = new Date(now.getTime() - minutesAgo * 60 * 1000);
-
-    return {
-        id: item.id || `initial-mobile-${index}`,
-        text: item.type === 'hotel' ? `Trip to ${item.destination}` : `Flight booking for ${item.userName}`,
-        color: 'rgba(255, 255, 255, 0.05)', // Keep existing color or generate new
-        userName: item.userName,
-        creationDateTime: creationDateTime, // Use recent date
-        destination: item.destination,
-        type: item.type,
-        amount: item.amount,
-        currency: item.currency
-        // cta is optional
-    };
-});
 
 // Sort by creationDateTime: oldest first (ascending order) so newest is at the bottom
-initialMobileFeedItems.sort((a, b) => (a.creationDateTime?.getTime() || 0) - (b.creationDateTime?.getTime() || 0));
 
 interface MobileContentWelcomeProps {
     predefinedStep?: OnboardingSteps;
@@ -238,6 +142,12 @@ export default function MobileContentWelcome({
     const [isGlobeReady, setIsGlobeReady] = useState(false);
     const [startUIAnimations, setStartUIAnimations] = useState(false);
     const [activeStepIndex, setActiveStepIndex] = useState(0);
+
+    useEffect(() => {
+        trackLuckyOrangeEvent(EventLists.takeoff.name, {
+            description: EventLists.takeoff.description
+        });
+    }, []);
 
     // --- Globe useEffects (copied and adapted from DesktopRightContent) ---
     // Data loading effect

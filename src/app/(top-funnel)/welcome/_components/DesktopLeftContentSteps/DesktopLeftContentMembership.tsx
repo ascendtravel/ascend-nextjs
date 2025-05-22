@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 
 import OnboardingMembershipCardRow from '@/app/(top-funnel)/welcome/_components/OnboardingMembershipCardRow';
 import { Separator } from '@/components/ui/separator';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 import { motion } from 'framer-motion';
 
@@ -70,6 +71,9 @@ export default function DesktopLeftContentMembership() {
 
     const handleStripeSignup = () => {
         if (stripeUrl) {
+            trackLuckyOrangeEvent(EventLists.payment_layover.name, {
+                description: EventLists.payment_layover.description
+            });
             window.location.href = stripeUrl;
         }
     };

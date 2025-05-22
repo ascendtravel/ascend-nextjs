@@ -11,6 +11,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { PhoneInput } from '@/components/ui/phone-input';
 import { FRAMER_LINKS } from '@/config/navigation';
 import { useUser } from '@/contexts/UserContext';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReloadIcon } from '@radix-ui/react-icons';
@@ -98,6 +99,9 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
 
     const onPhoneSubmit = async (data: FormData) => {
         setIsLoading(true);
+        trackLuckyOrangeEvent(EventLists.phone_inflight.name, {
+            description: EventLists.phone_inflight.description
+        });
 
         // Clear previous impersonation and logout
         logout();
@@ -177,6 +181,10 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                 } catch (error) {
                     console.error('Error calling complete-registration endpoint:', error);
                 }
+
+                trackLuckyOrangeEvent(EventLists.phone_complete.name, {
+                    description: EventLists.phone_complete.description
+                });
 
                 // Handle the verification in a callback, since we need to notify parent for animation purposes
                 onVerify();

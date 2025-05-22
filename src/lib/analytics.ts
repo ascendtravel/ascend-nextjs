@@ -30,3 +30,13 @@ declare global {
         LOQ: any[];
     }
 }
+
+export const EventLists = {
+    takeoff: { name: 'takeoff', description: 'Loaded landing page' },
+    began_boarding: { name: 'began_boarding', description: 'Clicked CTA on landing page' },
+    gmail_layover: { name: 'gmail_layover', description: 'Clicked link my email' },
+    phone_inflight: { name: 'phone_inflight', description: 'Clicked verify my phone' },
+    phone_complete: { name: 'phone_complete', description: 'Phone verified' },
+    payment_layover: { name: 'payment_layover', description: 'Clicked payment button' },
+    landed: { name: 'landed', description: 'Arrived on signup success page' }
+} as const;
