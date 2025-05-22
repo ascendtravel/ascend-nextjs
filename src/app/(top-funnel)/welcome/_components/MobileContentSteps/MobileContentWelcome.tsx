@@ -366,9 +366,9 @@ export default function MobileContentWelcome({
     const stepItemDisplayVariants = {
         active: {
             opacity: 1,
-            scale: 1,
+            scale: 0.9,
             y: 0,
-            marginLeft: 25,
+            marginLeft: 12,
             transition: { type: 'spring', stiffness: 120, damping: 15 }
         },
         inactive: {
@@ -474,10 +474,10 @@ export default function MobileContentWelcome({
                 transition={{
                     delay: startUIAnimations ? (UI_ANIMATION_STAGGER_MS * 2) / 1000 : 0,
                     type: 'spring',
-                    stiffness: 80,
+                    stiffness: 60,
                     damping: 18
                 }}>
-                <div className='flex w-[calc(100%-20%)] flex-col items-stretch justify-center rounded-xl'>
+                <div className='-ml-12 flex w-[calc(100%-20%)] flex-col items-stretch justify-center rounded-xl'>
                     {cyclingStepsData.map((step, index) => (
                         <motion.div
                             key={step.id}
