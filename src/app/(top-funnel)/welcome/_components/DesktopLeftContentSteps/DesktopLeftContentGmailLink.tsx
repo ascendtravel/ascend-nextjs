@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import OnboardingFooterWithLock from '@/app/(top-funnel)/welcome/_components/OnboardingFooterWithLock';
 import OnboardingGmailCheckCta from '@/app/(top-funnel)/welcome/_components/OnboardingGmailCheckCta';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../../_types';
@@ -86,7 +87,13 @@ export default function DesktopLeftContentGmailLink() {
                         </div>
 
                         <Link href={`https://gmail.heyascend.com/gmail/import/start/${state_id || ''}`}>
-                            <div className='font-figtree mt-8 ml-2 flex w-fit items-center gap-2 rounded-full bg-white px-6 py-4 font-semibold text-neutral-900 transition-all hover:bg-white/90'>
+                            <div
+                                onClick={() => {
+                                    trackLuckyOrangeEvent(EventLists.gmail_layover.name, {
+                                        description: EventLists.gmail_layover.description
+                                    });
+                                }}
+                                className='font-figtree mt-8 ml-2 flex w-fit items-center gap-2 rounded-full bg-white px-6 py-4 font-semibold text-neutral-900 transition-all hover:bg-white/90'>
                                 <Image
                                     src='/images/google-icon.png'
                                     alt='Gmail icon'

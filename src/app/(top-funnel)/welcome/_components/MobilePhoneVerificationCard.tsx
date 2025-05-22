@@ -11,6 +11,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { PhoneInput } from '@/components/ui/phone-input';
 import { FRAMER_LINKS } from '@/config/navigation';
 import { useUser } from '@/contexts/UserContext';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReloadIcon } from '@radix-ui/react-icons';
@@ -131,6 +132,9 @@ export default function MobilePhoneVerificationCard({
                 const masked = phone.replace(/\d(?=\d{4})/g, '*');
                 setMaskedPhone(masked);
                 setIsCodeStep(true);
+                trackLuckyOrangeEvent(EventLists.phone_inflight.name, {
+                    description: EventLists.phone_inflight.description
+                });
                 forceHeight(verificationStepHeight);
             } else {
                 throw new Error(responseData.message || 'Failed to send OTP');
@@ -181,7 +185,9 @@ export default function MobilePhoneVerificationCard({
                     if (!registrationResponse.ok) {
                         console.error('Failed to complete registration:', await registrationResponse.json());
                     }
-
+                    trackLuckyOrangeEvent(EventLists.phone_complete.name, {
+                        description: EventLists.phone_complete.description
+                    });
                     onVerify?.();
                 } catch (error) {
                     console.error('Error calling complete-registration endpoint:', error);

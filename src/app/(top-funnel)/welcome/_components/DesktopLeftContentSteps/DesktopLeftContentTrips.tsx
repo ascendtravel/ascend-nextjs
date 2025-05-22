@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import UserDetailsMenu from '@/components/UserDetailsMenu';
 import { useUser } from '@/contexts/UserContext';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import Intercom from '@intercom/messenger-js-sdk';
 
 import IntercomIcon from '../IntercomIcon';
@@ -23,6 +24,12 @@ export default function DesktopLeftContentTrips() {
             ...(user?.main_email && { email: user?.main_email })
         });
     }, [user]);
+
+    useEffect(() => {
+        trackLuckyOrangeEvent(EventLists.takeoff.name, {
+            description: EventLists.takeoff.description
+        });
+    }, []);
 
     // useEffect(() => {
     //     if (!user?.id) {

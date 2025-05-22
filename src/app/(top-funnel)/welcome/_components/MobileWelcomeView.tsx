@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { YcombBanner } from '@/components/YcombBanner/YcombBanner';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../_types';
 import GoogleWhiteIcon from './GoogleWhiteIcon';
@@ -91,6 +92,9 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     const handleNextClick = () => {
         if (onNext && stateId && !isLoading && !error) {
             onNext(stateId);
+            trackLuckyOrangeEvent(EventLists.began_boarding.name, {
+                description: EventLists.began_boarding.description
+            });
         } else if (error) {
             // Retry fetching stateId if there was an error
             getStateId();
@@ -114,7 +118,13 @@ const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; sta
         <div className='flex h-fit flex-col items-center justify-center text-center shadow-2xl'>
             {stateId ? (
                 <Link href={`https://gmail.heyascend.com/gmail/import/start/${stateId}`}>
-                    <div className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
+                    <div
+                        onClick={() => {
+                            trackLuckyOrangeEvent(EventLists.gmail_layover.name, {
+                                description: EventLists.gmail_layover.description
+                            });
+                        }}
+                        className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
                         <GoogleWhiteIcon /> Continue with Google
                     </div>
                 </Link>
@@ -182,6 +192,9 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
     const handleStripeSignup = () => {
         if (stripeUrl) {
             window.location.href = stripeUrl;
+            trackLuckyOrangeEvent(EventLists.payment_layover.name, {
+                description: EventLists.payment_layover.description
+            });
         }
     };
 
@@ -424,6 +437,12 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
 
         return [];
     };
+
+    useEffect(() => {
+        trackLuckyOrangeEvent(EventLists.takeoff.name, {
+            description: EventLists.takeoff.description
+        });
+    }, []);
 
     return (
         <div className='md:hidden'>
