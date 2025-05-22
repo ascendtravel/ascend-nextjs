@@ -4,7 +4,7 @@ import React, { ReactNode, createContext, useCallback, useContext, useEffect, us
 
 // Constants (can be defined here or passed as props to Provider)
 const DEFAULT_ITEM_HEIGHT = 80;
-const AUTO_SCROLL_INTERVAL_MS = 2000;
+const AUTO_SCROLL_INTERVAL_MS = 10000; // 10 seconds
 
 // ---------------------------------------------------------------------------
 // Mock-feed defaults
@@ -14,16 +14,33 @@ const MAX_FEED_INTERVAL_MS = 30000; // 30 seconds
 const MAX_LIST_ITEMS = 30; // Define the maximum number of items
 
 const DEFAULT_FEED_NAMES = [
-    'Alex G.',
-    'Maria L.',
-    'Chris B.',
-    'Lena P.',
-    'John F.',
-    'Jane D.',
-    'Sam T.',
-    'Lucy K.',
-    'Omar S.',
-    'Ivy R.'
+    'Alex Green',
+    'Maria Lopez',
+    'Chris Baker',
+    'Lena Petrova',
+    'John Fischer',
+    'Jane Doe',
+    'Samuel Taylor',
+    'Lucy Kim',
+    'Omar Silva',
+    'Ivy Rose',
+    'Ben Carter',
+    'Sofia Chen',
+    'David Miller',
+    'Chloe Davis',
+    'Mohammed Ali',
+    'Ava Patel',
+    'Ethan Nguyen',
+    'Mia Rodriguez',
+    'Daniel Kim',
+    'Olivia Lee',
+    'William Chen',
+    'Emily Johnson',
+    'Michael Brown',
+    'Sophia Patel',
+    'James Kim',
+    'Avery Nguyen',
+    'Isabella Patel'
 ];
 
 const DEFAULT_FEED_DESTINATIONS = [
@@ -78,14 +95,14 @@ function generateMockTransaction(index: number, options: FeedOptions = {}): List
         maxAmount = 200;
     }
 
-    const userName = names[index % names.length];
+    const userName = names[index % names.length][0];
     const destination = destinations[index % destinations.length];
     const amount = Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
     const currency = currencies[index % currencies.length];
 
     const creationDateTime = now;
 
-    const text = `${userName} booked a ${type} to ${destination}`;
+    const text = `${userName[0]} booked a ${type} to ${destination}`;
 
     return {
         id: `feed-${index + Date.now()}`,
@@ -320,9 +337,6 @@ export function StickyScrollListProvider({
 
         // Function to add an item and schedule the next one
         const addAndScheduleNext = () => {
-            const container = scrollContainerRef.current;
-            const currentScrollTop = container ? container.scrollTop : 0;
-
             const currentIndexForGeneration = mockFeedItemIndexRef.current;
             mockFeedItemIndexRef.current += 1;
 
@@ -333,17 +347,27 @@ export function StickyScrollListProvider({
                     updatedItems = updatedItems.slice(updatedItems.length - MAX_LIST_ITEMS);
                 }
 
+                if (updatedItems.length > itemRefs.current.length) {
+                    itemRefs.current = new Array(updatedItems.length).fill(null);
+                } else if (updatedItems.length < itemRefs.current.length && updatedItems.length === MAX_LIST_ITEMS) {
+                    // If items were sliced and list is at max, refs should match MAX_LIST_ITEMS
+                    itemRefs.current = new Array(MAX_LIST_ITEMS).fill(null);
+                }
+
                 return updatedItems;
             });
 
+            // Scroll after state update and DOM re-render
             setTimeout(() => {
+                const container = scrollContainerRef.current;
                 if (container) {
+                    // Scroll to the bottom to make the new item visible
                     container.scrollTo({
-                        top: currentScrollTop + itemHeight,
+                        top: container.scrollHeight, // Scroll to the very bottom
                         behavior: 'smooth'
                     });
                 }
-            }, 0);
+            }, 50); // Increased delay slightly to ensure DOM has updated after setItems
 
             // Schedule the next call
             const randomInterval =

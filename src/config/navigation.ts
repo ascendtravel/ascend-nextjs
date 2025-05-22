@@ -11,9 +11,9 @@ export const isPathBlacklisted = (pathname: string): boolean => {
 };
 
 export const FRAMER_LINKS = {
-    privacy: 'https://heyascend.com/privacy',
-    terms: 'https://heyascend.com/terms',
-    support: 'https://heyascend.com/support',
-    about: 'https://heyascend.com/about',
-    careers: 'https://heyascend.com/careers'
+    privacy: 'https://info.heyascend.com/privacy',
+    terms: 'https://info.heyascend.com/terms',
+    support: 'https://info.heyascend.com/support',
+    about: 'https://info.heyascend.com/about',
+    careers: 'https://info.heyascend.com/careers'
 } as const;
