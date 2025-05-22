@@ -9,9 +9,9 @@ const AUTO_SCROLL_INTERVAL_MS = 2000;
 // ---------------------------------------------------------------------------
 // Mock-feed defaults
 // ---------------------------------------------------------------------------
-const MIN_FEED_INTERVAL_MS = 40000; // 40 seconds
-const MAX_FEED_INTERVAL_MS = 120000; // 120 seconds (2 minutes)
-const MAX_LIST_ITEMS = 40; // Define the maximum number of items
+const MIN_FEED_INTERVAL_MS = 10000; // 10 seconds
+const MAX_FEED_INTERVAL_MS = 30000; // 30 seconds
+const MAX_LIST_ITEMS = 30; // Define the maximum number of items
 
 const DEFAULT_FEED_NAMES = [
     'Alex G.',
