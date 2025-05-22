@@ -144,10 +144,10 @@ export default function DesktopLeftContentWelcome() {
                     </Link>
                 </div>
                 <div className='flex flex-col items-start justify-center gap-4'>
-                    <h1 className='text-figtree text-[68px] leading-[60px] font-bold tracking-[-2%] text-white drop-shadow-xl'>
+                    <h1 className='text-figtree pr-8 text-[68px] leading-[60px] font-bold tracking-[-2%] text-white drop-shadow-xl'>
                         Smart travelers don't overpay
                     </h1>
-                    <h2 className='text-figtree max-w-md text-base font-semibold text-white drop-shadow-sm'>
+                    <h2 className='text-figtree max-w-md pr-4 text-base font-semibold text-white drop-shadow-sm'>
                         Ascend watches your bookings and gets you money back when <b>Big Travel</b> drops prices. Get
                         started in just 3 steps.
                     </h2>
