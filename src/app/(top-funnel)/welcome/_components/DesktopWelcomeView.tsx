@@ -56,7 +56,7 @@ const generateInitialFeedItems = (count: number): ContextListItem[] => {
             id: `initial-desktop-${i}`,
             text: `${userName} booked a ${type} to ${destination}`,
             color: `hsl(${(i * 60) % 360}, 70%, 85%)`, // Simple color generation
-            userName: userName[0],
+            userName: userName[0] + '.',
             creationDateTime,
             destination,
             type,

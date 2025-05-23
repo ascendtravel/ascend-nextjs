@@ -95,14 +95,14 @@ function generateMockTransaction(index: number, options: FeedOptions = {}): List
         maxAmount = 200;
     }
 
-    const userName = names[index % names.length][0];
+    const userName = names[index % names.length][0] + '.';
     const destination = destinations[index % destinations.length];
     const amount = Math.floor(Math.random() * (maxAmount - minAmount + 1)) + minAmount;
     const currency = currencies[index % currencies.length];
 
     const creationDateTime = now;
 
-    const text = `${userName[0]} booked a ${type} to ${destination}`;
+    const text = `${userName[0]}. booked a ${type} to ${destination}`;
 
     return {
         id: `feed-${index + Date.now()}`,
