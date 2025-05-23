@@ -28,8 +28,8 @@ export default function MobileContentTrips() {
     }, [user]);
 
     useEffect(() => {
-        trackLuckyOrangeEvent(EventLists.takeoff.name, {
-            description: EventLists.takeoff.description
+        trackLuckyOrangeEvent(EventLists.landed.name, {
+            description: EventLists.landed.description
         });
     }, []);
 
