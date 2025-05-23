@@ -39,7 +39,7 @@ export default function DesktopLeftContentPhoneRegister({ onVerify }: { onVerify
                         <p className='font-figtree max-w-md text-[36px] leading-[40px] font-extrabold tracking-[-0.02em] text-white'>
                             We'll text you when prices drop on your trips
                         </p>
-                        <p className='font-figtree mb-4 text-[20px] leading-[30px] font-medium text-white'>
+                        <p className='font-figtree mb-4 max-w-[400px] text-[20px] leading-[30px] font-medium text-white'>
                             Prices are time-sensitive, so we'll text you as soon as we see an opportunity.
                         </p>
                     </div>
@@ -48,27 +48,27 @@ export default function DesktopLeftContentPhoneRegister({ onVerify }: { onVerify
                         <OnboardingPhoneRegisterFlipCard state_id={state_id ?? ''} onVerify={onVerify} />
                     </div>
                 </motion.div>
-                <div className='flex w-full flex-wrap items-center justify-center text-white/60 transition-colors'>
+                <div className='flex w-full flex-wrap items-center justify-start text-white/60 transition-colors'>
                     <div className='flex flex-row items-center justify-center gap-2'>
                         <a
                             href={FRAMER_LINKS.privacy}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='font-figtree text-base transition-colors hover:text-white'>
+                            className='font-figtree text-xs transition-colors hover:text-white'>
                             Privacy Policy
                         </a>
-                        <span className='font-figtree ml-2 pb-2 text-base'>.</span>
+                        <span className='font-figtree pb-2 text-base'>.</span>
                         <a
                             href={FRAMER_LINKS.terms}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='font-figtree text-base transition-colors hover:text-white'>
+                            className='font-figtree text-xs transition-colors hover:text-white'>
                             Terms of Service
                         </a>
                     </div>
                     <div className='flex flex-row items-center justify-center gap-2'>
-                        <span className='font-figtree base pb-2 font-bold'>.</span>
-                        <p className='font-figtree text-sm'>
+                        <span className='font-figtree ml-2 pb-2 text-base font-bold'>.</span>
+                        <p className='font-figtree text-xs'>
                             Copyright {format(new Date(), 'yyyy')} © Ascend. All Rights Reserved.
                         </p>
                     </div>

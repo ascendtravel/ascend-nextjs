@@ -222,7 +222,7 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
     useEffect(() => {
         async function getStripeUrl() {
             if (!state_id) {
-                setError('Session ID missing. Please go back and try again.');
+                setError('Try again or');
                 setIsLoading(false);
 
                 return;

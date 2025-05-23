@@ -210,7 +210,7 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
             className={cn(
                 'perspective-1000 relative',
                 isFlipped && 'h-[250px]',
-                !isFlipped && 'h-[280px]',
+                !isFlipped && 'h-[310px]',
                 'w-full max-w-[400px] transition-all duration-500'
             )}>
             <AnimatePresence>
@@ -238,18 +238,9 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                                         placeholder='Phone number'
                                         className='h-12 w-full rounded-l-none'
                                     />
-                                    <Button
-                                        type='submit'
-                                        className='text-md w-full rounded-full bg-[#1DC167] py-6 font-semibold'
-                                        disabled={isLoading || cooldown > 0}>
-                                        {isLoading
-                                            ? 'Sending...'
-                                            : cooldown > 0
-                                              ? `Wait ${formatCooldown()}`
-                                              : 'Get verification code'}
-                                    </Button>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <span className='w-[240px] text-center text-xs text-neutral-700'>
+
+                                    <div className='flex flex-col items-center justify-center font-semibold'>
+                                        <span className='w-[270px] text-center text-xs text-neutral-700'>
                                             By verifying your number, you agree that you are at least 18 years of age
                                             and agree to our{' '}
                                             <Link
@@ -265,6 +256,17 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                                             </Link>
                                         </span>
                                     </div>
+
+                                    <Button
+                                        type='submit'
+                                        className='text-md mt-4 w-full rounded-full bg-[#17AA59] py-6 font-semibold'
+                                        disabled={isLoading || cooldown > 0}>
+                                        {isLoading
+                                            ? 'Sending...'
+                                            : cooldown > 0
+                                              ? `Wait ${formatCooldown()}`
+                                              : 'Get verification code'}
+                                    </Button>
                                 </form>
                             </Form>
                         </div>
@@ -306,7 +308,7 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                             <Button
                                 onClick={handleVerifyOtp}
                                 disabled={otpValue.length !== 6 || isVerifying}
-                                className='mt-4 w-full rounded-full bg-[#1DC167]'>
+                                className='mt-4 w-full rounded-full bg-[#17AA59]'>
                                 {isVerifying ? 'Verifying...' : 'Confrim number'}
                             </Button>
                         </div>

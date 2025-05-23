@@ -8,6 +8,8 @@ import OnboardingMembershipCardRow from '@/app/(top-funnel)/welcome/_components/
 import { Separator } from '@/components/ui/separator';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
+import { OnboardingSteps } from '../../_types';
+import OnboardingStepper from '../OnboardingStepper';
 import { motion } from 'framer-motion';
 
 export default function DesktopLeftContentMembership() {
@@ -79,69 +81,84 @@ export default function DesktopLeftContentMembership() {
     };
 
     return (
-        <div className='relative z-10 flex w-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 pl-14 backdrop-blur-md transition-all'>
-            <motion.div
-                className='flex flex-1 flex-col items-center justify-center gap-4'
-                variants={contentVariants}
-                initial='hidden'
-                animate='visible'>
-                <div className='flex w-full flex-col items-start justify-center'>
-                    <div className='flex flex-col items-start justify-center gap-4 py-4 pt-6 sm:pt-24'>
-                        <p className='font-figtree max-w-md text-[36px] leading-[40px] font-extrabold tracking-[-0.02em] text-white'>
-                            Ascend works for you, not Big Travel
-                        </p>
-                        <p className='font-figtree mb-4 text-[20px] leading-[30px] font-medium text-white'>
-                            You get the best deals on travel. We get $25. It's that simple!
-                        </p>
-                    </div>
+        <div className='relative z-10 flex h-full w-1/2 flex-col items-stretch justify-start overflow-y-hidden rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] pl-14 backdrop-blur-md transition-all'>
+            <div className='-mr-12 flex h-full w-full flex-1 flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto pt-12 pr-12'>
+                <div className='ml-2 w-full shrink-0'>
+                    <OnboardingStepper
+                        steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
+                        currentStep={OnboardingSteps.Step3}
+                        failedSteps={[]}
+                    />
+                </div>
 
-                    <div className='flex w-full max-w-[400px] justify-center pb-12'>
-                        <div className='flex w-full flex-col items-start justify-center gap-4 rounded-2xl bg-neutral-50 p-6'>
-                            <h2 className='text-2xl font-bold'>Ascend Membership</h2>
-                            <div className='flex flex-row gap-3'>
-                                <div className='flex items-start justify-start gap-1'>
-                                    <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
-                                        $
-                                    </span>
-                                    <span className='text-3xl font-bold'>25</span>
-                                    <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
+                <motion.div
+                    className='flex flex-col items-center justify-start'
+                    variants={contentVariants}
+                    initial='hidden'
+                    animate='visible'>
+                    <div className='flex w-full flex-col items-center justify-start px-6'>
+                        <div className='w-full max-w-lg'>
+                            <div className='flex flex-col items-start justify-center gap-4 py-4'>
+                                <p className='font-figtree max-w-md text-[36px] leading-[40px] font-extrabold tracking-[-0.02em] text-white'>
+                                    Ascend works for you, not Big Travel
+                                </p>
+                                <p className='font-figtree mb-4 text-[20px] leading-[30px] font-medium text-white'>
+                                    You get the best deals on travel. We get $25. It's that simple!
+                                </p>
+                            </div>
+
+                            <div className='flex w-full justify-center pb-12'>
+                                <div className='flex w-full flex-col items-start justify-center gap-2 rounded-2xl bg-neutral-50 px-10 py-8'>
+                                    <h2 className='text-2xl font-bold'>Ascend Membership</h2>
+                                    <div className='flex flex-row gap-3'>
+                                        <div className='flex items-start justify-start gap-1'>
+                                            <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
+                                                $
+                                            </span>
+                                            <span className='text-3xl font-bold'>25</span>
+                                            <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
+                                        </div>
+                                    </div>
+                                    <div className='text-neutral-1000 -mt-1 flex flex-row items-center gap-2 text-sm'>
+                                        <span className='font-semibold'>Less than $2.99 per month</span>
+                                    </div>
+                                    <div className='mt-1' />
+                                    <OnboardingMembershipCardRow
+                                        title='Flight Refunds'
+                                        description='We get airlines to give you the credits you are entitled to based on their policy.'
+                                    />
+                                    <div className='mt-1' />
+                                    <OnboardingMembershipCardRow
+                                        title='Hotel Refunds'
+                                        description='We rebook you automatically when you could get the same room for less.'
+                                    />
+                                    <div className='mt-1' />
+                                    <OnboardingMembershipCardRow
+                                        title='Members-Only Deals'
+                                        description="Tell us where you're going, we'll find you the best price."
+                                    />
+                                    <button
+                                        onClick={handleStripeSignup}
+                                        disabled={isLoading || !!error}
+                                        className='mt-4 rounded-full bg-[#17AA59] px-16 py-4 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
+                                        {error ? (
+                                            <a
+                                                href='mailto:hey@ascend.travel'
+                                                className='text-white hover:text-white/90'>
+                                                Contact hey@ascend.travel
+                                            </a>
+                                        ) : isLoading ? (
+                                            'Loading...'
+                                        ) : (
+                                            'Start saving now'
+                                        )}
+                                    </button>
                                 </div>
                             </div>
-                            <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-sm'>
-                                <span className='font-semibold'>Less than $2.99 per month</span>
-                            </div>
-                            <OnboardingMembershipCardRow
-                                title='Flight Refunds'
-                                description='We get airlines to give you the credits you are entitled to based on their policy.'
-                            />
-                            <Separator className='w-full' />
-                            <OnboardingMembershipCardRow
-                                title='Hotel Refunds'
-                                description='We rebook you automatically when you could get the same room for less.'
-                            />
-                            <Separator className='w-full' />
-                            <OnboardingMembershipCardRow
-                                title='Members-Only Deals'
-                                description="Tell us where you're going, we'll find you the best price."
-                            />
                         </div>
                     </div>
-                    <button
-                        onClick={handleStripeSignup}
-                        disabled={isLoading || !!error}
-                        className='w-fit rounded-full bg-white px-8 py-3 font-semibold text-neutral-900 transition-all hover:bg-white/90 disabled:opacity-50'>
-                        {error ? (
-                            <a href='mailto:hey@ascend.travel' className='text-white hover:text-white/90'>
-                                Contact hey@ascend.travel
-                            </a>
-                        ) : isLoading ? (
-                            'Loading...'
-                        ) : (
-                            'Start saving now'
-                        )}
-                    </button>
-                </div>
-            </motion.div>
+                </motion.div>
+            </div>
         </div>
     );
 }

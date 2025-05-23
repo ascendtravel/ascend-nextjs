@@ -33,7 +33,9 @@ export default function OnboardingMembershipCardRow({
                     <OnboardingMembershipCheckSvg />
                     <p className='text-lg font-bold'>{title}</p>
                 </div>
-                <p className='pl-[calc(1rem+0.5rem)] text-sm text-neutral-600'>{description}</p>{' '}
+                <p className='-mt-1 -ml-6 pl-[calc(1rem+0.5rem)] text-sm font-semibold text-neutral-900'>
+                    {description}
+                </p>{' '}
                 {/* Indent description under title */}
             </div>
 

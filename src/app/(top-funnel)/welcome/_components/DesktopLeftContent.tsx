@@ -125,32 +125,32 @@ export default function DesktopLeftContent() {
     };
 
     // Handle step changes with direction tracking
-    const handlePrevStep = () => {
-        const prevStep = getPreviousStep(currentStep);
-        if (prevStep !== currentStep) {
-            const newParams = new URLSearchParams(searchParams.toString());
-            const stepString = getStepString(prevStep);
-            if (prevStep === OnboardingSteps.Step0) {
-                newParams.delete('step');
-            } else {
-                newParams.set('step', stepString);
-            }
-            router.replace(`${pathname}${newParams.toString() ? '?' : ''}${newParams.toString()}`, { scroll: false });
-        }
-    };
+    // const handlePrevStep = () => {
+    //     const prevStep = getPreviousStep(currentStep);
+    //     if (prevStep !== currentStep) {
+    //         const newParams = new URLSearchParams(searchParams.toString());
+    //         const stepString = getStepString(prevStep);
+    //         if (prevStep === OnboardingSteps.Step0) {
+    //             newParams.delete('step');
+    //         } else {
+    //             newParams.set('step', stepString);
+    //         }
+    //         router.replace(`${pathname}${newParams.toString() ? '?' : ''}${newParams.toString()}`, { scroll: false });
+    //     }
+    // };
 
-    const handleNextStep = () => {
-        if (currentStep === OnboardingSteps.Step4) {
-            return;
-        }
-        const nextStep = getNextStep(currentStep);
-        if (nextStep !== currentStep) {
-            const newParams = new URLSearchParams(searchParams.toString());
-            const stepString = getStepString(nextStep);
-            newParams.set('step', stepString);
-            router.replace(`${pathname}${newParams.toString() ? '?' : ''}${newParams.toString()}`, { scroll: false });
-        }
-    };
+    // const handleNextStep = () => {
+    //     if (currentStep === OnboardingSteps.Step4) {
+    //         return;
+    //     }
+    //     const nextStep = getNextStep(currentStep);
+    //     if (nextStep !== currentStep) {
+    //         const newParams = new URLSearchParams(searchParams.toString());
+    //         const stepString = getStepString(nextStep);
+    //         newParams.set('step', stepString);
+    //         router.replace(`${pathname}${newParams.toString() ? '?' : ''}${newParams.toString()}`, { scroll: false });
+    //     }
+    // };
 
     const bannerVariants = {
         hidden: { y: '-100%', opacity: 0 },
@@ -184,17 +184,19 @@ export default function DesktopLeftContent() {
                 </div>
             </div> */}
 
-            {currentStep !== OnboardingSteps.Step0 && currentStep !== OnboardingSteps.Step4 && (
-                <div className='fixed inset-x-3 top-8 z-20 flex flex-row justify-between pl-8'>
-                    <OnboardingStepper
-                        steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
-                        currentStep={
-                            currentStep as OnboardingSteps.Step1 | OnboardingSteps.Step2 | OnboardingSteps.Step3
-                        }
-                        failedSteps={getFailedSteps()}
-                    />
-                </div>
-            )}
+            {currentStep !== OnboardingSteps.Step0 &&
+                currentStep !== OnboardingSteps.Step4 &&
+                currentStep !== OnboardingSteps.Step3 && (
+                    <div className='fixed inset-x-3 top-8 z-20 flex flex-row justify-between pl-8'>
+                        <OnboardingStepper
+                            steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
+                            currentStep={
+                                currentStep as OnboardingSteps.Step1 | OnboardingSteps.Step2 | OnboardingSteps.Step3
+                            }
+                            failedSteps={getFailedSteps()}
+                        />
+                    </div>
+                )}
 
             {currentStep === OnboardingSteps.Step4 && (
                 <div className='fixed inset-x-3 z-20 flex flex-row justify-center px-4'>

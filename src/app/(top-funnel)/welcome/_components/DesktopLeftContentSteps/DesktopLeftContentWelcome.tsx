@@ -210,27 +210,27 @@ export default function DesktopLeftContentWelcome() {
                         </div>
                     </Link>
                 </div>
-                <div className='flex w-full shrink-0 flex-wrap items-center justify-start text-center text-xs text-white/60 transition-colors'>
-                    <div className='flex flex-row items-center justify-center gap-x-2'>
+                <div className='flex w-full flex-wrap items-center justify-start text-white/60 transition-colors'>
+                    <div className='flex flex-row items-center justify-center gap-2'>
                         <a
                             href={FRAMER_LINKS.privacy}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='font-figtree transition-colors hover:text-white'>
+                            className='font-figtree text-xs transition-colors hover:text-white'>
                             Privacy Policy
                         </a>
-                        <span className='font-figtree hidden pb-2 sm:inline'>.</span>
+                        <span className='font-figtree pb-2 text-base'>.</span>
                         <a
                             href={FRAMER_LINKS.terms}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='font-figtree transition-colors hover:text-white'>
+                            className='font-figtree text-xs transition-colors hover:text-white'>
                             Terms of Service
                         </a>
                     </div>
-                    <div className='mt-1 flex w-full flex-row items-center justify-center gap-x-2 sm:mt-0 sm:w-auto'>
-                        <span className='font-figtree hidden pb-2 sm:inline'>.</span>
-                        <p className='font-figtree'>
+                    <div className='flex flex-row items-center justify-center gap-2'>
+                        <span className='font-figtree ml-2 pb-2 text-base font-bold'>.</span>
+                        <p className='font-figtree text-xs'>
                             Copyright {format(new Date(), 'yyyy')} © Ascend. All Rights Reserved.
                         </p>
                     </div>
