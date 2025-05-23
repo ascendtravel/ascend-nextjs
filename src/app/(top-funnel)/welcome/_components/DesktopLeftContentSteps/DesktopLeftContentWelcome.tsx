@@ -24,8 +24,8 @@ const cyclingStepsData = [
     {
         id: 'phone',
         icon: '☎️',
-        text: 'So we can text you when we find savings.',
-        subtext: "We'll notify you when prices drop."
+        text: 'Add your phone number',
+        subtext: 'So we can text you when we find savings.'
     },
     {
         id: 'member',
@@ -186,11 +186,13 @@ export default function DesktopLeftContentWelcome() {
                                 <div className='flex flex-col text-left'>
                                     {' '}
                                     {/* Allow text to wrap if needed */}
-                                    <span className='font-bolder text-[14px] drop-shadow-lg'>
+                                    <span className='text-[18px] font-bold drop-shadow-lg'>
                                         {cyclingStepsData[index].text}
                                     </span>
                                     {cyclingStepsData[index].subtext && (
-                                        <span className='text-bold text-[14px]'>{cyclingStepsData[index].subtext}</span>
+                                        <span className='-mt-2 text-[18px] font-bold drop-shadow-lg'>
+                                            {cyclingStepsData[index].subtext}
+                                        </span>
                                     )}
                                 </div>
                             </motion.div>

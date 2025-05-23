@@ -59,8 +59,8 @@ const cyclingStepsData = [
     {
         id: 'phone',
         icon: '☎️',
-        text: 'So we can text you when we find savings.',
-        subtext: "We'll notify you when prices drop."
+        text: 'Add your phone number',
+        subtext: 'So we can text you when we find savings.'
     },
     {
         id: 'member',
@@ -293,7 +293,7 @@ export default function MobileContentWelcome({
             opacity: 1,
             scale: 1,
             y: 0,
-            marginLeft: 12,
+            marginLeft: 25,
             transition: { type: 'spring', stiffness: 120, damping: 15 }
         },
         inactive: {
@@ -382,7 +382,7 @@ export default function MobileContentWelcome({
                     damping: 18
                 }}>
                 <h1 className='text-figtree font-bolder mx-auto max-w-[650px] text-[48px] leading-[38px] tracking-tighter text-white drop-shadow-lg'>
-                    Big Travel hates this app.
+                    Big Travel <br /> hates this app.
                 </h1>
                 <h2
                     className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-[16px] leading-normal font-bold text-white'
@@ -393,7 +393,7 @@ export default function MobileContentWelcome({
 
             {/* Bottom Steps - Container animates in, items inside have dynamic styles */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 bottom-[23%] z-40 flex flex-col items-center justify-center text-sm font-semibold text-white'
+                className='pointer-events-auto fixed inset-x-0 bottom-[16%] z-40 flex flex-col items-center justify-center gap-2 text-sm font-semibold text-white'
                 initial={{ opacity: 0, y: 50 }} // Container slides up and fades in
                 animate={startUIAnimations ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{
@@ -403,11 +403,11 @@ export default function MobileContentWelcome({
                     damping: 18
                 }}>
                 <h2
-                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-center text-[16px] leading-normal font-bold text-white/80'
+                    className='text-figtree absolute -top-13 mx-auto w-[calc(100%-12%)] rounded-xl px-4 text-left text-[16px] leading-normal font-bold text-white/80'
                     style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.5)' }}>
                     Let's get your money back (no matter where you booked).
                 </h2>
-                <div className='-ml-12 flex w-[calc(100%-20%)] flex-col items-stretch justify-center rounded-xl'>
+                <div className='-ml-8 flex w-[calc(100%-12%)] flex-col items-stretch justify-center rounded-xl'>
                     {cyclingStepsData.map((step, index) => (
                         <motion.div
                             key={step.id}
@@ -420,11 +420,13 @@ export default function MobileContentWelcome({
                             <div className='flex flex-col text-left'>
                                 {' '}
                                 {/* Allow text to wrap if needed */}
-                                <span className='font-bolder text-[12px] drop-shadow-lg'>
+                                <span className='font-bolder text-[14px] drop-shadow-lg'>
                                     {cyclingStepsData[index].text}
                                 </span>
                                 {cyclingStepsData[index].subtext && (
-                                    <span className='text-[12px] opacity-80'>{cyclingStepsData[index].subtext}</span>
+                                    <span className='text-[14px] opacity-90 drop-shadow-lg'>
+                                        {cyclingStepsData[index].subtext}
+                                    </span>
                                 )}
                             </div>
                         </motion.div>
