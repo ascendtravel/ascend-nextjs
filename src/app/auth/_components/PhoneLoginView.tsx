@@ -157,7 +157,7 @@ export function PhoneLoginView({ redirectUrl }: PhoneLoginViewProps) {
                 // Check if we need to redirect to Gmail link
                 if (data.shouldRedirectToGmail) {
                     toast.info('Please sign on as a member first.');
-                    router.push('/gmail-link');
+                    router.push('/welcome?step=1');
 
                     return;
                 }

@@ -113,11 +113,77 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
 };
 
 // Placeholder Content Components for inside the animator bar (Steps 1, 2, 3)
-const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; stateId: string }) => {
+const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; stateId: string | null }) => {
+    const searchParams = useSearchParams();
+    const [localStateId, setLocalStateId] = useState<string | null>(stateId);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const getUtmParams = useCallback(() => {
+        const utmParams = new URLSearchParams();
+        const utmParamsObject: { [key: string]: string } = {};
+
+        searchParams.forEach((value, key) => {
+            if (key.startsWith('utm_')) {
+                utmParams.append(key, value);
+            }
+        });
+
+        const utmParamsString = utmParams.toString();
+        const utmParamsArray = utmParamsString.split('&');
+
+        utmParamsArray.forEach((param) => {
+            if (param) {
+                const [key, value] = param.split('=');
+                if (key) {
+                    utmParamsObject[key] = value;
+                }
+            }
+        });
+        console.log(utmParamsObject);
+
+        return utmParamsObject;
+    }, [searchParams]);
+
+    const getStateId = useCallback(async () => {
+        setIsLoading(true);
+        setError('');
+        try {
+            const fbp = Cookies.get('_fbp');
+            const fbc = Cookies.get('_fbc');
+            const utmParams = getUtmParams();
+
+            const response = await fetch('/api/gmail/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...(fbp ? { fbp } : {}),
+                    ...(fbc ? { fbc } : {}),
+                    ...(Object.keys(utmParams).length > 0 ? { utm_params: utmParams } : {})
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to get state ID');
+            const data = await response.json();
+            setLocalStateId(data.state_id);
+        } catch (err) {
+            setError('Failed to initialize. Please try again.');
+            setLocalStateId(null); // Clear stateId on error
+        } finally {
+            setIsLoading(false);
+        }
+    }, [getUtmParams, setIsLoading, setError, setLocalStateId]);
+
+    useEffect(() => {
+        if (!localStateId) {
+            getStateId();
+        }
+    }, [localStateId]);
+
     return (
         <div className='flex h-fit flex-col items-center justify-center text-center shadow-2xl'>
-            {stateId ? (
-                <Link href={`https://gmail.heyascend.com/gmail/import/start/${stateId}`}>
+            {localStateId ? (
+                <Link href={`https://gmail.heyascend.com/gmail/import/start/${localStateId}`}>
                     <div
                         onClick={() => {
                             trackLuckyOrangeEvent(EventLists.gmail_layover.name, {
@@ -125,12 +191,10 @@ const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; sta
                             });
                         }}
                         className='flex w-full max-w-xs flex-row items-center justify-center gap-2 rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90'>
-                        <GoogleWhiteIcon /> Continue with Google
+                        <GoogleWhiteIcon /> {!isLoading ? 'Continue with Google' : 'Loading...'}
                     </div>
                 </Link>
-            ) : (
-                <p className='text-sm text-neutral-600'>Initializing link...</p>
-            )}
+            ) : null}
         </div>
     );
 };
@@ -369,13 +433,7 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
             />
         );
     } else if (currentStep === OnboardingSteps.Step1) {
-        stepContentInAnimator = appStateId ? (
-            <MobileSheetStep1Content onNext={goToNextStep} stateId={appStateId} />
-        ) : (
-            <div className='flex h-full items-center justify-center p-4 text-sm text-neutral-600'>
-                Loading session details...
-            </div>
-        );
+        stepContentInAnimator = <MobileSheetStep1Content onNext={goToNextStep} stateId={appStateId} />;
     } else if (currentStep === OnboardingSteps.Step2) {
         stepContentInAnimator = (
             <MobileSheetStep2Content
