@@ -62,6 +62,12 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
         try {
             const fbp = Cookies.get('_fbp');
             const fbc = Cookies.get('_fbc');
+
+            const referral_code = searchParams.get('referral_code');
+            if (referral_code) {
+                localStorage.setItem('referral_code', referral_code);
+            }
+
             const utmParams = getUtmParams();
 
             const response = await fetch('/api/gmail/state', {
