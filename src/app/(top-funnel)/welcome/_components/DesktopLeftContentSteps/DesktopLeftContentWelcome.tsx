@@ -169,11 +169,11 @@ export default function DesktopLeftContentWelcome() {
                     <h1 className='text-figtree pr-8 text-[68px] leading-[66px] font-bold tracking-[-2%] text-white drop-shadow-xl'>
                         Big Travel <br /> hates this app.
                     </h1>
-                    <h2 className='text-figtree max-w-md pr-4 text-base font-semibold text-white drop-shadow-sm'>
+                    <h2 className='text-figtree max-w-md pr-4 text-base font-bold text-white drop-shadow-lg'>
                         Other travel sites keep your money when prices drop. We think that's wrong.
                     </h2>
-                    <div className='my-4 -ml-3 flex flex-col items-start justify-center gap-1 text-white'>
-                        <h2 className='text-figtree ml-3 max-w-md pr-4 text-base font-semibold text-white drop-shadow-sm'>
+                    <div className='text-bold my-4 -ml-3 flex flex-col items-start justify-center gap-1 text-white'>
+                        <h2 className='text-figtree ml-3 max-w-md pr-4 text-base font-bold text-white drop-shadow-lg'>
                             Let's get your money back (no matter where you booked).
                         </h2>
                         {cyclingStepsData.map((step, index) => (
@@ -186,11 +186,11 @@ export default function DesktopLeftContentWelcome() {
                                 <div className='flex flex-col text-left'>
                                     {' '}
                                     {/* Allow text to wrap if needed */}
-                                    <span className='text-[18px] font-bold drop-shadow-lg'>
+                                    <span className='text-[16px] font-bold drop-shadow-lg'>
                                         {cyclingStepsData[index].text}
                                     </span>
                                     {cyclingStepsData[index].subtext && (
-                                        <span className='-mt-2 text-[18px] font-bold drop-shadow-lg'>
+                                        <span className='-mt-2 text-[16px] font-bold drop-shadow-lg'>
                                             {cyclingStepsData[index].subtext}
                                         </span>
                                     )}

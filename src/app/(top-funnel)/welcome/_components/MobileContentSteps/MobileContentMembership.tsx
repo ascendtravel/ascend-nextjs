@@ -143,21 +143,6 @@ export default function MobileContentMembership() {
                                 isInitiallyOpen={openStates[2]}
                             />
                         </div>
-
-                        {/* <button
-                            onClick={handleStripeSignup}
-                            disabled={isLoading || !!error}
-                            className='w-full rounded-full bg-[#1DC167] py-3 font-semibold text-white transition-all hover:bg-[#1DC167]/90 disabled:opacity-50'>
-                            {error ? (
-                                <a href='mailto:hey@ascend.travel' className='text-white hover:text-white/90'>
-                                    Contact hey@ascend.travel
-                                </a>
-                            ) : isLoading ? (
-                                'Loading...'
-                            ) : (
-                                'Start Saving Money'
-                            )}
-                        </button> */}
                     </div>
                 </div>
             </div>
