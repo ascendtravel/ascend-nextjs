@@ -106,7 +106,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
             <div
                 className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 onClick={handleNextClick}>
-                Import my travel bookings
+                Find my travel bookings
             </div>
         </div>
     );

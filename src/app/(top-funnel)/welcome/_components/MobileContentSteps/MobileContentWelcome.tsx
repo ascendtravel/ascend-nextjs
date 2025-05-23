@@ -50,9 +50,24 @@ const UI_ANIMATION_STAGGER_MS = 200;
 
 // Data for the cycling steps - MOVED TO MODULE SCOPE
 const cyclingStepsData = [
-    { id: 'email', icon: '📧', text: 'Connect your email to import travel bookings' },
-    { id: 'phone', icon: '☎️', text: 'Add your phone number to get notified' },
-    { id: 'member', icon: '🎉', text: 'Become a member to start saving' }
+    {
+        id: 'email',
+        icon: '📧',
+        text: 'Connect your Gmail',
+        subtext: "We'll instantly find your past and upcoming bookings."
+    },
+    {
+        id: 'phone',
+        icon: '☎️',
+        text: 'So we can text you when we find savings.',
+        subtext: "We'll notify you when prices drop."
+    },
+    {
+        id: 'member',
+        icon: '🎉',
+        text: 'Become a member to start saving',
+        subtext: 'Automatic refunds when prices drop for just $25/year.'
+    }
 ];
 const CYCLE_STEP_INTERVAL_MS = 4000; // Change step every 4 seconds
 
@@ -276,14 +291,14 @@ export default function MobileContentWelcome({
     const stepItemDisplayVariants = {
         active: {
             opacity: 1,
-            scale: 0.9,
+            scale: 1,
             y: 0,
             marginLeft: 12,
             transition: { type: 'spring', stiffness: 120, damping: 15 }
         },
         inactive: {
             opacity: 0.6, // Dimmed opacity
-            scale: 0.85, // Slightly smaller
+            scale: 0.8, // Slightly smaller
             y: 0, // Optional: slightly offset inactive items
             marginLeft: 0,
 
@@ -339,7 +354,15 @@ export default function MobileContentWelcome({
                 animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '-100%', opacity: 0 }}
                 transition={{ delay: 0, type: 'spring', stiffness: 80, damping: 15 }} // Base delay removed, controlled by startUIAnimations
             >
-                <IconNewWhite className='size-16 rounded-2xl' />
+                <div className='-ml-2 flex flex-col items-center justify-start'>
+                    <IconNewWhite className='size-18 rounded-2xl' />
+                    <div className='pointer-events-auto -mt-4 flex flex-row items-center justify-start gap-1 rounded-sm px-2 text-xs font-bold text-white drop-shadow-2xl'>
+                        <span>Backed by </span>
+                        <span className='flex size-3 items-center justify-center bg-[#f26522] text-[8px] font-bold'>
+                            Y
+                        </span>
+                    </div>
+                </div>
                 <Link href='/auth/phone-login' className='pointer-events-auto'>
                     <div className='cursor-pointer rounded-full bg-[#5AA6DA]/20 px-6 py-2 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/20'>
                         Login
@@ -349,7 +372,7 @@ export default function MobileContentWelcome({
 
             {/* Middle Content (YC, Title, Subtitle) - Animates from Bottom */}
             <motion.div
-                className='fixed inset-x-[5%] top-[40%] z-30 flex h-fit flex-1 translate-y-[-50%] flex-col items-center justify-center gap-4 rounded-xl px-4 py-6 text-center'
+                className='fixed inset-x-[5%] top-[32%] z-30 flex h-fit flex-1 translate-y-[-50%] flex-col items-center justify-center gap-4 rounded-xl px-4 py-6 text-center'
                 initial={{ y: '100vh', opacity: 0 }} // Start from bottom of viewport
                 animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '100vh', opacity: 0 }}
                 transition={{
@@ -358,27 +381,19 @@ export default function MobileContentWelcome({
                     stiffness: 70,
                     damping: 18
                 }}>
-                <div className='pointer-events-auto flex flex-row items-center justify-start gap-2 rounded-sm px-2 text-sm font-bold text-white'>
-                    <span>Backed by </span>
-                    <span className='flex size-5 items-center justify-center bg-[#f26522] text-[12px] font-bold'>
-                        Y
-                    </span>
-                    <span>Combinator</span>
-                </div>
                 <h1 className='text-figtree font-bolder mx-auto max-w-[650px] text-[48px] leading-[38px] tracking-tighter text-white drop-shadow-lg'>
-                    Smart travelers don't overpay
+                    Big Travel hates this app.
                 </h1>
                 <h2
-                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-[16px] leading-normal font-bold font-medium text-white'
+                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-[16px] leading-normal font-bold text-white'
                     style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.5)' }}>
-                    Ascend watches your bookings and gets you money back when <b>Big Travel</b> drops prices. Get
-                    started in 3 steps.
+                    Other travel sites keep your money when prices drop. We think that's wrong.
                 </h2>
             </motion.div>
 
             {/* Bottom Steps - Container animates in, items inside have dynamic styles */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 bottom-[20%] z-40 flex flex-col items-center justify-center text-sm font-semibold text-white' // Adjusted bottom positioning slightly
+                className='pointer-events-auto fixed inset-x-0 bottom-[23%] z-40 flex flex-col items-center justify-center text-sm font-semibold text-white'
                 initial={{ opacity: 0, y: 50 }} // Container slides up and fades in
                 animate={startUIAnimations ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{
@@ -387,6 +402,11 @@ export default function MobileContentWelcome({
                     stiffness: 60,
                     damping: 18
                 }}>
+                <h2
+                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-center text-[16px] leading-normal font-bold text-white/80'
+                    style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.5)' }}>
+                    Let's get your money back (no matter where you booked).
+                </h2>
                 <div className='-ml-12 flex w-[calc(100%-20%)] flex-col items-stretch justify-center rounded-xl'>
                     {cyclingStepsData.map((step, index) => (
                         <motion.div
@@ -396,8 +416,17 @@ export default function MobileContentWelcome({
                             className='flex flex-row items-center gap-3 rounded-md p-1' // Basic styling for each row
                             // Add transition prop here if needed, or rely on variant transition
                         >
-                            <span className='text-xl'>{step.icon}</span>
-                            <div className='font-bolder text-sm text-nowrap'>{step.text}</div>
+                            <span className='text-2xl'>{cyclingStepsData[index].icon}</span>
+                            <div className='flex flex-col text-left'>
+                                {' '}
+                                {/* Allow text to wrap if needed */}
+                                <span className='font-bolder text-[12px] drop-shadow-lg'>
+                                    {cyclingStepsData[index].text}
+                                </span>
+                                {cyclingStepsData[index].subtext && (
+                                    <span className='text-[12px] opacity-80'>{cyclingStepsData[index].subtext}</span>
+                                )}
+                            </div>
                         </motion.div>
                     ))}
                 </div>
