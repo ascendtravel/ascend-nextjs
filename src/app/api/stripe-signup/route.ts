@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        const { state_id } = await request.json();
+        const { state_id, referral_code } = await request.json();
 
         if (!state_id) {
             console.error('Missing state_id in request body');
@@ -21,7 +21,8 @@ export async function POST(request: Request) {
             },
             body: JSON.stringify({
                 state_id,
-                live_mode: true
+                live_mode: true,
+                ...(referral_code ? { referral_code } : {})
             })
         });
 
