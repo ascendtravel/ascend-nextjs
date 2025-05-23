@@ -28,11 +28,21 @@ export default function DesktopLeftContentMembership() {
                 return;
             }
 
+            // fetch referral code from local storage if present and clear it + send to BE stripe link builder api
+            const referral_code = localStorage.getItem('referral_code');
+            if (referral_code) {
+                localStorage.removeItem('referral_code');
+            }
+            const stripe_signup_request_body = {
+                state_id,
+                ...(referral_code ? { referral_code } : {})
+            };
+
             try {
                 const response = await fetch('/api/stripe-signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ state_id })
+                    body: JSON.stringify(stripe_signup_request_body)
                 });
 
                 const data = await response.json();
