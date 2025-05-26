@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,10 +13,13 @@ import { cn } from '@/lib/utils';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../../_types';
 import { motion } from 'framer-motion';
+import Cookies from 'js-cookie';
 
 export default function DesktopLeftContentGmailLink() {
     const searchParams = useSearchParams();
     const state_id = searchParams.get('state_id');
+    const [isLoading, setIsLoading] = useState(true);
+    const [localStateId, setLocalStateId] = useState<string | null>(null);
 
     const isLinkFailure = searchParams.get(LINK_FAILURE_PARAM) === 'true';
     const isPermissionsFailure = searchParams.get(PERMISSIONS_FAILURE_PARAM) === 'true';
@@ -59,6 +62,70 @@ export default function DesktopLeftContentGmailLink() {
         }
     };
 
+    const getUtmParams = useCallback(() => {
+        const utmParams = new URLSearchParams();
+        const utmParamsObject: { [key: string]: string } = {};
+
+        searchParams.forEach((value, key) => {
+            if (key.startsWith('utm_')) {
+                utmParams.append(key, value);
+            }
+        });
+
+        const utmParamsString = utmParams.toString();
+        const utmParamsArray = utmParamsString.split('&');
+
+        utmParamsArray.forEach((param) => {
+            if (param) {
+                const [key, value] = param.split('=');
+                if (key) {
+                    utmParamsObject[key] = value;
+                }
+            }
+        });
+        console.log(utmParamsObject);
+
+        return utmParamsObject;
+    }, [searchParams]);
+
+    const getStateId = useCallback(async () => {
+        try {
+            const fbp = Cookies.get('_fbp');
+            const fbc = Cookies.get('_fbc');
+
+            // save referral code to local storage
+
+            const utmParams = getUtmParams();
+            setIsLoading(true);
+
+            const response = await fetch('/api/gmail/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...(fbp ? { fbp } : {}),
+                    ...(fbc ? { fbc } : {}),
+                    ...(Object.keys(utmParams).length > 0 ? { utm_params: utmParams } : {})
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to get state ID');
+            const data = await response.json();
+            setLocalStateId(data.state_id);
+        } catch (err) {
+            setLocalStateId(null); // Clear stateId on error
+        } finally {
+            setIsLoading(false);
+        }
+    }, [getUtmParams]);
+
+    useEffect(() => {
+        if (!state_id && !localStateId) {
+            getStateId();
+        } else if (state_id) {
+            setIsLoading(false);
+        }
+    }, [state_id, localStateId]);
+
     return (
         <div className='relative z-10 flex w-1/2 items-center justify-start rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] px-[2%] py-8 pl-14 backdrop-blur-md'>
             <div className='flex h-full flex-col items-center justify-between gap-4'>
@@ -86,7 +153,7 @@ export default function DesktopLeftContentGmailLink() {
                             <OnboardingGmailCheckCta />
                         </div>
 
-                        <Link href={`https://gmail.heyascend.com/gmail/import/start/${state_id || ''}`}>
+                        <Link href={`https://gmail.heyascend.com/gmail/import/start/${state_id || localStateId || ''}`}>
                             <div
                                 onClick={() => {
                                     trackLuckyOrangeEvent(EventLists.gmail_layover.name, {

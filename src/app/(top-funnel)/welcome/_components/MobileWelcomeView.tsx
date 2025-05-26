@@ -9,6 +9,7 @@ import { YcombBanner } from '@/components/YcombBanner/YcombBanner';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../_types';
+import { REFERRAL_CODE_KEY, popReferralCode, pushReferralCode } from '../_utils/onboarding.ultis';
 import GoogleWhiteIcon from './GoogleWhiteIcon';
 import MobileContentGmailLink from './MobileContentSteps/MobileContentGmailLink';
 import MobileContentMembership from './MobileContentSteps/MobileContentMembership';
@@ -63,10 +64,8 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
             const fbp = Cookies.get('_fbp');
             const fbc = Cookies.get('_fbc');
 
-            const referral_code = searchParams.get('referral_code');
-            if (referral_code) {
-                localStorage.setItem('referral_code', referral_code);
-            }
+            // save referral code to local storage
+            pushReferralCode(searchParams.get(REFERRAL_CODE_KEY));
 
             const utmParams = getUtmParams();
 
@@ -234,11 +233,19 @@ const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNe
                 return;
             }
 
+            // fetch referral code from local storage if present and clear it + send to BE stripe link builder api
+            const referral_code = popReferralCode();
+
+            const stripe_signup_request_body = {
+                state_id,
+                ...(referral_code ? { referral_code } : {})
+            };
+
             try {
                 const response = await fetch('/api/stripe-signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ state_id })
+                    body: JSON.stringify(stripe_signup_request_body)
                 });
 
                 const data = await response.json();
