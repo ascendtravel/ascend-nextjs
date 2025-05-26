@@ -502,12 +502,6 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
         return [];
     };
 
-    useEffect(() => {
-        trackLuckyOrangeEvent(EventLists.takeoff.name, {
-            description: EventLists.takeoff.description
-        });
-    }, []);
-
     return (
         <div className='md:hidden'>
             {currentStep === OnboardingSteps.Step4 && showWelcome && (
