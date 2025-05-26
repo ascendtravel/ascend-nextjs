@@ -105,20 +105,19 @@ export default function DesktopLeftContentMembership() {
                     variants={contentVariants}
                     initial='hidden'
                     animate='visible'>
-                    <div className='flex w-full flex-col items-center justify-start px-6'>
+                    <div className='flex w-full flex-col items-start justify-start px-6'>
                         <div className='w-full max-w-lg'>
                             <div className='flex flex-col items-start justify-center gap-4 py-4'>
                                 <p className='font-figtree max-w-md text-[36px] leading-[40px] font-extrabold tracking-[-0.02em] text-white'>
-                                    Ascend works for you, not Big Travel
+                                    Get your money back when travel prices drop.
                                 </p>
                                 <p className='font-figtree mb-4 text-[20px] leading-[30px] font-medium text-white'>
-                                    You get the best deals on travel. We get $25. It's that simple!
+                                    Ascend works for you, not Big Travel.
                                 </p>
                             </div>
 
                             <div className='flex w-full justify-center pb-12'>
                                 <div className='flex w-full flex-col items-start justify-center gap-2 rounded-2xl bg-neutral-50 px-10 py-8'>
-                                    <h2 className='text-2xl font-bold'>Ascend Membership</h2>
                                     <div className='flex flex-row gap-3'>
                                         <div className='flex items-start justify-start gap-1'>
                                             <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
@@ -129,22 +128,22 @@ export default function DesktopLeftContentMembership() {
                                         </div>
                                     </div>
                                     <div className='text-neutral-1000 -mt-1 flex flex-row items-center gap-2 text-sm'>
-                                        <span className='font-semibold'>Less than $2.99 per month</span>
+                                        <span className='font-semibold'> (just $2/month)</span>
                                     </div>
                                     <div className='mt-1' />
                                     <OnboardingMembershipCardRow
                                         title='Flight Refunds'
-                                        description='We get airlines to give you the credits you are entitled to based on their policy.'
+                                        description='We average $64 back per flight, harassing the airline to make sure you get your money back.'
                                     />
                                     <div className='mt-1' />
                                     <OnboardingMembershipCardRow
                                         title='Hotel Refunds'
-                                        description='We rebook you automatically when you could get the same room for less.'
+                                        description='We average $116 back per hotel, rebooking you automatically when you could get the same room for less.'
                                     />
                                     <div className='mt-1' />
                                     <OnboardingMembershipCardRow
-                                        title='Members-Only Deals'
-                                        description="Tell us where you're going, we'll find you the best price."
+                                        title='Book anywhere, no restrictions'
+                                        description='Expedia, Kayak, airline sites. If the price drops, we catch it and you get paid.'
                                     />
                                     <button
                                         onClick={handleStripeSignup}
