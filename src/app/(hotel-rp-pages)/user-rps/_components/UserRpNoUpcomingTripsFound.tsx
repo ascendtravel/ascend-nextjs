@@ -18,7 +18,7 @@ export default function UserRpNoUpcomingTripsFound({ totalSavings = 'more than $
     };
 
     return (
-        <div className='flex w-full flex-col items-center justify-center gap-2 rounded-lg border-t border-gray-200 p-4 pt-8'>
+        <div className='flex w-full flex-col items-center justify-center gap-2 p-4 pt-8'>
             <div className='mb-2 flex items-center justify-center'>
                 <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='none' viewBox='0 0 32 32'>
                     <path

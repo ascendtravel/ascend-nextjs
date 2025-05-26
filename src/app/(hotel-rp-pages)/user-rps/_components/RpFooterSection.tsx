@@ -5,6 +5,7 @@ import { FRAMER_LINKS } from '@/config/navigation';
 
 import { motion } from 'framer-motion';
 import { DockIcon, InfoIcon, LockIcon } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
 
 const Links = [
     {
@@ -25,9 +26,10 @@ const Links = [
 ];
 
 export default function RpFooterSection() {
+    const { user } = useUser();
     return (
         <motion.div
-            className='mt-6 w-full pb-2'
+            className='mt-6 w-full pb-2 text-neutral-50'
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -35,23 +37,29 @@ export default function RpFooterSection() {
                 delay: 0.2,
                 ease: 'easeOut'
             }}>
-            <div className='mb-1 pl-4 text-sm font-bold'>More</div>
-            <Separator />
-            <div className='ml-6 flex flex-col items-center justify-center gap-2 pt-2'>
+            <div className='mb-1 text-xs font-semibold text-[#FFFFFFCC'>MORE</div>
+            <div className='flex flex-col items-center justify-center gap-2 pt-2'>
                 {Links.map((link, index) => (
                     <React.Fragment key={link.title}>
                         <a
                             href={link.href}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='flex w-full flex-row items-start justify-start gap-2 py-1 text-xs'>
+                            className='flex w-full flex-row items-start justify-start gap-2 py-2 text-md'>
                             <link.Icon className='h-4 w-4' />
-                            <div className='font-bold'>{link.title}</div>
+                            <div className='font-medium'>{link.title}</div>
                         </a>
-                        {index !== Links.length - 1 && <Separator />}
+                        <Separator className='bg-[#FFFFFF0D]' />
                     </React.Fragment>
                 ))}
             </div>
+            {
+                !!user?.main_email && (
+                    <div className='pt-8 pb-2'>
+                        <span className='text-sm'>Your unique email for forwarding missing trips is <strong>{user?.main_email}</strong></span>
+                    </div>
+                )
+            }
         </motion.div>
     );
 }

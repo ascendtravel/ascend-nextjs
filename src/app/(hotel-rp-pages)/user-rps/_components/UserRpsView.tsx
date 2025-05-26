@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 
 import { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
-import { useTripsRp } from '@/contexts/TripsRpContext';
+import { TripYear, useTripsRp } from '@/contexts/TripsRpContext';
 import { getCurrencyAndAmountText } from '@/lib/money';
 import { cn } from '@/lib/utils';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import AddTripCard from './AddTripCard';
 import { FlightSegmentBasic } from './FlightMap';
@@ -126,118 +127,123 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                 />
             )}
             {/* <UserRpsView /> */}
-            <div className='relative -mt-2 h-[260px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
+            <div className='relative -mt-2 h-[300px] w-full overflow-hidden rounded-t-xl md:h-[350px]'>
                 {/* {JSON.stringify(flightSegments)} */}
                 <RpMap hotels={hotelsMapDetails} flightSegments={flightSegments} showResetBtn={false} />
             </div>
-            <AnimatePresence>
-                {!selectedTrip && (
-                    <motion.div
-                        className='relative -mt-20 flex w-full flex-row items-center justify-start overflow-x-auto rounded-t-xl bg-neutral-50/50 px-4 pt-2 pb-4'
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{
-                            duration: 0.3,
-                            ease: 'easeInOut'
-                        }}>
-                        <div
-                            className={cn('flex flex-row items-center justify-start gap-2', {
-                                'overflow-x-auto pb-2': filteredTrips.length > 3
-                            })}>
-                            {allYears.map((year, index) => (
-                                <React.Fragment key={`${year} + ${index}`}>
+            <div className='px-2 bg-gradient-to-b from-[#0F77C1] to-[#4994C9] rounded-t-xl relative z-2'>
+                <AnimatePresence>
+                    {!selectedTrip && (
+                        <motion.div
+                            className='relative -mt-20 flex w-full flex-row items-center justify-start overflow-x-auto  pt-1 pb-3'
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{
+                                duration: 0.3,
+                                ease: 'easeInOut'
+                            }}>
+                            <Tabs 
+                                defaultValue={selectedYear.toString()} 
+                                onValueChange={(value) => {
+                                    // Convert numeric strings to numbers, leave special values as strings
+                                    const yearValue = !isNaN(Number(value)) ? Number(value) : value;
+                                    setSelectedYear(yearValue as TripYear);
+                                }}
+                            >
+                                <TabsList className='bg-transparent'>
+                                    {allYears.map((year, index) => (
+                                        <TabsTrigger 
+                                            key={`${year}-${index}`}
+                                            value={year.toString()}
+                                        >
+                                            {year}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+                            </Tabs>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <div className='relative -mt-2 w-full'>
+                    <div className='bg-neutral-50 rounded-xl rounded-tl-none border border-gray-200 px-2'>
+                        {/* Update no trips messaging */}
+                        {filteredTrips.length === 0 && selectedYear === 'Upcoming' && (
+                            <UserRpNoUpcomingTripsFound totalSavings='more than $500' />
+                        )}
+
+                        {filteredTrips.length === 0 && selectedYear !== 'Upcoming' && <UserRpNoTripsCard />}
+
+                        <div className='grid w-full grid-cols-2 gap-2 py-4 md:gap-8'>
+                            {!showSpecificTrip ? (
+                                <AnimatePresence>
+                                    {filteredTrips.map((trip, index) => (
+                                        <motion.div
+                                            key={`${trip.id} + ${index}`}
+                                            initial={{ opacity: 1, x: 0 }}
+                                            animate={{
+                                                opacity: selectedTrip ? 0 : 1,
+                                                x: selectedTrip ? (index % 2 === 0 ? -100 : 100) : 0
+                                            }}
+                                            transition={{ duration: 0.5 }}
+                                            onClick={() => handleTripClick(trip)}>
+                                            {trip.type === 'flight' ? (
+                                                <div
+                                                    className={`w-full ${
+                                                        index % 2 === 0 ? 'flex flex-row justify-end' : 'flex flex-row'
+                                                    }`}>
+                                                    <RpGridCardWrapper trip={trip}>
+                                                        <FlightTripRpGridCard
+                                                            trip={trip as Booking & { type: 'flight'; payload: FlightPayload }}
+                                                        />
+                                                    </RpGridCardWrapper>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={`w-full ${
+                                                        index % 2 === 1
+                                                            ? 'flex flex-row justify-start'
+                                                            : 'flex flex-row-reverse'
+                                                    }`}>
+                                                    <RpGridCardWrapper trip={trip}>
+                                                        <HotelStayRPGridCard
+                                                            trip={trip as Booking & { type: 'hotel'; payload: HotelPayload }}
+                                                        />
+                                                    </RpGridCardWrapper>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                    {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />}
                                     <div
-                                        onClick={() => setSelectedYear(year)}
-                                        className={`flex w-fit cursor-pointer justify-center px-4 py-2 ${
-                                            selectedYear === year
-                                                ? 'rounded-full bg-[#1DC167] text-neutral-50'
-                                                : 'font-semibold'
-                                        }`}>
-                                        {year}
+                                        className={cn('flex w-full cursor-pointer', {
+                                            hidden: filteredTrips.length === 0,
+                                            'justify-start pr-2': filteredTrips.length % 2 === 1,
+                                            'justify-start': filteredTrips.length % 2 === 0
+                                        })}>
+                                        <AddTripCard />
                                     </div>
-                                </React.Fragment>
-                            ))}
+                                </AnimatePresence>
+                            ) : null}
                         </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-            <div className='relative -mt-2 w-full rounded-t-xl bg-neutral-50'>
-                {/* Update no trips messaging */}
-                {filteredTrips.length === 0 && selectedYear === 'Upcoming' && (
-                    <UserRpNoUpcomingTripsFound totalSavings='more than $500' />
-                )}
 
-                {filteredTrips.length === 0 && selectedYear !== 'Upcoming' && <UserRpNoTripsCard />}
+                        {showSpecificTrip && (
+                            <UserRpSpecificTripSelectedView
+                                handleBackClick={() => {
+                                    setShowSpecificTrip(false);
+                                    setSelectedTrip(null);
+                                    setFlightSegments([]);
+                                    setHotelsMapDetails([]);
+                                    setShowConfetti(false);
+                                }}
+                                trip={selectedTrip || undefined}
+                            />
+                        )}
+                    </div>
 
-                <div className='grid w-full grid-cols-2 gap-2 pt-8 md:gap-8'>
-                    {!showSpecificTrip ? (
-                        <AnimatePresence>
-                            {filteredTrips.map((trip, index) => (
-                                <motion.div
-                                    key={`${trip.id} + ${index}`}
-                                    initial={{ opacity: 1, x: 0 }}
-                                    animate={{
-                                        opacity: selectedTrip ? 0 : 1,
-                                        x: selectedTrip ? (index % 2 === 0 ? -100 : 100) : 0
-                                    }}
-                                    transition={{ duration: 0.5 }}
-                                    onClick={() => handleTripClick(trip)}>
-                                    {trip.type === 'flight' ? (
-                                        <div
-                                            className={`w-full ${
-                                                index % 2 === 0 ? 'flex flex-row justify-end' : 'flex flex-row'
-                                            }`}>
-                                            <RpGridCardWrapper trip={trip}>
-                                                <FlightTripRpGridCard
-                                                    trip={trip as Booking & { type: 'flight'; payload: FlightPayload }}
-                                                />
-                                            </RpGridCardWrapper>
-                                        </div>
-                                    ) : (
-                                        <div
-                                            className={`w-full ${
-                                                index % 2 === 1
-                                                    ? 'flex flex-row justify-start'
-                                                    : 'flex flex-row-reverse'
-                                            }`}>
-                                            <RpGridCardWrapper trip={trip}>
-                                                <HotelStayRPGridCard
-                                                    trip={trip as Booking & { type: 'hotel'; payload: HotelPayload }}
-                                                />
-                                            </RpGridCardWrapper>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            ))}
-                            {filteredTrips.length % 2 === 0 && <div key='spacer-div' className='h-full w-full' />}
-                            <div
-                                className={cn('flex w-full cursor-pointer', {
-                                    hidden: filteredTrips.length === 0,
-                                    'justify-start pr-2': filteredTrips.length % 2 === 1,
-                                    'justify-start': filteredTrips.length % 2 === 0
-                                })}>
-                                <AddTripCard />
-                            </div>
-                        </AnimatePresence>
-                    ) : null}
-                </div>
-
-                {showSpecificTrip && (
-                    <UserRpSpecificTripSelectedView
-                        handleBackClick={() => {
-                            setShowSpecificTrip(false);
-                            setSelectedTrip(null);
-                            setFlightSegments([]);
-                            setHotelsMapDetails([]);
-                            setShowConfetti(false);
-                        }}
-                        trip={selectedTrip || undefined}
-                    />
-                )}
-
-                <div className='relative mt-2 h-full w-full bg-neutral-50'>
-                    <RpFooterSection />
+                    <div className='relative mt-2 h-full w-full px-2'>
+                        <RpFooterSection />
+                    </div>
                 </div>
             </div>
         </div>
