@@ -1,13 +1,13 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { Booking, FlightPayload, HotelPayload } from '@/app/api/rp-trips/route';
 
 import { useUser } from './UserContext';
 import { isFuture, parseISO } from 'date-fns';
 
-export type TripYear = number | 'Upcoming';
+export type TripYear = number | 'Upcoming' | 'Past Years';
 
 // Add helper for checking upcoming trips
 const isTripUpcoming = (trip: Booking) => {
@@ -70,16 +70,25 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     const { getToken, getImpersonateUserId } = useUser();
     const [allYears, setAllYears] = useState<TripYear[]>([]);
 
+    const years = useMemo(() => {
+        return [...new Set(trips.map((trip) => getDate(trip).getFullYear()))];
+    }, [trips]);
+
     // Filter trips based on selected year
     useEffect(() => {
         let filtered = [...trips];
 
         if (selectedYear === 'Upcoming') {
             filtered = filtered.filter(isTripUpcoming);
+        } else if (selectedYear === 'Past Years') {
+            const maxYear = Math.max(...years);
+            filtered = filtered.filter((trip) => {
+                const tripDate = getDate(trip);
+                return tripDate.getFullYear() < maxYear;
+            });
         } else {
             filtered = filtered.filter((trip) => {
                 const tripDate = getDate(trip);
-
                 return tripDate.getFullYear() === selectedYear;
             });
         }
@@ -87,7 +96,7 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
         // Sort filtered trips
         const sortedFiltered = sortTrips(filtered);
         setFilteredTrips(sortedFiltered);
-    }, [selectedYear, trips]);
+    }, [selectedYear, trips, years]);
 
     // When trips are fetched, sort them immediately
     const fetchTrips = async () => {
@@ -141,9 +150,16 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
     };
 
     const fillYears = () => {
-        // Should be upcoming tips and then all the years we have trips for
-        const years = [...new Set(trips.map((trip) => getDate(trip).getFullYear()))];
-        setAllYears(['Upcoming', ...years.reverse()]);
+        // Get unique years from trips and find the most recent year
+        const maxYear = Math.max(...years);
+
+        if (years.length > 1) {
+            setAllYears(['Upcoming', maxYear, 'Past Years']);
+        } else if (years.length === 1) {
+            setAllYears(['Upcoming', years[0]]);
+        } else {
+            setAllYears(['Upcoming']);
+        }
     };
 
     if (initialTrips && allYears.length === 0) {
