@@ -106,7 +106,7 @@ export default function DesktopLeftContentMembership() {
                     variants={contentVariants}
                     initial='hidden'
                     animate='visible'>
-                    <div className='flex w-full flex-col items-center justify-start px-6'>
+                    <div className='flex w-full flex-col items-start justify-start px-6'>
                         <div className='w-full max-w-lg'>
                             <div className='flex flex-col items-start justify-center gap-4 py-4'>
                                 <p className='font-figtree max-w-md text-[36px] leading-[40px] font-extrabold tracking-[-0.02em] text-white'>
@@ -144,7 +144,7 @@ export default function DesktopLeftContentMembership() {
                                     <div className='mt-1' />
                                     <OnboardingMembershipCardRow
                                         title='Book anywhere, no restrictions'
-                                        description="Expedia, Kayak, airline sites. If the price drops, we catch it and you get paid."
+                                        description='Expedia, Kayak, airline sites. If the price drops, we catch it and you get paid.'
                                     />
                                     <button
                                         onClick={handleStripeSignup}
