@@ -9,6 +9,7 @@ import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { FRAMER_LINKS } from '@/config/navigation';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
+import { REFERRAL_CODE_KEY, pushReferralCode } from '../../_utils/onboarding.ultis';
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import Cookies from 'js-cookie';
@@ -71,10 +72,7 @@ export default function DesktopLeftContentWelcome() {
                 const fbp = Cookies.get('_fbp');
                 const fbc = Cookies.get('_fbc');
 
-                const referral_code = searchParams.get('referral_code');
-                if (referral_code) {
-                    localStorage.setItem('referral_code', referral_code);
-                }
+                pushReferralCode(searchParams.get(REFERRAL_CODE_KEY));
 
                 const utmParams = getUtmParams();
                 const response = await fetch('/api/gmail/state', {

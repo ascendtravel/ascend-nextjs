@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 import { OnboardingSteps } from '../../_types';
+import { popReferralCode } from '../../_utils/onboarding.ultis';
 import OnboardingStepper from '../OnboardingStepper';
 import { motion } from 'framer-motion';
 
@@ -29,10 +30,8 @@ export default function DesktopLeftContentMembership() {
             }
 
             // fetch referral code from local storage if present and clear it + send to BE stripe link builder api
-            const referral_code = localStorage.getItem('referral_code');
-            if (referral_code) {
-                localStorage.removeItem('referral_code');
-            }
+            const referral_code = popReferralCode();
+
             const stripe_signup_request_body = {
                 state_id,
                 ...(referral_code ? { referral_code } : {})

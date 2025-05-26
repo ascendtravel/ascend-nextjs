@@ -52,60 +52,6 @@ export default function MobileContentMembership() {
         setOpenStates(getOpenStates());
     }, [getOpenStates]);
 
-    useEffect(() => {
-        async function getStripeUrl() {
-            if (!state_id) {
-                setError('Please contact hey@ascend.travel for assistance');
-                setIsLoading(false);
-
-                return;
-            }
-
-            // fetch referral code from local storage if present and clear it + send to BE stripe link builder api
-            const referral_code = localStorage.getItem('referral_code');
-            if (referral_code) {
-                localStorage.removeItem('referral_code');
-            }
-            const stripe_signup_request_body = {
-                state_id,
-                ...(referral_code ? { referral_code } : {})
-            };
-
-            try {
-                const response = await fetch('/api/stripe-signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(stripe_signup_request_body)
-                });
-
-                const data = await response.json();
-
-                if (data?.signup_link_code) {
-                    setStripeUrl(`https://payments.heyascend.com/${data.signup_link_code}`);
-                } else {
-                    setError('Please contact hey@ascend.travel for assistance');
-                }
-            } catch (err) {
-                console.error('Error getting Stripe signup URL:', err);
-                setError('Please contact hey@ascend.travel for assistance');
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        if (state_id) {
-            getStripeUrl();
-        } else {
-            setIsLoading(false);
-        }
-    }, [state_id]);
-
-    const handleStripeSignup = () => {
-        if (stripeUrl) {
-            window.location.href = stripeUrl;
-        }
-    };
-
     return (
         <div className='flex h-screen w-full flex-col items-center justify-start bg-gradient-to-t from-[#5AA6DA] from-0% via-[#006DBC] via-[22.5%] to-[#006DBC] pt-20 sm:pt-36'>
             {/* Scrollable content area */}
