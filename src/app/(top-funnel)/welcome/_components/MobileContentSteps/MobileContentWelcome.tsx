@@ -46,7 +46,7 @@ const SLOW_ROTATION_SPEED = 0.16;
 
 // Animation delays for floating content
 const UI_ANIMATION_BASE_DELAY_MS = 700;
-const UI_ANIMATION_STAGGER_MS = 200;
+const UI_ANIMATION_STAGGER_MS = 400;
 
 // Data for the cycling steps - MOVED TO MODULE SCOPE
 const cyclingStepsData = [
@@ -69,7 +69,7 @@ const cyclingStepsData = [
         subtext: 'Automatic refunds when prices drop for just $25/year.'
     }
 ];
-const CYCLE_STEP_INTERVAL_MS = 4000; // Change step every 4 seconds
+const CYCLE_STEP_INTERVAL_MS = 3000; // Change step every 3 seconds
 
 interface Airport {
     airportId: string;
@@ -320,27 +320,30 @@ export default function MobileContentWelcome({
                 onAnimationComplete={onGlobeFadeInComplete} // Trigger UI animations after fade-in
             >
                 {globeWidth > 0 && globeHeight > 0 && (
-                    <Globe
-                        ref={globeRef}
-                        width={globeWidth}
-                        height={globeHeight}
-                        globeImageUrl='/earth-day-low-res.jpg' // Ensure this path is correct
-                        backgroundColor='#0B74C0'
-                        onGlobeReady={handleGlobeReady}
-                        atmosphereColor='lightblue'
-                        atmosphereAltitude={0.25}
-                        arcsData={routes}
-                        arcStartLat={(d: any) => +d.srcAirport!.lat}
-                        arcStartLng={(d: any) => +d.srcAirport!.lng}
-                        arcEndLat={(d: any) => +d.dstAirport!.lat}
-                        arcEndLng={(d: any) => +d.dstAirport!.lng}
-                        arcDashLength={0.25}
-                        arcDashGap={1}
-                        arcDashInitialGap={() => Math.random()}
-                        arcDashAnimateTime={4000}
-                        arcColor={(d: any) => [`rgba(0, 255, 0, ${ARC_OPACITY})`, `rgba(255, 0, 0, ${ARC_OPACITY})`]}
-                        arcsTransitionDuration={0}
-                    />
+                    <>
+                        <Globe
+                            ref={globeRef}
+                            width={globeWidth}
+                            height={globeHeight}
+                            globeImageUrl='/earth-day-low-res.jpg' // Ensure this path is correct
+                            backgroundColor='#0B74C0'
+                            onGlobeReady={handleGlobeReady}
+                            atmosphereColor='lightblue'
+                            atmosphereAltitude={0.25}
+                            arcsData={routes}
+                            arcStartLat={(d: any) => +d.srcAirport!.lat}
+                            arcStartLng={(d: any) => +d.srcAirport!.lng}
+                            arcEndLat={(d: any) => +d.dstAirport!.lat}
+                            arcEndLng={(d: any) => +d.dstAirport!.lng}
+                            arcDashLength={0.25}
+                            arcDashGap={1}
+                            arcDashInitialGap={() => Math.random()}
+                            arcDashAnimateTime={4000}
+                            arcColor={(d: any) => [`rgba(0, 255, 0, ${ARC_OPACITY})`, `rgba(255, 0, 0, ${ARC_OPACITY})`]}
+                            arcsTransitionDuration={0}
+                        />
+                        <div className='absolute inset-0 z-10 bg-[#00000077] pointer-events-none' />
+                    </>
                 )}
             </motion.div>
 
@@ -356,15 +359,9 @@ export default function MobileContentWelcome({
             >
                 <div className='-ml-2 flex flex-col items-center justify-start'>
                     <IconNewWhite className='size-18 rounded-2xl' />
-                    <div className='pointer-events-auto -mt-4 flex flex-row items-center justify-start gap-1 rounded-sm px-2 text-xs font-bold text-white drop-shadow-2xl'>
-                        <span>Backed by </span>
-                        <span className='flex size-3 items-center justify-center bg-[#f26522] text-[8px] font-bold'>
-                            Y
-                        </span>
-                    </div>
                 </div>
                 <Link href='/auth/phone-login' className='pointer-events-auto'>
-                    <div className='cursor-pointer rounded-full bg-[#5AA6DA]/20 px-6 py-2 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/20'>
+                    <div className='cursor-pointer rounded-full px-6 py-2 text-base font-semibold text-white hover:bg-white/20'>
                         Login
                     </div>
                 </Link>
@@ -381,12 +378,16 @@ export default function MobileContentWelcome({
                     stiffness: 70,
                     damping: 18
                 }}>
-                <h1 className='text-figtree font-bolder mx-auto max-w-[650px] text-[48px] leading-[38px] tracking-tighter text-white drop-shadow-lg'>
-                    Big Travel <br /> hates this app.
+                <div className='pointer-events-auto -mt-4 flex flex-row items-center justify-start gap-1 rounded-sm px-2 text-xs font-bold text-white drop-shadow-2xl'>
+                    <span>Backed by </span>
+                    <span className='flex size-3 items-center justify-center bg-[#f26522] text-[10px] font-bold'>
+                        Y
+                    </span>
+                </div>
+                <h1 className='text-figtree font-extrabold mx-auto max-w-[650px] text-[40px] leading-[34px] tracking-tighter text-white drop-shadow-lg'>
+                    Big travel <br /> hates this app.
                 </h1>
-                <h2
-                    className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-[16px] leading-normal font-bold text-white'
-                    style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.5)' }}>
+                <h2 className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-sm leading-normal font-medium text-white'>
                     Other travel sites keep your money when prices drop. We think that's wrong.
                 </h2>
             </motion.div>
@@ -402,11 +403,6 @@ export default function MobileContentWelcome({
                     stiffness: 60,
                     damping: 18
                 }}>
-                <h2
-                    className='text-figtree absolute -top-13 mx-auto w-[calc(100%-12%)] rounded-xl px-4 text-left text-[16px] leading-normal font-bold text-white/80'
-                    style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.5)' }}>
-                    Let's get your money back (no matter where you booked).
-                </h2>
                 <div className='-ml-8 flex w-[calc(100%-12%)] flex-col items-stretch justify-center rounded-xl'>
                     {cyclingStepsData.map((step, index) => (
                         <motion.div

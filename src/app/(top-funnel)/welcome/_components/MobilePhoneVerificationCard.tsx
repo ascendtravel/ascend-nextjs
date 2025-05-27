@@ -248,7 +248,7 @@ export default function MobilePhoneVerificationCard({
                             </div>
                             <Button
                                 type='submit'
-                                className='text-md w-full rounded-full bg-[#1DC167] py-6 font-semibold'
+                                className='text-md w-full rounded-full bg-[#17AA59] py-6 font-semibold'
                                 disabled={isLoading || cooldown > 0}>
                                 {isLoading
                                     ? 'Sending...'
