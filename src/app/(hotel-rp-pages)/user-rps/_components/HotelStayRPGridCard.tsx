@@ -1,5 +1,7 @@
 'use client';
 
+import OnboardingMembershipCheckSvg from '@/app/(top-funnel)/welcome/_components/OnboardingMembershipCheckSvg';
+import WelcomeGreenBedIcon from '@/app/(top-funnel)/welcome/_components/WelcomeGreenBedIcon';
 import { Booking, HotelPayload } from '@/app/api/rp-trips/route';
 import { formatDateNoTZ } from '@/lib/date-formatters';
 
@@ -9,6 +11,14 @@ interface HotelStayRPGridCardProps {
     trip: Booking & { type: 'hotel'; payload: HotelPayload };
 }
 
+
+const _parseDate = (dateString: string): string => {
+    const parsed = formatDateNoTZ(dateString).split(',')[0];
+    const date = parsed.split(' ');
+    const dd = date[1].length === 1 ? `0${date[1]}` : date[1];
+    
+return `${date[0]} ${dd}`;
+}
 export default function HotelStayRPGridCard({ trip }: HotelStayRPGridCardProps) {
     const hasSavings = (trip.payload.potential_savings_cents?.amount ?? 0) > 0;
 
@@ -16,15 +26,21 @@ export default function HotelStayRPGridCard({ trip }: HotelStayRPGridCardProps) 
         <div className='absolute bottom-0 left-0 flex w-full flex-col p-2 text-neutral-50 shadow-sm'>
             <div className='flex flex-1 flex-col justify-between p-2'>
                 <div className='flex flex-col items-start justify-start'>
-                    <span className='relative flex flex-row items-center justify-start gap-1 text-sm font-semibold'>
+                    <WelcomeGreenBedIcon size={20} />
+                    <span className='font-semibold mt-2' style={{ lineHeight: '1.2', marginBottom: '4px', fontWeight: '700' }}>
                         {trip.payload.hotel_name}
-                        {hasSavings && <DotIcon className='absolute -right-6 -bottom-1.5 z-50 size-8 text-[#1DC167]' />}
+                        {hasSavings && <span style={{
+                            display: 'inline-block',
+                            backgroundColor: '#1DC167',
+                            borderRadius: '100%',
+                            marginLeft: '6px',
+                            marginBottom: '3px',
+                            width: '7px',
+                            height: '7px',
+                            content: "-",
+                        }}></span>}
                     </span>
-                    <div className='text-xs text-neutral-300'>{formatDateNoTZ(trip.payload.check_in_date)} </div>
-                </div>
-                <div className='flex items-center justify-start gap-2'>
-                    <MapPinIcon className='h-3 w-3 text-neutral-100' />
-                    <div className='text-xs text-neutral-100'>{trip.payload.city}</div>
+                    <div className='text-xs text-neutral-300'>{_parseDate(trip.payload.check_in_date)} - {_parseDate(trip.payload.check_out_date)}</div>
                 </div>
             </div>
         </div>

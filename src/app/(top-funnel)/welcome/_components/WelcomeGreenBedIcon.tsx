@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-const SvgIcon = () => (
-    <svg xmlns='http://www.w3.org/2000/svg' width='33' height='33' fill='none' viewBox='0 0 33 33'>
+const SvgIcon = ({ size }: { size?: number }) => (
+    <svg xmlns='http://www.w3.org/2000/svg' width={size ?? 33} height={size ?? 33} fill='none' viewBox='0 0 33 33'>
         <rect width='33.001' height='33.001' fill='#1DC167' rx='16.5'></rect>
         <path
             fill='#fff'

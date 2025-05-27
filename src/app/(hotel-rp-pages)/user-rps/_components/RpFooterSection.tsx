@@ -27,7 +27,8 @@ const Links = [
 
 export default function RpFooterSection() {
     const { user } = useUser();
-    return (
+    
+return (
         <motion.div
             className='mt-6 w-full pb-2 text-neutral-50'
             initial={{ opacity: 0, y: 10 }}

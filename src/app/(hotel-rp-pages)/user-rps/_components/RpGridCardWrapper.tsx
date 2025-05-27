@@ -8,6 +8,7 @@ import { PlusIcon } from '@radix-ui/react-icons';
 
 import { isFuture, parseISO } from 'date-fns';
 import { ShieldCheck } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type RpGridCardWrapperProps = {
     children: React.ReactNode;
@@ -51,6 +52,7 @@ export default function RpGridCardWrapper({
         return isFuture(parseISO(date));
     };
 
+
     // Show protection badge only for future trips without current savings
     const shouldShowProtection = trip && isTripInFuture(trip) && !getPotentialSavings(trip) && !getPastSavings(trip);
 
@@ -83,13 +85,15 @@ export default function RpGridCardWrapper({
 
     return (
         <div
-            className={`relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm drop-shadow-xl transition-transform duration-300 hover:rotate-6 ${
-                getPotentialSavings(trip) ? 'border-[#1DC167]' : ''
-            } ${className}`}>
+            className={cn(
+                'relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm drop-shadow-xl transition-transform duration-300 hover:rotate-6',
+                getPotentialSavings(trip) && 'border border-3 border-[#17AA59]',
+                className
+            )}>
             {shouldShowProtection ? (
                 <div className='absolute top-2 left-2 z-50 flex flex-row items-center justify-center gap-2 rounded-full bg-neutral-500 px-2 py-1'>
-                    <ShieldCheck className='size-4 text-[#1DC167]' />
-                    <span className='text-xs font-semibold text-[#1DC167]'>Price drop protection</span>
+                    <ShieldCheck className='size-4 text-[#17AA59]' />
+                    <span className='text-xs font-semibold text-[#17AA59]'>Price drop protection</span>
                 </div>
             ) : shouldShowPastSavings && (
                 <div className='absolute top-2 left-2 z-50 flex flex-row items-center justify-center gap-2 rounded-full bg-neutral-500 px-2 py-1'>
@@ -101,32 +105,50 @@ export default function RpGridCardWrapper({
             {/* <Image src={'https://cataas.com/cat'} alt={getAltText(trip)} fill className='object-cover' /> */}
 
             {/* bottom up shadow to top */}
-            <div className='absolute top-0 right-0 bottom-0 left-0 bg-gradient-to-t from-black from-0% via-black/60 via-25% to-transparent to-100%' />
-            {getPotentialSavings(trip) ? (
-                <div className='absolute inset-x-0 flex h-8 flex-row bg-[#1DC167]'>
-                    <div className='flex w-full items-center justify-center text-xs font-semibold text-white'>
-                        Tap to save{' '}
-                        {getCurrencyAndAmountText(
-                            trip?.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' },
-                            true,
-                            false
-                        )}
+            <div className='absolute top-0 right-0 bottom-0 left-0 bg-gradient-to-t from-black from-15% via-black/30 via-30% to-[#66666600] to-100%' />
+            {(trip?.payload.past_savings_cents?.amount ?? 0) > 0 &&
+                <div className='absolute inset-x-0 flex h-8 flex-row bg-white'>
+                    <div className='flex w-full items-center justify-center text-xs font-semibold text-black'>
+                        <b className='text-bold me-1'>
+                            {getCurrencyAndAmountText(
+                                trip?.payload.past_savings_cents ?? { amount: 0, currency: 'USD' },
+                                true,
+                                false
+                            )}
+                        </b> Saved
                     </div>
-                </div>
-            ) : null}
+                </div>}
+            {
+                getPotentialSavings(trip) && (trip?.payload.past_savings_cents?.amount ?? 0) <= 0 ? (
+                    <div className='absolute inset-x-0 flex h-8 flex-row bg-[#17AA59]'>
+                        <div className='flex w-full items-center justify-center text-xs font-semibold text-white'>
+                            Tap to save{' '}
+                            {getCurrencyAndAmountText(
+                                trip?.payload.potential_savings_cents ?? { amount: 0, currency: 'USD' },
+                                true,
+                                false
+                            )}
+                        </div>
+                    </div>
+                ) : null
+            }
             {!loading && !addItem && children}
-            {loading && (
-                <div className='absolute inset-0 flex items-center justify-center'>
-                    <div className='h-10 w-10 animate-spin rounded-full border-t-2 border-b-2 border-neutral-500' />
-                </div>
-            )}
-            {addItem && (
-                <div className='absolute right-0 bottom-0'>
-                    <div className='flex h-10 w-10 items-center justify-center rounded-full bg-neutral-500'>
-                        <PlusIcon className='h-5 w-5 text-neutral-50' />
+            {
+                loading && (
+                    <div className='absolute inset-0 flex items-center justify-center'>
+                        <div className='h-10 w-10 animate-spin rounded-full border-t-2 border-b-2 border-neutral-500' />
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+            {
+                addItem && (
+                    <div className='absolute right-0 bottom-0'>
+                        <div className='flex h-10 w-10 items-center justify-center rounded-full bg-neutral-500'>
+                            <PlusIcon className='h-5 w-5 text-neutral-50' />
+                        </div>
+                    </div>
+                )
+            }
+        </div >
     );
 }

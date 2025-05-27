@@ -20,5 +20,5 @@ export const getCurrencyAndAmountText = (
         return `$${formatCentAmount(currencyAndAmount.amount, includeDecimals)}`;
     }
 
-    return `${currencyAndAmount.currency} ${formatCentAmount(currencyAndAmount.amount, includeDecimals)}`;
+    return `${currencyAndAmount.currency} $${formatCentAmount(currencyAndAmount.amount, includeDecimals)}`;
 };

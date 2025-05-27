@@ -84,12 +84,14 @@ export function TripsRpProvider({ children, initialTrips }: { children: React.Re
             const maxYear = Math.max(...years);
             filtered = filtered.filter((trip) => {
                 const tripDate = getDate(trip);
-                return tripDate.getFullYear() < maxYear;
+                
+return tripDate.getFullYear() < maxYear;
             });
         } else {
             filtered = filtered.filter((trip) => {
                 const tripDate = getDate(trip);
-                return tripDate.getFullYear() === selectedYear;
+                
+return tripDate.getFullYear() === selectedYear;
             });
         }
 
