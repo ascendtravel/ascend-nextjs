@@ -66,7 +66,8 @@ export default function MobileContentMembership() {
                 </div>
 
                 <div className='flex w-full max-w-lg justify-center px-4 pb-24'>
-                    <div className='flex w-full flex-col items-start justify-center gap-4 rounded-2xl bg-neutral-50 p-6'>
+                    <div className='flex w-full flex-col items-start justify-center gap-3 rounded-2xl bg-neutral-50 p-6'>
+                        <span className='font-bold text-lg'>Ascend Membership</span>
                         <div className='flex flex-row gap-3'>
                             <div className='flex items-start justify-start gap-1'>
                                 <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>$</span>
@@ -77,21 +78,21 @@ export default function MobileContentMembership() {
                         <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-sm'>
                             <span className='font-semibold'>(just $2/month)</span>
                         </div>
-                        <div className='flex w-full flex-col gap-2 border-b border-neutral-200 drop-shadow-md'>
+                        <div className='flex w-full flex-col gap-2'>
                             <OnboardingMembershipCardRow
                                 title='Flight Repricings'
                                 description='We average $64 back per flight, harassing the airline to make sure you get your money back.'
                                 isInitiallyOpen={openStates[0]}
                             />
                         </div>
-                        <div className='flex w-full flex-col gap-2 border-b border-neutral-200 drop-shadow-md'>
+                        <div className='flex w-full flex-col gap-2'>
                             <OnboardingMembershipCardRow
                                 title='Hotel Repricings'
                                 description='We average $116 back per hotel, rebooking you automatically when you could get the same room for less.'
                                 isInitiallyOpen={openStates[1]}
                             />
                         </div>
-                        <div className='flex w-full flex-col gap-2 border-b border-neutral-200 drop-shadow-md'>
+                        <div className='flex w-full flex-col gap-2'>
                             <OnboardingMembershipCardRow
                                 title='Book anywhere, no restrictions'
                                 description='Expedia, Kayak, airline sites. If the price drops, we catch it and you get paid.'

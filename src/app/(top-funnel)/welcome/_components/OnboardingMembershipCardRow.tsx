@@ -33,7 +33,7 @@ export default function OnboardingMembershipCardRow({
                     <OnboardingMembershipCheckSvg />
                     <p className='text-lg font-bold'>{title}</p>
                 </div>
-                <p className='-mt-1 -ml-6 pl-[calc(1rem+0.5rem)] text-sm font-semibold text-neutral-900'>
+                <p className='-mt-1 -ml-6 text-sm font-semibold text-[#1F453D]'>
                     {description}
                 </p>{' '}
                 {/* Indent description under title */}
@@ -48,14 +48,14 @@ export default function OnboardingMembershipCardRow({
                     collapsible
                     className='w-full'
                     defaultValue={isInitiallyOpen ? itemValue : undefined}>
-                    <AccordionItem value={itemValue}>
-                        <AccordionTrigger className='py-2 text-lg font-bold hover:no-underline'>
+                    <AccordionItem value={itemValue} className='!border-b-none'>
+                        <AccordionTrigger className='py-2 text-md font-bold hover:no-underline'>
                             <div className='flex flex-row items-center gap-2'>
                                 <OnboardingMembershipCheckSvg />
                                 <span>{title}</span>
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent className='pl-[calc(1rem+0.5rem)] text-base font-semibold text-neutral-800'>
+                        <AccordionContent className='text-sm font-semibold text-[#1F453D] pb-0'>
                             {' '}
                             {/* Indent description */}
                             {description}
