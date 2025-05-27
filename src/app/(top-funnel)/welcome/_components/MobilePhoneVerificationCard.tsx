@@ -21,6 +21,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import ReloadTimerComponent from './ReloadTimerComponent';
 
 const formSchema = z.object({
     phone: z.string().min(8, 'Please enter a valid phone number')
@@ -253,8 +254,8 @@ export default function MobilePhoneVerificationCard({
                                 {isLoading
                                     ? 'Sending...'
                                     : cooldown > 0
-                                      ? `Wait ${formatCooldown()}`
-                                      : 'Get verification code'}
+                                        ? `Wait ${formatCooldown()}`
+                                        : 'Get verification code'}
                             </Button>
                         </form>
                     </Form>
@@ -263,11 +264,15 @@ export default function MobilePhoneVerificationCard({
                 <div className='flex h-full w-full flex-col gap-4 bg-white'>
                     <div className='flex items-center justify-between'>
                         <p className='text-base font-semibold text-neutral-700'>Enter Verification Code</p>
-                        <div
+                        <div>
+                            <ReloadTimerComponent reloadTime={60} onReload={handleResend} />
+                        </div>
+
+                        {/* <div
                             className='rounded-full p-1 text-neutral-700 hover:cursor-pointer hover:bg-neutral-100'
                             onClick={handleResend}>
                             <ReloadIcon className='size-4' />
-                        </div>
+                        </div> */}
                     </div>
                     <div className=''>
                         <InputOTP
