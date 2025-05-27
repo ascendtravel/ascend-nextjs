@@ -20,6 +20,7 @@ import UserRpNoUpcomingTripsFound from './UserRpNoUpcomingTripsFound';
 import UserRpSpecificTripSelectedView from './UserRpSpecificTripSelectedView/UserRpSpecificTripSelectedView';
 import { AnimatePresence, motion } from 'framer-motion';
 import ReactConfetti from 'react-confetti';
+import { RepricingYearTabs } from './RepricingYearTabs';
 
 interface UserRpsViewProps {
     initialSelectedTripId?: string;
@@ -143,25 +144,11 @@ export default function UserRpsView({ initialSelectedTripId }: UserRpsViewProps)
                                 duration: 0.3,
                                 ease: 'easeInOut'
                             }}>
-                            <Tabs 
-                                defaultValue={selectedYear.toString()} 
-                                onValueChange={(value) => {
-                                    // Convert numeric strings to numbers, leave special values as strings
-                                    const yearValue = !isNaN(Number(value)) ? Number(value) : value;
-                                    setSelectedYear(yearValue as TripYear);
-                                }}
-                            >
-                                <TabsList className='bg-transparent'>
-                                    {allYears.map((year, index) => (
-                                        <TabsTrigger 
-                                            key={`${year}-${index}`}
-                                            value={year.toString()}
-                                        >
-                                            {year}
-                                        </TabsTrigger>
-                                    ))}
-                                </TabsList>
-                            </Tabs>
+                            <RepricingYearTabs
+                                selectedYear={selectedYear}
+                                setSelectedYear={setSelectedYear}
+                                allYears={allYears}
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>

@@ -45,7 +45,7 @@ export default function RpFooterSection() {
                             href={link.href}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='flex w-full flex-row items-start justify-start gap-2 py-2 text-md'>
+                            className='flex w-full flex-row items-center justify-start gap-2 py-2 text-md'>
                             <link.Icon className='h-4 w-4' />
                             <div className='font-medium'>{link.title}</div>
                         </a>
