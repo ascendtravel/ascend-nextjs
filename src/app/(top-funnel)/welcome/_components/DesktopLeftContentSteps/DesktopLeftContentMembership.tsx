@@ -132,12 +132,12 @@ export default function DesktopLeftContentMembership() {
                                     </div>
                                     <div className='mt-1' />
                                     <OnboardingMembershipCardRow
-                                        title='Flight Refunds'
+                                        title='Flight Repricings'
                                         description='We average $64 back per flight, harassing the airline to make sure you get your money back.'
                                     />
                                     <div className='mt-1' />
                                     <OnboardingMembershipCardRow
-                                        title='Hotel Refunds'
+                                        title='Hotel Repricings'
                                         description='We average $116 back per hotel, rebooking you automatically when you could get the same room for less.'
                                     />
                                     <div className='mt-1' />

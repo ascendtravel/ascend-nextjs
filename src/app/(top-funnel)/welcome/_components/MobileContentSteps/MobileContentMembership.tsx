@@ -37,13 +37,13 @@ export default function MobileContentMembership() {
 
     // Determine which items are open based on window height
     const getOpenStates = useCallback(() => {
-        if (windowHeight >= 900) {
-            return [true, true, true]; // All open
-        } else if (windowHeight >= 800) {
-            return [true, true, false]; // First two open
-        }
+        // if (windowHeight >= 900) {
+        //     return [true, true, true]; // All open
+        // } else if (windowHeight >= 800) {
+        //     return [true, true, false]; // First two open
+        // }
 
-        return [false, false, false]; // All collapsed
+        return [true, true, true]; // All open
     }, [windowHeight]);
 
     const [openStates, setOpenStates] = useState(getOpenStates());
@@ -79,14 +79,14 @@ export default function MobileContentMembership() {
                         </div>
                         <div className='flex w-full flex-col gap-2 border-b border-neutral-200 drop-shadow-md'>
                             <OnboardingMembershipCardRow
-                                title='Flight Refunds'
+                                title='Flight Repricings'
                                 description='We average $64 back per flight, harassing the airline to make sure you get your money back.'
                                 isInitiallyOpen={openStates[0]}
                             />
                         </div>
                         <div className='flex w-full flex-col gap-2 border-b border-neutral-200 drop-shadow-md'>
                             <OnboardingMembershipCardRow
-                                title='Hotel Refunds'
+                                title='Hotel Repricings'
                                 description='We average $116 back per hotel, rebooking you automatically when you could get the same room for less.'
                                 isInitiallyOpen={openStates[1]}
                             />
