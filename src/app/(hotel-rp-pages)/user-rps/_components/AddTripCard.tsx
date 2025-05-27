@@ -19,11 +19,11 @@ export default function AddTripCard() {
     return (
         <div
             onClick={handleClick}
-            className='flex h-[254px] w-[177px] cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-neutral-300 bg-white/50 transition-all hover:border-neutral-400 hover:shadow-sm hover:drop-shadow-md'>
-            <div className='flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100'>
-                <PlusIcon className='h-6 w-6 text-neutral-500 drop-shadow-lg' />
+            className='flex h-[254px] w-[177px] cursor-pointer flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed border-neutral-300 bg-white/50 transition-all hover:border-neutral-400 hover:shadow-sm'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-full bg-[#D2D2D2]'>
+                <PlusIcon className='h-4 w-4 text-white' />
             </div>
-            <p className='text-center text-sm font-medium text-neutral-500'>Add trip</p>
+            <p className='text-center text-sm font-semibold text-[#D2D2D2]'>Add a trip</p>
         </div>
     );
 }

@@ -86,30 +86,25 @@ export default function RpGridCardWrapper({
     return (
         <div
             className={cn(
-                'relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm drop-shadow-xl transition-transform duration-300 hover:rotate-6',
-                getPotentialSavings(trip) && 'border border-3 border-[#17AA59]',
+                'relative h-[254px] w-[177px] cursor-pointer overflow-hidden rounded-xl transition-transform duration-300 hover:rotate-6',
+                getPotentialSavings(trip) && 'border border-2 border-[#17AA59]',
                 className
             )}>
-            {shouldShowProtection ? (
+            {shouldShowProtection && (
                 <div className='absolute top-2 left-2 z-50 flex flex-row items-center justify-center gap-2 rounded-full bg-neutral-500 px-2 py-1'>
                     <ShieldCheck className='size-4 text-[#17AA59]' />
                     <span className='text-xs font-semibold text-[#17AA59]'>Price drop protection</span>
                 </div>
-            ) : shouldShowPastSavings && (
-                <div className='absolute top-2 left-2 z-50 flex flex-row items-center justify-center gap-2 rounded-full bg-neutral-500 px-2 py-1'>
-                    <span className='text-xs font-semibold text-[#1DC167]'>we saved you {getCurrencyAndAmountText(trip?.payload.past_savings_cents ?? { amount: 0, currency: 'USD' }, true, false)}</span>
-                </div>
             )}
             <Image src={getImageUrl()} alt={getAltText(trip) || 'Trip image '} fill className='object-cover' />
             {/* TODO: remove this */}
-            {/* <Image src={'https://cataas.com/cat'} alt={getAltText(trip)} fill className='object-cover' /> */}
 
             {/* bottom up shadow to top */}
             <div className='absolute top-0 right-0 bottom-0 left-0 bg-gradient-to-t from-black from-15% via-black/30 via-30% to-[#66666600] to-100%' />
-            {(trip?.payload.past_savings_cents?.amount ?? 0) > 0 &&
-                <div className='absolute inset-x-0 flex h-8 flex-row bg-white'>
-                    <div className='flex w-full items-center justify-center text-xs font-semibold text-black'>
-                        <b className='text-bold me-1'>
+            {shouldShowPastSavings &&
+                <div className='absolute inset-x-0 flex h-8 flex-row bg-white border border-[#2A2A2A1C] rounded-t-xl'>
+                    <div className='flex w-full items-center justify-center text-xs font-medium text-black'>
+                        <b className='font-bold me-1'>
                             {getCurrencyAndAmountText(
                                 trip?.payload.past_savings_cents ?? { amount: 0, currency: 'USD' },
                                 true,

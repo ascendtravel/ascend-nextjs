@@ -26,7 +26,7 @@ export default function HotelStayRPGridCard({ trip }: HotelStayRPGridCardProps) 
         <div className='absolute bottom-0 left-0 flex w-full flex-col p-2 text-neutral-50 shadow-sm'>
             <div className='flex flex-1 flex-col justify-between p-2'>
                 <div className='flex flex-col items-start justify-start'>
-                    <WelcomeGreenBedIcon size={20} />
+                    <WelcomeGreenBedIcon size={20} isMask={!hasSavings} bgColor={hasSavings ? '#1DC167' : '#fff'}/>
                     <span className='font-semibold mt-2' style={{ lineHeight: '1.2', marginBottom: '4px', fontWeight: '700' }}>
                         {trip.payload.hotel_name}
                         {hasSavings && <span style={{
