@@ -35,6 +35,7 @@ export default function RpGridCardWrapper({
 
     const getPastSavings = (trip?: Booking) => {
         if (!trip?.payload.past_savings_cents?.amount) return 0;
+
         return trip.payload.past_savings_cents.amount;
     };
 
