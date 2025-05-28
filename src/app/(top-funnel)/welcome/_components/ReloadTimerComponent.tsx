@@ -12,7 +12,8 @@ const ReloadTimerComponent: FC<ReloadTimerComponentProps> = ({ reloadTime, onRel
     const _getMMSS = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
-        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        
+return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
     const _handleOnReload = () => {
@@ -34,7 +35,8 @@ const ReloadTimerComponent: FC<ReloadTimerComponentProps> = ({ reloadTime, onRel
                     setTimeLeft(timerCounter);
                 }
             }, 1000);
-            return () => clearTimeout(timer);
+            
+return () => clearTimeout(timer);
         }
     }, [timeLeft, onReload]);
 
