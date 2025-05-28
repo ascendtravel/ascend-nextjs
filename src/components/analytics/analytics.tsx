@@ -72,12 +72,47 @@ function LuckyOrange() {
     );
 }
 
+function GoogleTagManager() {
+    // const GTM_ID = 'G-FJKMT8Y8ND'; // Consider moving this to an environment variable
+    const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+
+    if (!GTM_ID) {
+        console.error('No GTM ID found');
+
+        return null;
+    }
+
+    return (
+        <>
+            <Script
+                id='google-tag-manager-src'
+                strategy='afterInteractive'
+                src={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`}
+                async
+            />
+            <Script
+                id='google-tag-manager-init'
+                strategy='afterInteractive'
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', '${GTM_ID}');
+                    `
+                }}
+            />
+        </>
+    );
+}
+
 export function Analytics() {
     return (
         <>
             <VercelAnalytics />
             <LuckyOrange />
             <MetaPixel />
+            <GoogleTagManager />
         </>
     );
 }
@@ -86,5 +121,7 @@ export function Analytics() {
 declare global {
     interface Window {
         LOQ: any[];
+        dataLayer: any[];
+        gtag: (...args: any[]) => void;
     }
 }

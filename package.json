@@ -46,6 +46,8 @@
         "@radix-ui/react-toggle-group": "^1.1.2",
         "@radix-ui/react-tooltip": "^1.1.8",
         "@sentry/nextjs": "^9.5.0",
+        "@stripe/react-stripe-js": "^3.7.0",
+        "@stripe/stripe-js": "^7.3.0",
         "@tailwindcss/postcss": "^4.0.9",
         "@turf/turf": "^7.2.0",
         "@types/d3-dsv": "^3.0.7",

@@ -21,6 +21,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import ReloadTimerComponent from './ReloadTimerComponent';
+import { Lock } from 'lucide-react';
 
 const formSchema = z.object({
     phone: z.string().min(8, 'Please enter a valid phone number')
@@ -83,7 +85,7 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
     const handleResend = () => {
         if (cooldown > 0) return;
         setIsFlipped(false);
-        setCooldown(60); // 60 second cooldown
+        // setCooldown(60); // 60 second cooldown
     };
 
     const formatCooldown = () => {
@@ -230,7 +232,7 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                                         control={form.control}
                                         name='phone'
                                         label={
-                                            <p className='text-base font-semibold text-neutral-700'>
+                                            <p className='text-base font-semibold font-w-700 text-neutral-700'>
                                                 Confirm Your Number *
                                             </p>
                                         }
@@ -264,8 +266,8 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                                         {isLoading
                                             ? 'Sending...'
                                             : cooldown > 0
-                                              ? `Wait ${formatCooldown()}`
-                                              : 'Get verification code'}
+                                                ? `Wait ${formatCooldown()}`
+                                                : 'Get verification code'}
                                     </Button>
                                 </form>
                             </Form>
@@ -280,16 +282,12 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                         animate='front'
                         exit='back'
                         style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}>
-                        <div className='flex h-full w-full flex-col gap-4 rounded-2xl bg-white p-10 drop-shadow-md'>
+                        <div className='flex w-full flex-col gap-4 rounded-2xl bg-white p-10 drop-shadow-md'>
                             <div className='flex items-center justify-between'>
-                                <p className='text-base font-semibold text-neutral-700'>Enter Verification Code</p>
-                                <div
-                                    className='rounded-full p-1 text-neutral-700 hover:cursor-pointer hover:bg-neutral-100'
-                                    onClick={handleResend}>
-                                    <ReloadIcon className='size-4' />
-                                </div>
+                                <p className='text-base font-bold'>Enter Verification Code</p>
+                                <ReloadTimerComponent reloadTime={60} onReload={handleResend} />
                             </div>
-                            <div className='mt-4'>
+                            <div className='mt-4 flex justify-center'>
                                 <InputOTP
                                     maxLength={6}
                                     value={otpValue}
@@ -311,6 +309,13 @@ export default function OnboardingPhoneRegisterFlipCard({ state_id, onVerify }: 
                                 className='mt-4 w-full rounded-full bg-[#17AA59]'>
                                 {isVerifying ? 'Verifying...' : 'Confrim number'}
                             </Button>
+                            <div className="my-3 flex items-center font-bold text-sm">
+                                <Lock className='size-6 text-black me-3' strokeWidth={3} />
+                                <p>
+                                    We only use your number for authentication purposes and to only strictly-necessary account messages.
+                                </p>
+                            </div>
+
                         </div>
                     </motion.div>
                 )}
