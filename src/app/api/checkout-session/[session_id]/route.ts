@@ -13,9 +13,7 @@ export async function GET(request: Request, { params }: { params: { session_id: 
 
         console.log('Making request to get checkout session status for session_id:', session_id);
 
-        const BASE_URL = '
-https://frontend-repricing-email-import.onrender.com
-';
+        const BASE_URL = 'https://frontend-repricing-email-import.onrender.com';
         const response = await fetch(`${BASE_URL}/v2/gmail/import/checkout_session_status/${session_id}`, {
             method: 'GET',
             headers: {
