@@ -15,9 +15,9 @@ import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReloadIcon } from '@radix-ui/react-icons';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import OnboardingFooterWithLock from './OnboardingFooterWithLock';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -32,21 +32,12 @@ const verificationStepHeight = 230;
 type FormData = z.infer<typeof formSchema>;
 
 const cardVariants = {
-    front: {
-        rotateY: 0,
-        scale: 1,
-        transition: { duration: 0.4, ease: 'easeOut' }
-    },
-    back: {
-        rotateY: 180,
-        scale: 1,
-        transition: { duration: 0.4, ease: 'easeOut' }
-    },
-    hidden: {
-        rotateY: -180,
-        scale: 1,
-        transition: { duration: 0.4, ease: 'easeOut' }
-    }
+    initial: { x: 0, opacity: 1 },
+    animate: { x: 0, opacity: 1 },
+    exitToLeft: { x: '-100%', opacity: 0, transition: { duration: 0.5 } },
+    exitToRight: { x: '100%', opacity: 0, transition: { duration: 0.5 } },
+    enterFromRight: { x: '100%', opacity: 0 },
+    enterFromLeft: { x: '-100%', opacity: 0 }
 };
 
 export default function MobilePhoneVerificationCard({
@@ -57,6 +48,8 @@ export default function MobilePhoneVerificationCard({
     forceHeight: (height: number | null) => void;
 }) {
     const [isCodeStep, setIsCodeStep] = useState(false);
+    const [animationDirection, setAnimationDirection] = useState<'left' | 'right'>('left');
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
     const [selectedCountry, setSelectedCountry] = useState('US');
     const [otpValue, setOtpValue] = useState('');
     const [maskedPhone, setMaskedPhone] = useState('');
@@ -88,9 +81,8 @@ export default function MobilePhoneVerificationCard({
     }, [cooldown]);
 
     const handleResend = () => {
-        if (cooldown > 0) return;
+        setAnimationDirection('left');
         setIsCodeStep(false);
-        setCooldown(60); // 60 second cooldown
         forceHeight(null);
     };
 
@@ -210,96 +202,110 @@ export default function MobilePhoneVerificationCard({
         }
     }, [otpValue]);
 
+    useEffect(() => {
+        setIsFirstLoad(false);
+    }, []);
+
     return (
         <div className='flex h-full flex-col items-center justify-center p-4 text-center'>
-            {!isCodeStep ? (
-                <>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onPhoneSubmit)} className='flex flex-col gap-4'>
-                            <div className='text-left text-base font-semibold text-neutral-700'>
-                                Prices are time-sensitive, so we'll text you as soon as we see an opportunity:
-                            </div>
-                            <PhoneInput
-                                control={form.control}
-                                name='phone'
-                                label={
-                                    <p className='text-base font-semibold text-neutral-700'>Confirm Your Number *</p>
-                                }
-                                onCountryChange={handleCountryChange}
-                                placeholder='Phone number'
-                                className='h-12 w-full rounded-l-none'
-                            />
+            <AnimatePresence mode='wait'>
+                {!isCodeStep ? (
+                    <motion.div
+                        key='phone-step'
+                        className='flex h-full w-full flex-col gap-4 bg-white'
+                        variants={cardVariants}
+                        initial={isFirstLoad ? undefined : animationDirection === 'right' ? 'enterFromRight' : 'enterFromLeft'}
+                        animate='animate'
+                        exit='exitToLeft'
+                    >
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onPhoneSubmit)} className='flex flex-col gap-4'>
+                                <div className='text-left text-base font-semibold text-neutral-700'>
+                                    Prices are time-sensitive, so we'll text you as soon as we see an opportunity:
+                                </div>
+                                <PhoneInput
+                                    control={form.control}
+                                    name='phone'
+                                    label={
+                                        <p className='text-base font-bold text-neutral-700'>Confirm Your Number *</p>
+                                    }
+                                    onCountryChange={handleCountryChange}
+                                    placeholder='Phone number'
+                                    className='h-12 w-full rounded-l-none'
+                                />
 
-                            <div className='flex flex-col items-center justify-center'>
-                                <span className='w-full text-center text-xs text-neutral-700'>
-                                    By verifying your number, you agree that you are at least 18 years of age and agree
-                                    to our{' '}
-                                    <Link
-                                        href={FRAMER_LINKS.privacy}
-                                        className='cursor-pointer text-neutral-900 underline'>
-                                        Privacy Policy
-                                    </Link>{' '}
-                                    and{' '}
-                                    <Link
-                                        href={FRAMER_LINKS.terms}
-                                        className='cursor-pointer text-neutral-900 underline'>
-                                        Terms of Use
-                                    </Link>
-                                </span>
+                                <div className='flex flex-col items-center justify-center'>
+                                    <span className='w-full text-center text-xs text-neutral-700'>
+                                        By verifying your number, you agree that you are at least 18 years of age and agree
+                                        to our{' '}
+                                        <Link
+                                            href={FRAMER_LINKS.privacy}
+                                            className='cursor-pointer text-neutral-900 underline'>
+                                            Privacy Policy
+                                        </Link>{' '}
+                                        and{' '}
+                                        <Link
+                                            href={FRAMER_LINKS.terms}
+                                            className='cursor-pointer text-neutral-900 underline'>
+                                            Terms of Use
+                                        </Link>
+                                    </span>
+                                </div>
+                                <Button
+                                    type='submit'
+                                    className='text-md w-full rounded-full bg-[#17AA59] py-6 font-semibold'
+                                    disabled={isLoading || cooldown > 0}>
+                                    {isLoading
+                                        ? 'Sending...'
+                                        : cooldown > 0
+                                            ? `Wait ${formatCooldown()}`
+                                            : 'Get verification code'}
+                                </Button>
+                            </form>
+                        </Form>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key='code-step'
+                        className='flex h-full w-full flex-col gap-4 bg-white'
+                        variants={cardVariants}
+                        initial={animationDirection === 'right' ? 'enterFromLeft' : 'enterFromRight'}
+                        animate='animate'
+                        exit='exitToRight'
+                    >
+                        <div className='flex items-center justify-between'>
+                            <p className='text-base font-semibold text-neutral-700'>Enter Verification Code</p>
+                            <div>
+                                <ReloadTimerComponent reloadTime={5} onReload={handleResend} />
                             </div>
-                            <Button
-                                type='submit'
-                                className='text-md w-full rounded-full bg-[#17AA59] py-6 font-semibold'
-                                disabled={isLoading || cooldown > 0}>
-                                {isLoading
-                                    ? 'Sending...'
-                                    : cooldown > 0
-                                        ? `Wait ${formatCooldown()}`
-                                        : 'Get verification code'}
-                            </Button>
-                        </form>
-                    </Form>
-                </>
-            ) : (
-                <div className='flex h-full w-full flex-col gap-4 bg-white'>
-                    <div className='flex items-center justify-between'>
-                        <p className='text-base font-semibold text-neutral-700'>Enter Verification Code</p>
-                        <div>
-                            <ReloadTimerComponent reloadTime={60} onReload={handleResend} />
+                        </div>
+                        <div className=''>
+                            <InputOTP
+                                maxLength={6}
+                                value={otpValue}
+                                onChange={(value) => {
+                                    setOtpValue(value);
+                                }}
+                                containerClassName='justify-start gap-2'>
+                                <InputOTPGroup>
+                                    {Array.from({ length: 6 }).map((_, i) => (
+                                        <InputOTPSlot key={i} index={i} className='size-11 text-xl font-bold' />
+                                    ))}
+                                </InputOTPGroup>
+                            </InputOTP>
                         </div>
 
-                        {/* <div
-                            className='rounded-full p-1 text-neutral-700 hover:cursor-pointer hover:bg-neutral-100'
-                            onClick={handleResend}>
-                            <ReloadIcon className='size-4' />
-                        </div> */}
-                    </div>
-                    <div className=''>
-                        <InputOTP
-                            maxLength={6}
-                            value={otpValue}
-                            onChange={(value) => {
-                                setOtpValue(value);
-                            }}
-                            containerClassName='justify-start gap-2'>
-                            <InputOTPGroup>
-                                {Array.from({ length: 6 }).map((_, i) => (
-                                    <InputOTPSlot key={i} index={i} className='size-11 text-xl font-bold' />
-                                ))}
-                            </InputOTPGroup>
-                        </InputOTP>
-                    </div>
-
-                    <div
-                        onClick={handleVerifyOtp}
-                        className={cn(
-                            'w-full max-w-xs rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90',
-                            otpValue.length !== 6 || (isVerifying && 'bg-neutral-400')
-                        )}>
-                        {isVerifying ? 'Verifying...' : 'Confrim number'}
-                    </div>
-                </div>
-            )}
+                        <div
+                            onClick={handleVerifyOtp}
+                            className={cn(
+                                'w-full max-w-xs rounded-full bg-[#1DC167] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#1D70B8]/90',
+                                otpValue.length !== 6 || (isVerifying && 'bg-neutral-400')
+                            )}>
+                            {isVerifying ? 'Verifying...' : 'Confirm number'}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
