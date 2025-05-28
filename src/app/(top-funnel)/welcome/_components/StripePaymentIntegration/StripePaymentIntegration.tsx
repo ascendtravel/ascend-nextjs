@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { FRAMER_LINKS } from '@/config/navigation';
+import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { CheckoutProvider, PaymentElement, useCheckout } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
@@ -233,6 +234,9 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
                             className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                             role='button'
                             onClick={() => {
+                                trackLuckyOrangeEvent(EventLists.payment_layover.name, {
+                                    description: EventLists.payment_layover.description
+                                });
                                 setIsSheetOpen(true);
                                 forceHeight?.('80%');
                             }}>
