@@ -1,9 +1,9 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request, { params }: { params: { session_id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ session_id: string }> }) {
     try {
-        const { session_id } = params;
+        const { session_id } = await params;
 
         if (!session_id) {
             console.error('Missing session_id in path parameters');
