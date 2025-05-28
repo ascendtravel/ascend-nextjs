@@ -276,7 +276,7 @@ export default function MobilePhoneVerificationCard({
                         <div className='flex items-center justify-between'>
                             <p className='text-base font-semibold text-neutral-700'>Enter Verification Code</p>
                             <div>
-                                <ReloadTimerComponent reloadTime={5} onReload={handleResend} />
+                                <ReloadTimerComponent reloadTime={60} onReload={handleResend} />
                             </div>
                         </div>
                         <div className=''>

@@ -42,7 +42,7 @@ return () => clearTimeout(timer);
 
     return (
         <div className={`flex items-center justify-center ${timeLeft > 0 ? 'cursor-not-allowed opacity-[.4]' : 'cursor-pointer text-[#0B74C0]'}`} onClick={_handleOnReload}>
-            <ReloadIcon className='size-4 me-2' /> {timeLeft > 0 ? _getMMSS(timeLeft) : "Resend"}
+            {timeLeft > 0 && _getMMSS(timeLeft)} <ReloadIcon className='size-4 ms-2' />
         </div>
     );
 }
