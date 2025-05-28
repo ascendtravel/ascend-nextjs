@@ -15,13 +15,13 @@ import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { AnimatePresence, motion } from 'framer-motion';
 
 import OnboardingFooterWithLock from './OnboardingFooterWithLock';
+import ReloadTimerComponent from './ReloadTimerComponent';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import ReloadTimerComponent from './ReloadTimerComponent';
 
 const formSchema = z.object({
     phone: z.string().min(8, 'Please enter a valid phone number')
@@ -181,6 +181,7 @@ export default function MobilePhoneVerificationCard({
                     trackLuckyOrangeEvent(EventLists.phone_complete.name, {
                         description: EventLists.phone_complete.description
                     });
+                    forceHeight(null);
                     onVerify?.();
                 } catch (error) {
                     console.error('Error calling complete-registration endpoint:', error);
@@ -214,10 +215,15 @@ export default function MobilePhoneVerificationCard({
                         key='phone-step'
                         className='flex h-full w-full flex-col gap-4 bg-white'
                         variants={cardVariants}
-                        initial={isFirstLoad ? undefined : animationDirection === 'right' ? 'enterFromRight' : 'enterFromLeft'}
+                        initial={
+                            isFirstLoad
+                                ? undefined
+                                : animationDirection === 'right'
+                                  ? 'enterFromRight'
+                                  : 'enterFromLeft'
+                        }
                         animate='animate'
-                        exit='exitToLeft'
-                    >
+                        exit='exitToLeft'>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onPhoneSubmit)} className='flex flex-col gap-4'>
                                 <div className='text-left text-base font-semibold text-neutral-700'>
@@ -236,8 +242,8 @@ export default function MobilePhoneVerificationCard({
 
                                 <div className='flex flex-col items-center justify-center'>
                                     <span className='w-full text-center text-xs text-neutral-700'>
-                                        By verifying your number, you agree that you are at least 18 years of age and agree
-                                        to our{' '}
+                                        By verifying your number, you agree that you are at least 18 years of age and
+                                        agree to our{' '}
                                         <Link
                                             href={FRAMER_LINKS.privacy}
                                             className='cursor-pointer text-neutral-900 underline'>
@@ -258,8 +264,8 @@ export default function MobilePhoneVerificationCard({
                                     {isLoading
                                         ? 'Sending...'
                                         : cooldown > 0
-                                            ? `Wait ${formatCooldown()}`
-                                            : 'Get verification code'}
+                                          ? `Wait ${formatCooldown()}`
+                                          : 'Get verification code'}
                                 </Button>
                             </form>
                         </Form>
@@ -271,8 +277,7 @@ export default function MobilePhoneVerificationCard({
                         variants={cardVariants}
                         initial={animationDirection === 'right' ? 'enterFromLeft' : 'enterFromRight'}
                         animate='animate'
-                        exit='exitToRight'
-                    >
+                        exit='exitToRight'>
                         <div className='flex items-center justify-between'>
                             <p className='text-base font-semibold text-neutral-700'>Enter Verification Code</p>
                             <div>
