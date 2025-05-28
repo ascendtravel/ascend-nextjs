@@ -177,12 +177,16 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
+    // For mobile: fetch client secret immediately when component renders (if not provided)
+    // For desktop: client secret is usually provided via props from parent
     useEffect(() => {
-        if (!clientSecret) {
+        if (!desktop && !clientSecret && !loading && !hasAttemptedFetch && !error) {
+            setHasAttemptedFetch(true);
             fetchClientSecret();
         }
-    }, [clientSecret]);
+    }, [desktop, clientSecret]); // Removed loading from dependencies to prevent infinite loop
 
     // Function to fetch client secret from your API
     const fetchClientSecret = async (): Promise<string> => {
@@ -219,28 +223,187 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
         } catch (err: any) {
             const errorMessage = err.message || 'Failed to initialize payment';
             setError(errorMessage);
+            console.error('Stripe checkout session error:', err);
             throw new Error(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
-    if (!desktop && (!clientSecret || !isSheetOpen)) {
+    const handleStartSaving = () => {
+        trackLuckyOrangeEvent(EventLists.payment_layover.name, {
+            description: EventLists.payment_layover.description
+        });
+
+        // For mobile: only open sheet if we have clientSecret
+        if (!desktop && clientSecret) {
+            setIsSheetOpen(true);
+            forceHeight?.('calc(100vh - 3.5rem)');
+        }
+
+        // For desktop: this shouldn't be called since desktop shows payment form immediately
+        if (desktop && !clientSecret && !loading) {
+            setHasAttemptedFetch(true);
+            fetchClientSecret();
+        }
+    };
+
+    const handleRetry = () => {
+        setError(null);
+        setHasAttemptedFetch(false);
+        fetchClientSecret();
+    };
+
+    // Desktop logic: Always show the payment form (open state)
+    if (desktop) {
+        // If we have clientSecret, show the payment form
+        if (clientSecret) {
+            return (
+                <div className='flex h-full w-full flex-col'>
+                    <div className='flex min-h-0 flex-1 flex-col overflow-x-hidden'>
+                        <div className='flex items-center justify-between px-4'>
+                            <h3 className='my-4 text-center text-lg font-semibold text-neutral-700'>
+                                Let's go <span className='text-neutral-500'>🎉</span>
+                            </h3>
+                        </div>
+                        <div className='-mr-6 flex-1 overflow-y-auto px-2 py-4 pr-10 pb-12 pl-4'>
+                            <div className='mx-auto max-w-md space-y-6'>
+                                <CheckoutProvider
+                                    stripe={stripe}
+                                    options={{
+                                        fetchClientSecret: () => Promise.resolve(clientSecret || ''),
+                                        elementsOptions: {
+                                            appearance: {
+                                                theme: 'stripe',
+                                                variables: {
+                                                    colorPrimary: '#006dbc'
+                                                }
+                                            }
+                                        }
+                                    }}>
+                                    <PaymentForm onPaymentSuccess={onPaymentSuccess} onPaymentError={onPaymentError} />
+                                </CheckoutProvider>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop loading state
+        if (loading) {
+            return (
+                <div className='flex h-full w-full flex-col'>
+                    <div className='flex min-h-0 flex-1 flex-col'>
+                        <div className='flex flex-1 items-center justify-center px-2 py-4'>
+                            <div className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
+                                Initializing payment...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop error state
+        if (error) {
+            return (
+                <div className='flex h-full w-full flex-col'>
+                    <div className='flex min-h-0 flex-1 flex-col'>
+                        <div className='flex flex-1 items-center justify-center px-2 py-4'>
+                            <div className='text-center text-red-600'>
+                                <p className='mb-4'>{error}</p>
+                                <button
+                                    onClick={handleRetry}
+                                    className='rounded-full bg-[#17AA59] px-8 py-2 text-white hover:bg-[#17AA59]/80'>
+                                    Retry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Desktop fallback - no clientSecret yet
         return (
             <div className='flex h-full w-full flex-col'>
                 <div className='flex min-h-0 flex-1 flex-col'>
                     <div className='flex flex-1 items-center justify-center'>
-                        <div
-                            className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
-                            role='button'
-                            onClick={() => {
-                                trackLuckyOrangeEvent(EventLists.payment_layover.name, {
-                                    description: EventLists.payment_layover.description
-                                });
-                                setIsSheetOpen(true);
-                                forceHeight?.('80%');
-                            }}>
+                        <button
+                            onClick={handleStartSaving}
+                            className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
                             Start saving now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Mobile logic: Show button first, then sheet only when clientSecret is ready AND button is clicked
+
+    // Mobile: Sheet is not open - show button
+    if (!isSheetOpen) {
+        return (
+            <div className='flex h-full w-full flex-col'>
+                <div className='flex min-h-0 flex-1 flex-col'>
+                    <div className='flex flex-1 items-center justify-center'>
+                        {!error && !loading && clientSecret && (
+                            <button
+                                onClick={handleStartSaving}
+                                disabled={loading || (!clientSecret && !error)}
+                                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
+                                {loading
+                                    ? 'Loading...'
+                                    : error
+                                      ? 'Error - Tap to retry'
+                                      : !clientSecret
+                                        ? 'Preparing...'
+                                        : 'Start saving now'}
+                            </button>
+                        )}
+                        {error && !loading && (
+                            <div className='mt-2 text-center'>
+                                <button
+                                    onClick={handleRetry}
+                                    className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
+                                    Retry loading payment
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Mobile: Sheet is open but there's an error
+    if (error) {
+        return (
+            <div className='flex h-full w-full flex-col'>
+                <div className='flex min-h-0 flex-1 flex-col overflow-x-hidden'>
+                    <div className='flex items-center justify-between px-4'>
+                        <h3 className='my-4 text-center text-lg font-semibold text-neutral-700'>Payment Error</h3>
+                        <div className='flex size-8 items-center justify-center'>
+                            <button
+                                onClick={() => {
+                                    forceHeight?.(null);
+                                    setIsSheetOpen(false);
+                                    setError(null);
+                                }}
+                                className='text-neutral-600 hover:text-neutral-900'>
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                    <div className='flex flex-1 items-center justify-center px-4 py-4'>
+                        <div className='text-center'>
+                            <button
+                                onClick={handleRetry}
+                                className='rounded-full bg-[#17AA59] px-8 py-2 text-white hover:bg-[#17AA59]/80'>
+                                Try Again
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -248,13 +411,19 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
         );
     }
 
-    if (loading) {
+    // Mobile: Sheet is open and we have clientSecret - show payment form
+    if (!clientSecret) {
         return (
             <div className='flex h-full w-full flex-col'>
                 <div className='flex min-h-0 flex-1 flex-col'>
                     <div className='flex flex-1 items-center justify-center px-2 py-4'>
-                        <div className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
-                            Initializing payment...
+                        <div className='text-center'>
+                            <p className='mb-4'>Unable to initialize payment</p>
+                            <button
+                                onClick={handleRetry}
+                                className='rounded-full bg-[#17AA59] px-8 py-2 text-white hover:bg-[#17AA59]/80'>
+                                Retry
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -262,10 +431,7 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
         );
     }
 
-    if (error) {
-        toast.error(error);
-    }
-
+    // Mobile: Sheet is open with valid clientSecret - show payment form
     return (
         <div className='flex h-full w-full flex-col'>
             {/* Outer container that expands */}
@@ -274,15 +440,7 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
                     <h3 className='my-4 text-center text-lg font-semibold text-neutral-700'>
                         Let's go <span className='text-neutral-500'>🎉</span>
                     </h3>
-                    <div className='flex size-8 items-center justify-center'>
-                        {/* // role='button'
-                        // onClick={() => {
-                        //     forceHeight?.(null);
-                        //     setIsSheetOpen(false);
-                        //     console.log('clicked');
-                        // }}> */}
-                        {/* <XCircle className='h-5 w-5 cursor-pointer text-neutral-600' /> */}
-                    </div>
+                    <div className='flex size-8 items-center justify-center'></div>
                 </div>
                 {/* Inner scrollable container */}
                 <div className='-mr-6 flex-1 overflow-y-auto px-2 py-4 pr-10 pb-12 pl-4'>

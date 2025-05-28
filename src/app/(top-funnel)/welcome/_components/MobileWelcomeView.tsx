@@ -520,11 +520,13 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
             {currentStep !== OnboardingSteps.Step0 && currentStep !== OnboardingSteps.Step4 && (
                 <div className='fixed inset-x-0 top-0 z-10 flex flex-col items-center justify-center'>
                     <OnboardingHeader />
-                    <OnboardingStepper
-                        steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
-                        currentStep={currentStep}
-                        failedSteps={getFailedSteps()}
-                    />
+                    {currentStep !== OnboardingSteps.Step3 && (
+                        <OnboardingStepper
+                            steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
+                            currentStep={currentStep}
+                            failedSteps={getFailedSteps()}
+                        />
+                    )}
                 </div>
             )}
 
@@ -544,16 +546,7 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
                         <MobileContentGmailLink />
                     </motion.div>
                 )}
-                {currentStep === OnboardingSteps.Step3 && (
-                    <motion.div
-                        key='content-step3'
-                        variants={mainContentVariants}
-                        initial='initial'
-                        animate='animate'
-                        exit='exit'>
-                        <MobileContentMembership />
-                    </motion.div>
-                )}
+                {currentStep === OnboardingSteps.Step3 && <MobileContentMembership />}
                 {currentStep === OnboardingSteps.Step4 && (
                     <motion.div
                         key='content-step4'
