@@ -12,14 +12,14 @@ interface MobileStepContentAnimatorProps {
     currentStep: OnboardingSteps; // To key the animation
     children: React.ReactNode; // The content for the current step
     direction?: number; // For animation: 1 for next, -1 for prev
-    forceHeight?: number; // This is a patch for second part of step 2 for OTP verification
+    forceHeight?: null | string; // This is a patch for second part of step 2 for OTP verification
 }
 
 export default function MobileStepContentAnimator({
     currentStep,
     children,
     direction = 0,
-    forceHeight = 0
+    forceHeight = null
 }: MobileStepContentAnimatorProps) {
     const variants = {
         enter: (direction: number) => ({
@@ -64,11 +64,10 @@ export default function MobileStepContentAnimator({
                     'shadow-t-2xl fixed right-0 bottom-0 left-0 z-20 overflow-hidden rounded-t-2xl bg-white p-2 drop-shadow-2xl transition-all md:hidden',
                     currentStep === OnboardingSteps.Step0 && 'h-[70px]',
                     currentStep === OnboardingSteps.Step1 && 'h-[70px]',
+                    currentStep === OnboardingSteps.Step2 && 'h-[350px]',
                     currentStep === OnboardingSteps.Step3 && 'h-[70px]'
                 )}
-                style={
-                    currentStep === OnboardingSteps.Step2 ? { height: forceHeight ? forceHeight + 'px' : '350px' } : {}
-                }
+                style={{ height: forceHeight ? forceHeight : '' }}
                 // Apply animation only for Step 0 initial appearance
                 initial={isStep0InitialMount ? 'initial' : false} // 'false' prevents initial animation for non-Step0
                 animate={isStep0InitialMount ? 'animate' : 'center'} // Use 'center' or a static state for non-Step0

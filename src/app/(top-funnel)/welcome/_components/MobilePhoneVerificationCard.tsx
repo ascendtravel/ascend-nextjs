@@ -26,7 +26,7 @@ const formSchema = z.object({
     phone: z.string().min(8, 'Please enter a valid phone number')
 });
 
-const verificationStepHeight = 230;
+const verificationStepHeight = '230px';
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -53,7 +53,7 @@ export default function MobilePhoneVerificationCard({
     forceHeight
 }: {
     onVerify?: () => void;
-    forceHeight: (height: number | null) => void;
+    forceHeight: (height: string | null) => void;
 }) {
     const [isCodeStep, setIsCodeStep] = useState(false);
     const [selectedCountry, setSelectedCountry] = useState('US');

@@ -20,6 +20,7 @@ import MobilePhoneVerificationCard from './MobilePhoneVerificationCard';
 import MobileStepContentAnimator from './MobileStepContentAnimator';
 import OnboardingHeader from './OnboardingHeader';
 import OnboardingStepper from './OnboardingStepper';
+import StripePaymentIntegration from './StripePaymentIntegration/StripePaymentIntegration';
 import { AnimatePresence, motion } from 'framer-motion';
 import Cookies from 'js-cookie';
 import ReactConfetti from 'react-confetti';
@@ -107,7 +108,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     };
 
     return (
-        <div className='flex h-fit flex-col items-center justify-center rounded-full text-center shadow-2xl min-w-[311px]'>
+        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center shadow-2xl'>
             <div
                 className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 role='button'
@@ -211,88 +212,59 @@ const MobileSheetStep2Content = ({
 }: {
     onNext?: () => void;
     onPrev?: () => void;
-    forceHeight: (height: number | null) => void;
+    forceHeight: (height: string | null) => void;
 }) => (
     <div className='flex h-full flex-col items-center justify-center p-4 text-center'>
         <MobilePhoneVerificationCard onVerify={onNext} forceHeight={forceHeight} />
     </div>
 );
 
-const MobileSheetStep3Content = ({ onPrev, onNext }: { onPrev?: () => void; onNext?: () => void }) => {
+const MobileSheetStep3Content = ({
+    onPrev,
+    onNext,
+    forceHeight
+}: {
+    onPrev?: () => void;
+    onNext?: () => void;
+    forceHeight?: (height: string | null) => void;
+}) => {
     const searchParams = useSearchParams();
     const state_id = searchParams.get('state_id'); // This should be correctly populated by the URL sync logic
-    const [isLoading, setIsLoading] = useState(true);
-    const [stripeUrl, setStripeUrl] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const referral_code = searchParams.get('referral_code');
 
-    useEffect(() => {
-        async function getStripeUrl() {
-            if (!state_id) {
-                setError('Try again or');
-                setIsLoading(false);
-
-                return;
-            }
-
-            // fetch referral code from local storage if present and clear it + send to BE stripe link builder api
-            const referral_code = popReferralCode();
-
-            const stripe_signup_request_body = {
-                state_id,
-                ...(referral_code ? { referral_code } : {})
-            };
-
-            try {
-                const response = await fetch('/api/stripe-signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(stripe_signup_request_body)
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data?.signup_link_code) {
-                    setStripeUrl(`https://payments.heyascend.com/${data.signup_link_code}`);
-                } else {
-                    setError('');
-                }
-            } catch (err) {
-                console.error('Error getting Stripe signup URL:', err);
-                setError('An error occurred. Please contact support.');
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        getStripeUrl();
-    }, [state_id]);
-
-    const handleStripeSignup = () => {
-        if (stripeUrl) {
-            window.location.href = stripeUrl;
-            trackLuckyOrangeEvent(EventLists.payment_layover.name, {
-                description: EventLists.payment_layover.description
-            });
-        }
+    const handlePaymentSuccess = () => {
+        console.log('Payment successful!');
+        onNext?.();
     };
 
+    const handlePaymentError = (error: any) => {
+        console.error('Payment failed:', error);
+        // You can add error handling UI here
+    };
+
+    if (!state_id) {
+        return (
+            <div className='flex h-fit flex-col items-center justify-center p-4 text-center'>
+                <div className='mb-4 text-red-500'>Missing state_id. Please go back and try again.</div>
+                <button onClick={onPrev} className='rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700'>
+                    Go Back
+                </button>
+            </div>
+        );
+    }
+
     return (
-        <div className='flex h-fit flex-col items-center justify-center rounded-full text-center drop-shadow-2xl'>
-            <button
-                type='button'
-                onClick={handleStripeSignup}
-                disabled={isLoading || !!error || !stripeUrl}
-                className='w-full rounded-full bg-[#17AA59] px-24 py-3 font-semibold text-nowrap text-white shadow-2xl transition-all hover:bg-[#17AA59]/90 disabled:cursor-not-allowed disabled:opacity-50'>
-                {error ? (
-                    <a href='mailto:hey@ascend.travel' className='text-white hover:text-white/90'>
-                        {error} (Contact Support)
-                    </a>
-                ) : isLoading ? (
-                    'Loading Payment Link...'
-                ) : (
-                    'Start saving now'
-                )}
-            </button>
+        <div className='flex h-full w-full flex-col'>
+            <StripePaymentIntegration
+                state_id={state_id}
+                referral_code={referral_code || undefined}
+                onPaymentSuccess={() => {
+                    forceHeight?.(null);
+                    handlePaymentSuccess();
+                }}
+                onPaymentError={handlePaymentError}
+                forceHeight={forceHeight}
+            />
         </div>
     );
 };
@@ -328,7 +300,7 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [showWelcome, setShowWelcome] = useState(true);
-    const [forceSheetHeight, setForceSheetHeight] = useState<number | null>(0);
+    const [forceSheetHeight, setForceSheetHeight] = useState<string | null>(null);
     const [showConfetti, setShowConfetti] = useState(true);
 
     const initialStepFromQueryOrProp = predefinedStep !== undefined ? predefinedStep : getStepFromQuery(searchParams);
@@ -453,14 +425,23 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
             <MobileSheetStep2Content
                 onNext={goToNextStep}
                 onPrev={goToPrevStep}
-                forceHeight={(height: number | null) => {
+                forceHeight={(height: string | null) => {
                     setForceSheetHeight(height);
                     console.log('forceSheetHeight', height);
                 }}
             />
         );
     } else if (currentStep === OnboardingSteps.Step3) {
-        stepContentInAnimator = <MobileSheetStep3Content onPrev={goToPrevStep} onNext={goToNextStep} />;
+        stepContentInAnimator = (
+            <MobileSheetStep3Content
+                onPrev={goToPrevStep}
+                onNext={goToNextStep}
+                forceHeight={(height: string | null) => {
+                    setForceSheetHeight(height);
+                    console.log('forceSheetHeight', height);
+                }}
+            />
+        );
     }
 
     const bannerVariants = {
