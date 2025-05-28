@@ -197,7 +197,7 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
                 body: JSON.stringify({
                     state_id,
                     return_url: `${window.location.origin}/welcome?step=4&state_id=${state_id}`,
-                    live_mode: false, // Set to true for production
+                    live_mode: true,
                     ...(referral_code ? { referral_code } : {})
                 })
             });

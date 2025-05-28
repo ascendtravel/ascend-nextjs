@@ -70,7 +70,7 @@ export default function DesktopLeftContentMembership() {
 
                 body: JSON.stringify({
                     state_id,
-                    live_mode: false, // Set to true for production
+                    live_mode: true, // Set to true for production
                     return_url: `${window.location.origin}/welcome?step=4&state_id=${state_id}`,
                     ...(referral_code ? { referral_code } : {})
                 })
