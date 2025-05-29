@@ -10,7 +10,9 @@ export async function POST(request: Request) {
         console.log('[GmailState] Creating state');
         console.log(fbp, fbc, utm_params, customer_id);
 
-        const response = await fetch('https://email.ascend.travel/gmail/import/create_state', {
+        const BASE_URL = 'https://frontend-repricing-email-import.onrender.com';
+
+        const response = await fetch(`${BASE_URL}/v2/gmail/import/create_state`, {
             method: 'POST',
             headers: {
                 'X-API-KEY': process.env.PICKS_BACKEND_API_KEY!,
