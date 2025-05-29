@@ -39,5 +39,10 @@
       "invalid": "Valor inválido",
       "generic": "Algo salió mal"
     }
+  },
+  "feedCard": {
+    "justNow": "ahora mismo",
+    "savedOnTrip": "{userName} ahorró {amount} en un viaje a {destination}",
+    "savedOnFlight": "{userName} ahorró {amount} en un vuelo"
   }
 }

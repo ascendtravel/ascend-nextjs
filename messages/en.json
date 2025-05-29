@@ -39,5 +39,10 @@
       "invalid": "Invalid value",
       "generic": "Something went wrong"
     }
+  },
+  "feedCard": {
+    "justNow": "just now",
+    "savedOnTrip": "{userName} saved {amount} on a trip to {destination}",
+    "savedOnFlight": "{userName} saved {amount} on a flight"
   }
 }

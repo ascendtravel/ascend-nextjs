@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { ItemAlignment } from '../StickyScrollList/StickyScrollListContext';
 import FeedCardHotelIcon from './FeedCardHotelIcon';
@@ -25,10 +26,10 @@ interface StickyListRenderInjectedProps {
 
 export type FeedCardProps = FeedCardData & StickyListRenderInjectedProps;
 
-const getFormattedTimeAgo = (date: Date): string => {
+const getFormattedTimeAgo = (date: Date, t: (key: string) => string): string => {
     const seconds = differenceInSeconds(new Date(), date);
     if (seconds < 5) {
-        return 'just now';
+        return t('feedCard.justNow');
     }
 
     // Add more granular formatting if desired (e.g., 30m ago -> 30m)
@@ -45,30 +46,35 @@ export default function FeedCard({
     alignment,
     isCenter
 }: FeedCardProps) {
-    // Initialize timeAgo to null. It will be populated on the client after hydration.
+    const t = useTranslations();
     const [timeAgo, setTimeAgo] = useState<string | null>(null);
 
     useEffect(() => {
-        // This effect runs only on the client, after the initial render.
         const updateDisplayTime = () => {
-            setTimeAgo(getFormattedTimeAgo(creationDateTime));
+            setTimeAgo(getFormattedTimeAgo(creationDateTime, t));
         };
 
-        updateDisplayTime(); // Set the initial relative time on the client
+        updateDisplayTime();
 
-        // Set up the interval to update the time periodically
-        const intervalId = setInterval(updateDisplayTime, 15000); // Update every 15 seconds
+        const intervalId = setInterval(updateDisplayTime, 15000);
 
-        return () => clearInterval(intervalId); // Cleanup interval on component unmount
-    }, [creationDateTime]); // Re-run effect if creationDateTime changes
+        return () => clearInterval(intervalId);
+    }, [creationDateTime, t]);
 
     const savedAmount = `${currency}${amount}`;
     let primaryText: string;
 
     if (type === 'hotel') {
-        primaryText = `${userName} saved ${savedAmount} on a trip to ${destination}`;
+        primaryText = t('feedCard.savedOnTrip', {
+            userName,
+            amount: savedAmount,
+            destination
+        });
     } else {
-        primaryText = `${userName} saved ${savedAmount} on a flight`;
+        primaryText = t('feedCard.savedOnFlight', {
+            userName,
+            amount: savedAmount
+        });
     }
 
     // Determine internal layout classes based on alignment prop
