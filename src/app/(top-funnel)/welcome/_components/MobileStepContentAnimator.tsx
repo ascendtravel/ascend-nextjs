@@ -62,7 +62,7 @@ export default function MobileStepContentAnimator({
             <motion.div
                 className={cn(
                     'shadow-t-2xl fixed right-0 bottom-0 left-0 z-20 overflow-hidden rounded-t-2xl bg-white p-2 drop-shadow-2xl transition-all md:hidden',
-                    currentStep === OnboardingSteps.Step0 && 'h-[70px]',
+                    currentStep === OnboardingSteps.Step0 && 'h-[90px]',
                     currentStep === OnboardingSteps.Step1 && 'h-[70px]',
                     currentStep === OnboardingSteps.Step2 && 'h-[350px]',
                     currentStep === OnboardingSteps.Step3 && 'h-[70px]'

@@ -352,7 +352,7 @@ export default function MobileContentWelcome({
 
             {/* Top Bar (Logo/Login) - Animates from Top */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 -top-3 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl px-4 py-2'
+                className='pointer-events-auto fixed inset-x-0 top-2 left-3 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl px-4 py-2'
                 initial={{ y: '-100%', opacity: 0 }}
                 animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '-100%', opacity: 0 }}
                 transition={{ delay: 0, type: 'spring', stiffness: 80, damping: 15 }} // Base delay removed, controlled by startUIAnimations
@@ -384,10 +384,10 @@ export default function MobileContentWelcome({
                         Y
                     </span>
                 </div>
-                <h1 className='text-figtree font-extrabold mx-auto max-w-[650px] text-[40px] leading-[34px] tracking-tighter text-white drop-shadow-lg'>
-                    Big travel <br /> hates this app.
+                <h1 className='text-figtree font-extrabold mx-auto max-w-[650px] text-[2.8rem] leading-[1em] tracking-tighter text-white drop-shadow-lg'>
+                    Big travel hates<br />  this app.
                 </h1>
-                <h2 className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-sm leading-normal font-medium text-white'>
+                <h2 className='text-figtree text-[1rem] mx-auto max-w-[320px] rounded-xl px-4 text-sm leading-normal font-medium text-white'>
                     Other travel sites keep your money when prices drop. We think that's wrong.
                 </h2>
             </motion.div>
@@ -416,11 +416,11 @@ export default function MobileContentWelcome({
                             <div className='flex flex-col text-left'>
                                 {' '}
                                 {/* Allow text to wrap if needed */}
-                                <span className='font-bolder text-[14px] drop-shadow-lg'>
+                                <span className='font-bolder text-[1rem] drop-shadow-lg'>
                                     {cyclingStepsData[index].text}
                                 </span>
                                 {cyclingStepsData[index].subtext && (
-                                    <span className='text-[14px] opacity-90 drop-shadow-lg'>
+                                    <span className='text-[0.9rem] opacity-90 drop-shadow-lg'>
                                         {cyclingStepsData[index].subtext}
                                     </span>
                                 )}

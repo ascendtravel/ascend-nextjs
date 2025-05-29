@@ -108,9 +108,9 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     };
 
     return (
-        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center shadow-2xl'>
+        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center '>
             <div
-                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
+                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-[0px_4px_4px_0px_#0000000D] transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 role='button'
                 onClick={handleNextClick}>
                 Find my travel bookings
