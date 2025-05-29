@@ -44,7 +44,7 @@ export default function MobileStepContentAnimator({
         animate: {
             y: '0%',
             opacity: 1,
-            transition: { delay: 2, type: 'spring', stiffness: 70, damping: 20 }
+            transition: { type: 'spring', stiffness: 60, delay: 2, damping: 25, duration: 0.5 }
         }
         // No exit needed here as it doesn't unmount, just its content/style changes
     };
@@ -61,7 +61,7 @@ export default function MobileStepContentAnimator({
 
             <motion.div
                 className={cn(
-                    'shadow-t-2xl fixed right-0 bottom-0 left-0 z-20 overflow-hidden rounded-t-2xl bg-white p-2 drop-shadow-2xl transition-all md:hidden',
+                    'shadow-t-2xl fixed right-0 h-90 bottom-0 left-0 z-20 overflow-hidden rounded-t-2xl bg-white p-2 drop-shadow-2xl transition-all md:hidden',
                     currentStep === OnboardingSteps.Step0 && 'h-[90px]',
                     currentStep === OnboardingSteps.Step1 && 'h-[70px]',
                     currentStep === OnboardingSteps.Step2 && 'h-[350px]',
