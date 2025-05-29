@@ -417,7 +417,7 @@ export default function MobileContentWelcome({
                                     {cyclingStepsData[index].text}
                                 </span>
                                 {cyclingStepsData[index].subtext && (
-                                    <span className='text-[0.9rem] opacity-90 drop-shadow-lg'>
+                                    <span className='text-[0.9rem] opacity-90 drop-shadow-lg' style={{maxWidth:"20em"}}>
                                         {cyclingStepsData[index].subtext}
                                     </span>
                                 )}
