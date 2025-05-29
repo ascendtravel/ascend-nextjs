@@ -291,18 +291,15 @@ export default function MobileContentWelcome({
     const stepItemDisplayVariants = {
         active: {
             opacity: 1,
-            scale: 1,
-            y: 0,
-            marginLeft: 25,
-            transition: { type: 'spring', stiffness: 120, damping: 15 }
+            scale: 1.1,
+            originX: 0,
+            transition: { type: 'spring', stiffness: 40, damping: 25 }
         },
         inactive: {
-            opacity: 0.6, // Dimmed opacity
-            scale: 0.8, // Slightly smaller
-            y: 0, // Optional: slightly offset inactive items
-            marginLeft: 0,
-
-            transition: { type: 'spring', stiffness: 120, damping: 15 }
+            opacity: 0.6,
+            scale: 0.9,
+            originX: 0,
+            transition: { type: 'spring', stiffness: 40, damping: 25 }
         }
     };
 
@@ -403,7 +400,7 @@ export default function MobileContentWelcome({
                     stiffness: 60,
                     damping: 18
                 }}>
-                <div className='-ml-8 flex w-[calc(100%-12%)] flex-col items-stretch justify-center rounded-xl'>
+                <div className='ml-8 flex w-[calc(100%-16%)] flex-col items-stretch justify-center rounded-xl'>
                     {cyclingStepsData.map((step, index) => (
                         <motion.div
                             key={step.id}
