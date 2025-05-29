@@ -1,10 +1,10 @@
-import { RpViewState } from '@/app/(hotel-rp-pages)/user-rp/[rp-id]/_components/UserRpView';
+import { RpViewState } from '@/app/[locale]/(hotel-rp-pages)/user-rp/[rp-id]/_components/UserRpView';
 import {
     LINK_FAILURE_PARAM,
     OnboardingSteps,
     PERMISSIONS_FAILURE_PARAM,
     mapStepToNumbers
-} from '@/app/(top-funnel)/welcome/_types';
+} from '@/app/[locale]/(top-funnel)/welcome/_types';
 
 export const urls = {
     /**

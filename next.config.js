@@ -1,6 +1,9 @@
 // Injected content via Sentry wizard below
 const { withSentryConfig } = require('@sentry/nextjs');
 const withPWA = require('next-pwa');
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -161,7 +164,7 @@ const pwaConfig = {
 const withPWAConfig = withPWA(pwaConfig);
 
 // Export the final config
-module.exports = withSentryConfig(withPWAConfig(nextConfig), {
+module.exports = withSentryConfig(withNextIntl(withPWAConfig(nextConfig)), {
     org: 'ascend-rq',
     project: 'ascend-nextjs',
     silent: !process.env.CI,
