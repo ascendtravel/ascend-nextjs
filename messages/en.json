@@ -1,0 +1,43 @@
+{
+  "welcome": {
+    "titlea": "Big Travel",
+    "titleb": "Hates This App",
+    "subtitle": "Other travel sites keep your money when prices drop. We think that's wrong.",
+    "moneyBack": "Let's get your money back (no matter where you booked).",
+    "steps": {
+      "connectGmail": {
+        "title": "Connect your Gmail",
+        "description": "We'll instantly find your past and upcoming bookings."
+      },
+      "verifyPhone": {
+        "title": "Verify your phone number",
+        "description": "So we can text you when we find savings."
+      },
+      "becomeMember": {
+        "title": "Become a member to start saving",
+        "description": "Automatic refunds when prices drop for just $25/year."
+      }
+    },
+    "buttons": {
+      "import": "Import my travel bookings"
+    }
+  },
+  "common": {
+    "navigation": {
+      "home": "Home",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "buttons": {
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete"
+    },
+    "errors": {
+      "required": "This field is required",
+      "invalid": "Invalid value",
+      "generic": "Something went wrong"
+    }
+  }
+}

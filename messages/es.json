@@ -1,0 +1,43 @@
+{
+  "welcome": {
+    "titlea": "Las grandes agencias",
+    "titleb": "odian esta app",
+    "subtitle": "Otros sitios de viajes se quedan con tu dinero cuando bajan los precios. Creemos que eso está mal.",
+    "moneyBack": "Recuperemos tu dinero (sin importar dónde reservaste).",
+    "steps": {
+      "connectGmail": {
+        "title": "Conecta tu Gmail",
+        "description": "Encontraremos instantáneamente tus reservas pasadas y futuras."
+      },
+      "verifyPhone": {
+        "title": "Verifica tu número de teléfono",
+        "description": "Para enviarte mensajes cuando encontremos ahorros."
+      },
+      "becomeMember": {
+        "title": "Hazte miembro para empezar a ahorrar",
+        "description": "Reembolsos automáticos cuando bajan los precios por solo $25/año."
+      }
+    },
+    "buttons": {
+      "import": "Importar mis reservas"
+    }
+  },
+  "common": {
+    "navigation": {
+      "home": "Inicio",
+      "about": "Acerca de",
+      "contact": "Contacto"
+    },
+    "buttons": {
+      "submit": "Enviar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "delete": "Eliminar"
+    },
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "invalid": "Valor inválido",
+      "generic": "Algo salió mal"
+    }
+  }
+}

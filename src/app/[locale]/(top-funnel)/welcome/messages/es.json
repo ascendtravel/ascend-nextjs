@@ -1,0 +1,40 @@
+{
+  "welcome": {
+    "title": "Bienvenido a Ascend",
+    "subtitle": "Configuremos tu cuenta en unos pocos pasos",
+    "steps": {
+      "connectGmail": {
+        "title": "Conecta tu Gmail",
+        "description": "Te ayudaremos a gestionar tus correos de manera más eficiente"
+      },
+      "verifyPhone": {
+        "title": "Verifica tu número de teléfono",
+        "description": "Te enviaremos un código para verificar tu número"
+      }
+    },
+    "buttons": {
+      "getStarted": "Comenzar",
+      "connectGmail": "Conectar Gmail",
+      "verifyPhone": "Verificar Teléfono",
+      "continue": "Continuar",
+      "back": "Atrás"
+    },
+    "errors": {
+      "gmailConnection": "Error al conectar Gmail. Por favor, inténtalo de nuevo.",
+      "phoneVerification": "Error al verificar el número de teléfono. Por favor, inténtalo de nuevo.",
+      "invalidPhone": "Por favor, introduce un número de teléfono válido",
+      "invalidCode": "Por favor, introduce un código de verificación válido"
+    },
+    "phoneVerification": {
+      "title": "Verifica tu número de teléfono",
+      "description": "Te enviaremos un código de verificación",
+      "inputLabel": "Número de teléfono",
+      "inputPlaceholder": "Introduce tu número de teléfono",
+      "codeInputLabel": "Código de verificación",
+      "codeInputPlaceholder": "Introduce el código que te enviamos",
+      "resendCode": "Reenviar código",
+      "codeSent": "¡Código enviado!",
+      "countdown": "Reenviar en {seconds}s"
+    }
+  }
+}
