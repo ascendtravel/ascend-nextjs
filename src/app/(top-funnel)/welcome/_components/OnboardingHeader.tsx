@@ -1,60 +1,36 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { motion } from 'framer-motion';
 
-const savingExamplesSeed = [
-    { amount: '$289', route: 'JFK to CDG' },
-    { amount: '$217', route: 'LAX to LHR' },
-    { amount: '$175', route: 'SFO to NRT' },
-    { amount: '$312', route: 'ORD to FCO' },
-    { amount: '$149', route: 'MIA to MEX' },
-    { amount: '$236', route: 'SEA to SYD' },
-    { amount: '$193', route: 'BOS to DUB' },
-    { amount: '$278', route: 'ATL to AMS' },
-    { amount: '$204', route: 'DFW to MAD' },
-    { amount: '$169', route: 'DEN to YVR' },
-    { amount: '$325', route: 'IAD to BKK' },
-    { amount: '$183', route: 'PHX to CUN' },
-    { amount: '$295', route: 'EWR to HKG' },
-    { amount: '$157', route: 'MSP to YYZ' },
-    { amount: '$276', route: 'CLT to BCN' },
-    { amount: '$224', route: 'SLC to LIM' },
-    { amount: '$342', route: 'DTW to ICN' },
-    { amount: '$188', route: 'LGA to MBJ' },
-    { amount: '$267', route: 'PHL to MUC' },
-    { amount: '$213', route: 'BWI to PVR' },
-    { amount: '$308', route: 'TPA to CPH' },
-    { amount: '$179', route: 'PDX to YYC' },
-    { amount: '$253', route: 'MCO to BOG' },
-    { amount: '$198', route: 'AUS to PTY' },
-    { amount: '$327', route: 'SAN to SIN' },
-    { amount: '$245', route: 'RDU to ZRH' },
-    { amount: '$172', route: 'MCI to PVG' },
-    { amount: '$286', route: 'CLE to ATH' },
-    { amount: '$235', route: 'STL to KEF' },
-    { amount: '$301', route: 'IND to VIE' }
-];
+import savedData from './savedData';
 
-const NUM_ITEMS_IN_MARQUEE = 5; // Number of items to form the base of the marquee
-const SCROLL_SPEED_PX_PER_SEC = 12; // Reduced speed
-const INITIAL_PAUSE_DURATION_SEC = 2; // Pause for 4 seconds before scroll starts
+// Fisher-Yates shuffle algorithm
+const shuffle = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
 
-// Function to get a random saving example from the seed
-const getRandomSavingExample = () => {
-    const randomIndex = Math.floor(Math.random() * savingExamplesSeed.length);
-
-    return { ...savingExamplesSeed[randomIndex], id: Math.random().toString(36).substring(7) }; // Add unique id
+    return shuffled;
 };
 
+const shuffledData = shuffle(savedData);
+
+const NUM_ITEMS_IN_MARQUEE = 5; // Number of items to form the base of the marquee
+const SCROLL_SPEED_PX_PER_SEC = 25; // Reduced speed
+const INITIAL_PAUSE_DURATION_SEC = 5; // Pause for 4 seconds before scroll starts
+
 // Function to generate an initial set of items
-const generateInitialMarqueeItems = (count: number) => {
-    return Array.from({ length: count }, getRandomSavingExample);
+const generateInitialMarqueeItems = (count: number, startIndex: number) => {
+    return shuffledData.slice(startIndex, startIndex + count);
 };
 
 export default function OnboardingHeader() {
-    const [marqueeItems, setMarqueeItems] = useState(() => generateInitialMarqueeItems(NUM_ITEMS_IN_MARQUEE));
+    const [marqueeItems, setMarqueeItems] = useState(() => generateInitialMarqueeItems(NUM_ITEMS_IN_MARQUEE, 0));
+    const iteration = useRef(NUM_ITEMS_IN_MARQUEE);
 
     // Duplicate items for seamless looping
     const duplicatedItems = useMemo(() => [...marqueeItems, ...marqueeItems], [marqueeItems]);
@@ -65,13 +41,14 @@ export default function OnboardingHeader() {
     // This simpler version refreshes the set periodically.
     useEffect(() => {
         const intervalId = setInterval(() => {
-            setMarqueeItems(generateInitialMarqueeItems(NUM_ITEMS_IN_MARQUEE));
+            setMarqueeItems(generateInitialMarqueeItems(NUM_ITEMS_IN_MARQUEE, iteration.current));
+            iteration.current += NUM_ITEMS_IN_MARQUEE;
         }, 15000); // Refresh content every 15 seconds, for example
 
         return () => clearInterval(intervalId);
     }, []);
 
-    const marqueeWidth = NUM_ITEMS_IN_MARQUEE * 350; // Approximate width of one set of items (adjust itemWidth if needed)
+    const marqueeWidth = NUM_ITEMS_IN_MARQUEE * 450; // Approximate width of one set of items (adjust itemWidth if needed)
     const animationDuration = marqueeWidth / SCROLL_SPEED_PX_PER_SEC;
 
     // The initial position for the pause: try to place the start of the content far right.
@@ -113,10 +90,10 @@ export default function OnboardingHeader() {
                 transition={{ delay: INITIAL_PAUSE_DURATION_SEC }}>
                 {duplicatedItems.map((item, index) => (
                     <div
-                        key={`${item.id}-${index}`}
+                        key={`${item.booking_type}-${item.hotel_name}-${item.arrival_airport}-${item.departure_airport}-${index}`}
                         className='flex flex-shrink-0 flex-row items-center px-3 whitespace-nowrap'>
                         <span className='text-figtree text-lg font-bold'>
-                            {item.amount} saved on a trip from {item.route}
+                            ${item.amount} saved on {item.booking_type === 'hotel' ? item.hotel_name : `trip from ${item.arrival_airport} to ${item.departure_airport}`}
                         </span>
                         {/* Add separator, ensuring it's not after the very last item of the duplicated list if it looks odd */}
                         {index < duplicatedItems.length - 1 && (
