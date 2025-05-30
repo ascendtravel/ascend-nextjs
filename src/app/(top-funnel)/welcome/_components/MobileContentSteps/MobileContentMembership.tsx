@@ -111,7 +111,7 @@ export default function MobileContentMembership() {
                                     <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
                                         $
                                     </span>
-                                    <span className='text-3xl font-bold'>25</span>
+                                    <span className='text-3xl font-bold'>24⁹⁹</span>
                                     <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
                                 </div>
                             </div>

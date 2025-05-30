@@ -120,10 +120,6 @@ export default function DesktopLeftContentMembership() {
         // Handle payment error
     };
 
-    const handleBackToMembership = () => {
-        setIsFlipped(false);
-    };
-
     return (
         <div className='relative z-10 flex h-full w-1/2 flex-col items-stretch justify-start overflow-y-hidden rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] pl-14 backdrop-blur-md transition-all'>
             <div className='-mr-12 flex h-full w-full flex-1 flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto pt-12 pr-12'>
@@ -169,7 +165,7 @@ export default function DesktopLeftContentMembership() {
                                                             <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
                                                                 $
                                                             </span>
-                                                            <span className='text-3xl font-bold'>25</span>
+                                                            <span className='text-3xl font-bold'>24⁹⁹</span>
                                                             <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
                                                         </div>
                                                     </div>
