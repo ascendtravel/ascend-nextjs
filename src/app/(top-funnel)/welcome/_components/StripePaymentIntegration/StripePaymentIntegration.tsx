@@ -417,14 +417,14 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
                             <button
                                 onClick={handleStartSaving}
                                 disabled={loading || (!clientSecret && !error)}
-                                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
+                                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-bold text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
                                 {loading
                                     ? 'Loading...'
                                     : error
                                       ? 'Error - Tap to retry'
                                       : !clientSecret
                                         ? 'Preparing...'
-                                        : 'Start saving now'}
+                                        : 'Get my free week'}
                             </button>
                         )}
                         {error && !loading && (
