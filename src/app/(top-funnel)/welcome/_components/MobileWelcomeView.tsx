@@ -108,9 +108,9 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     };
 
     return (
-        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center shadow-2xl'>
+        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center '>
             <div
-                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
+                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-[0px_4px_4px_0px_#0000000D] transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 role='button'
                 onClick={handleNextClick}>
                 Find my travel bookings
@@ -520,11 +520,13 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
             {currentStep !== OnboardingSteps.Step0 && currentStep !== OnboardingSteps.Step4 && (
                 <div className='fixed inset-x-0 top-0 z-10 flex flex-col items-center justify-center'>
                     <OnboardingHeader />
-                    <OnboardingStepper
-                        steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
-                        currentStep={currentStep}
-                        failedSteps={getFailedSteps()}
-                    />
+                    {currentStep !== OnboardingSteps.Step3 && (
+                        <OnboardingStepper
+                            steps={[OnboardingSteps.Step1, OnboardingSteps.Step2, OnboardingSteps.Step3]}
+                            currentStep={currentStep}
+                            failedSteps={getFailedSteps()}
+                        />
+                    )}
                 </div>
             )}
 
@@ -544,16 +546,7 @@ export default function MobileWelcomeView({ predefinedStep }: MobileWelcomeViewP
                         <MobileContentGmailLink />
                     </motion.div>
                 )}
-                {currentStep === OnboardingSteps.Step3 && (
-                    <motion.div
-                        key='content-step3'
-                        variants={mainContentVariants}
-                        initial='initial'
-                        animate='animate'
-                        exit='exit'>
-                        <MobileContentMembership />
-                    </motion.div>
-                )}
+                {currentStep === OnboardingSteps.Step3 && <MobileContentMembership />}
                 {currentStep === OnboardingSteps.Step4 && (
                     <motion.div
                         key='content-step4'

@@ -291,18 +291,15 @@ export default function MobileContentWelcome({
     const stepItemDisplayVariants = {
         active: {
             opacity: 1,
-            scale: 1,
-            y: 0,
-            marginLeft: 25,
-            transition: { type: 'spring', stiffness: 120, damping: 15 }
+            scale: 1.05,
+            originX: 0,
+            transition: { type: 'spring', stiffness: 40, damping: 25 }
         },
         inactive: {
-            opacity: 0.6, // Dimmed opacity
-            scale: 0.8, // Slightly smaller
-            y: 0, // Optional: slightly offset inactive items
-            marginLeft: 0,
-
-            transition: { type: 'spring', stiffness: 120, damping: 15 }
+            opacity: 0.6,
+            scale: 0.9,
+            originX: 0,
+            transition: { type: 'spring', stiffness: 40, damping: 25 }
         }
     };
 
@@ -352,7 +349,7 @@ export default function MobileContentWelcome({
 
             {/* Top Bar (Logo/Login) - Animates from Top */}
             <motion.div
-                className='pointer-events-auto fixed inset-x-0 -top-3 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl px-4 py-2'
+                className='pointer-events-auto fixed inset-x-0 top-2 left-3 z-50 flex w-full flex-row items-center justify-between rounded-b-2xl px-4 py-2'
                 initial={{ y: '-100%', opacity: 0 }}
                 animate={startUIAnimations ? { y: '0%', opacity: 1 } : { y: '-100%', opacity: 0 }}
                 transition={{ delay: 0, type: 'spring', stiffness: 80, damping: 15 }} // Base delay removed, controlled by startUIAnimations
@@ -384,10 +381,10 @@ export default function MobileContentWelcome({
                         Y
                     </span>
                 </div>
-                <h1 className='text-figtree font-extrabold mx-auto max-w-[650px] text-[40px] leading-[34px] tracking-tighter text-white drop-shadow-lg'>
-                    Big travel <br /> hates this app.
+                <h1 className='text-figtree font-extrabold mx-auto max-w-[650px] text-[2.8rem] leading-[1em] tracking-tighter text-white drop-shadow-lg'>
+                    Big travel hates<br />  this app.
                 </h1>
-                <h2 className='text-figtree mx-auto max-w-[320px] rounded-xl px-4 text-sm leading-normal font-medium text-white'>
+                <h2 className='text-figtree text-[1rem] mx-auto max-w-[320px] rounded-xl px-4 text-sm leading-normal font-medium text-white'>
                     Other travel sites keep your money when prices drop. We think that's wrong.
                 </h2>
             </motion.div>
@@ -403,7 +400,7 @@ export default function MobileContentWelcome({
                     stiffness: 60,
                     damping: 18
                 }}>
-                <div className='-ml-8 flex w-[calc(100%-12%)] flex-col items-stretch justify-center rounded-xl'>
+                <div className='ml-2 flex w-[calc(100%-16%)] flex-col items-stretch justify-center rounded-xl'>
                     {cyclingStepsData.map((step, index) => (
                         <motion.div
                             key={step.id}
@@ -416,11 +413,11 @@ export default function MobileContentWelcome({
                             <div className='flex flex-col text-left'>
                                 {' '}
                                 {/* Allow text to wrap if needed */}
-                                <span className='font-bolder text-[14px] drop-shadow-lg'>
+                                <span className='font-bolder text-[1rem] drop-shadow-lg'>
                                     {cyclingStepsData[index].text}
                                 </span>
                                 {cyclingStepsData[index].subtext && (
-                                    <span className='text-[14px] opacity-90 drop-shadow-lg'>
+                                    <span className='text-[0.9rem] opacity-90 drop-shadow-lg' style={{maxWidth:"20em"}}>
                                         {cyclingStepsData[index].subtext}
                                     </span>
                                 )}
