@@ -4,9 +4,11 @@ import React, { useEffect, useState } from 'react';
 
 import { FRAMER_LINKS } from '@/config/navigation';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
+import { cn } from '@/lib/utils';
 import { CheckoutProvider, PaymentElement, useCheckout } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
+import { Loader2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Initialize Stripe with your publishable key
@@ -33,6 +35,12 @@ const PaymentForm = ({
     const checkout = useCheckout();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [promoCode, setPromoCode] = useState('');
+    const [promoLoading, setPromoLoading] = useState(false);
+    const [promoError, setPromoError] = useState<string | null>(null);
+    const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
+
+    const { applyPromotionCode, removePromotionCode } = checkout || {};
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,6 +71,45 @@ const PaymentForm = ({
         }
     };
 
+    const handleApplyPromoCode = async () => {
+        if (!applyPromotionCode || !promoCode.trim()) return;
+
+        setPromoLoading(true);
+        setPromoError(null);
+        setPromoSuccess(null);
+
+        try {
+            const result = await applyPromotionCode(promoCode.trim());
+
+            if (result.type === 'error') {
+                setPromoError(result.error.message || 'Invalid promotion code');
+            } else {
+                setPromoSuccess('Promotion code applied successfully!');
+            }
+        } catch (err: any) {
+            setPromoError(err.message || 'Failed to apply promotion code');
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
+    const handleRemovePromoCode = async () => {
+        if (!removePromotionCode) return;
+
+        setPromoLoading(true);
+        setPromoError(null);
+        setPromoSuccess(null);
+
+        try {
+            await removePromotionCode();
+            setPromoSuccess(null);
+        } catch (err: any) {
+            setPromoError(err.message || 'Failed to remove promotion code');
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className='space-y-6'>
             <div>
@@ -78,7 +125,8 @@ const PaymentForm = ({
                         }
                     }}
                 />
-                <div className='flex flex-row items-center justify-center gap-2'>
+
+                <div className='mt-4 flex flex-row items-center justify-center gap-2'>
                     <a
                         href={FRAMER_LINKS.privacy}
                         target='_blank'
@@ -94,6 +142,58 @@ const PaymentForm = ({
                         className='font-figtree text-base text-neutral-600 underline transition-colors hover:text-neutral-900'>
                         Terms of Service
                     </a>
+                </div>
+
+                {/* Promotion Code Section */}
+                <div className='mt-4 space-y-3'>
+                    <label className='block text-sm font-medium text-gray-700'>Promotion Code</label>
+                    <div className='flex gap-2'>
+                        <input
+                            type='text'
+                            value={promoCode}
+                            onChange={(e) => setPromoCode(e.target.value)}
+                            placeholder='Enter promotion code'
+                            disabled={promoLoading || !!promoSuccess}
+                            className={cn(
+                                'flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100',
+                                promoSuccess && 'bg-gray-100 ring-1 ring-[#17AA59]'
+                            )}
+                        />
+                        {!promoSuccess && !promoLoading && (
+                            <button
+                                type='button'
+                                onClick={handleApplyPromoCode}
+                                disabled={promoLoading || !promoCode.trim()}
+                                className='rounded-md bg-[#17aa59]/80 px-4 py-2 text-sm font-medium text-white hover:bg-[#17aa59]/80 focus:ring-2 focus:ring-[#17aa59]/80 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'>
+                                Apply
+                            </button>
+                        )}
+
+                        {promoLoading && (
+                            <button
+                                type='button'
+                                onClick={handleApplyPromoCode}
+                                disabled={promoLoading || !promoCode.trim()}
+                                className='rounded-md bg-[#17aa59]/80 px-4 py-2 text-sm font-medium text-white hover:bg-[#17aa59]/80 focus:ring-2 focus:ring-[#17aa59]/80 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'>
+                                <Loader2 className='size-4 animate-spin' />
+                            </button>
+                        )}
+
+                        {promoSuccess && (
+                            <div className='flex items-center justify-between text-sm text-green-600'>
+                                <button
+                                    type='button'
+                                    onClick={handleRemovePromoCode}
+                                    disabled={promoLoading}
+                                    className='rounded-md bg-red-400 p-2 text-sm font-medium text-white shadow-md hover:bg-red-500/80 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'>
+                                    <Trash2 className='size-4' />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Promotion Code Messages */}
+                    {promoError && <p className='text-sm text-red-600'>{promoError}</p>}
                 </div>
             </div>
 
@@ -288,57 +388,21 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
                     </div>
                 </div>
             );
-        }
+        } else {
+            fetchClientSecret();
 
-        // Desktop loading state
-        if (loading) {
             return (
                 <div className='flex h-full w-full flex-col'>
                     <div className='flex min-h-0 flex-1 flex-col'>
                         <div className='flex flex-1 items-center justify-center px-2 py-4'>
                             <div className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
-                                Initializing payment...
+                                Initializing Stripe...
                             </div>
                         </div>
                     </div>
                 </div>
             );
         }
-
-        // Desktop error state
-        if (error) {
-            return (
-                <div className='flex h-full w-full flex-col'>
-                    <div className='flex min-h-0 flex-1 flex-col'>
-                        <div className='flex flex-1 items-center justify-center px-2 py-4'>
-                            <div className='text-center text-red-600'>
-                                <p className='mb-4'>{error}</p>
-                                <button
-                                    onClick={handleRetry}
-                                    className='rounded-full bg-[#17AA59] px-8 py-2 text-white hover:bg-[#17AA59]/80'>
-                                    Retry
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // Desktop fallback - no clientSecret yet
-        return (
-            <div className='flex h-full w-full flex-col'>
-                <div className='flex min-h-0 flex-1 flex-col'>
-                    <div className='flex flex-1 items-center justify-center'>
-                        <button
-                            onClick={handleStartSaving}
-                            className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
-                            Start saving now
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
     }
 
     // Mobile logic: Show button first, then sheet only when clientSecret is ready AND button is clicked
@@ -353,14 +417,14 @@ const StripePaymentIntegration: React.FC<StripePaymentIntegrationProps> = ({
                             <button
                                 onClick={handleStartSaving}
                                 disabled={loading || (!clientSecret && !error)}
-                                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
+                                className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-center text-base font-bold text-white shadow-md transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'>
                                 {loading
                                     ? 'Loading...'
                                     : error
                                       ? 'Error - Tap to retry'
                                       : !clientSecret
                                         ? 'Preparing...'
-                                        : 'Start saving now'}
+                                        : 'Get my free week'}
                             </button>
                         )}
                         {error && !loading && (

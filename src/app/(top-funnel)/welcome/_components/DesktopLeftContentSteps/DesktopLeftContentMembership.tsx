@@ -120,10 +120,6 @@ export default function DesktopLeftContentMembership() {
         // Handle payment error
     };
 
-    const handleBackToMembership = () => {
-        setIsFlipped(false);
-    };
-
     return (
         <div className='relative z-10 flex h-full w-1/2 flex-col items-stretch justify-start overflow-y-hidden rounded-r-2xl bg-gradient-to-b from-[#0B74C0] to-[#57A3D9] pl-14 backdrop-blur-md transition-all'>
             <div className='-mr-12 flex h-full w-full flex-1 flex-col items-stretch justify-start overflow-x-hidden overflow-y-auto pt-12 pr-12'>
@@ -164,13 +160,20 @@ export default function DesktopLeftContentMembership() {
                                                 exit='hidden'
                                                 style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}>
                                                 <div className='flex w-full flex-col items-start justify-center gap-2 rounded-2xl bg-neutral-50 px-10 py-8'>
-                                                    <div className='flex flex-row gap-3'>
+                                                    <div className='flex w-full flex-row items-center justify-between gap-3'>
                                                         <div className='flex items-start justify-start gap-1'>
                                                             <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
                                                                 $
                                                             </span>
-                                                            <span className='text-3xl font-bold'>25</span>
+                                                            <span className='text-3xl font-bold'>24⁹⁹</span>
                                                             <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
+                                                        </div>
+
+                                                        <div
+                                                            className='flex items-start justify-start rounded-full bg-[#17AA59]/90 px-4 py-1 text-sm font-medium text-white'
+                                                            role='button'
+                                                            onClick={handleStartSaving}>
+                                                            First week free!
                                                         </div>
                                                     </div>
                                                     <div className='text-neutral-1000 -mt-1 flex flex-row items-center gap-2 text-sm'>
@@ -193,8 +196,8 @@ export default function DesktopLeftContentMembership() {
                                                     />
                                                     <button
                                                         onClick={handleStartSaving}
-                                                        className='mt-4 rounded-full bg-[#17AA59] px-16 py-4 text-base font-medium text-white shadow-md transition-colors hover:bg-[#17AA59]/80'>
-                                                        Start saving now
+                                                        className='mt-4 rounded-full bg-[#17AA59] px-16 py-4 text-base font-bold text-white shadow-md transition-colors hover:bg-[#17AA59]/80'>
+                                                        Get my free week
                                                     </button>
                                                 </div>
                                             </motion.div>

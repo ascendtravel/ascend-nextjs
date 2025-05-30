@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { FRAMER_LINKS } from '@/config/navigation';
 import { useUser } from '@/contexts/UserContext';
+import { urls } from '@/lib/urls';
 
 import AddGmailCheckboxCTA from './AddGmailCheckboxCTA';
 import Cookies from 'js-cookie';
@@ -55,12 +56,10 @@ function AddGmailView() {
                 </p>
             </div>
 
-            <Link href={stateId ? `https://gmail.heyascend.com/gmail/import/start/${stateId} ` : ''}>
+            <Link href={stateId ? urls.gmailLinkStartUrl(stateId) : ''}>
                 <div className='mb-12 flex flex-col items-center justify-center gap-4 overflow-clip rounded-3xl'>
                     <div
-                        onClick={() =>
-                            (window.location.href = `https://gmail.heyascend.com/gmail/import/start/${stateId} `)
-                        }
+                        onClick={() => (window.location.href = urls.gmailLinkStartUrl(stateId || ''))}
                         className='cursor-pointer'>
                         <AddGmailCheckboxCTA width={260} height={120} showText={false} />
                     </div>
@@ -70,7 +69,7 @@ function AddGmailView() {
             <div className='flex flex-1 flex-col items-center'>
                 {stateId ? (
                     <Link
-                        href={`https://gmail.heyascend.com/gmail/import/start/${stateId} `}
+                        href={urls.gmailLinkStartUrl(stateId)}
                         className='font-figtree animate-shake animate-fade-in mt-2 flex origin-center items-center gap-2 rounded-full bg-white px-6 py-4 font-semibold text-neutral-900 transition-all hover:bg-white/90'>
                         <Image
                             src='/images/google-icon.png'

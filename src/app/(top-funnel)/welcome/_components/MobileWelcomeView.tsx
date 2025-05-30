@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { YcombBanner } from '@/components/YcombBanner/YcombBanner';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
+import { urls } from '@/lib/urls';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../_types';
 import { REFERRAL_CODE_KEY, popReferralCode, pushReferralCode } from '../_utils/onboarding.ultis';
@@ -113,7 +114,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
                 className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-[0px_4px_4px_0px_#0000000D] transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 role='button'
                 onClick={handleNextClick}>
-                Find my travel bookings
+                Get started free!
             </div>
         </div>
     );
@@ -190,7 +191,7 @@ const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; sta
     return (
         <div className='flex h-fit flex-col items-center justify-center text-center shadow-2xl'>
             {localStateId ? (
-                <Link href={`https://gmail.heyascend.com/gmail/import/start/${localStateId}`}>
+                <Link href={urls.gmailLinkStartUrl(localStateId)}>
                     <div
                         onClick={() => {
                             trackLuckyOrangeEvent(EventLists.gmail_layover.name, {

@@ -8,7 +8,7 @@ import { useUser } from '@/contexts/UserContext';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
 import Intercom from '@intercom/messenger-js-sdk';
 
-import IntercomIcon from '../IntercomIcon';
+import MessageUsBtn from '../MessageUsBtn';
 import MobileMoreFooter from '../MobileMoreFooter';
 import WelcomeGreenBedIcon from '../WelcomeGreenBedIcon';
 import { WelcomeWhatsNext } from '../WelcomeWhatsNext';
@@ -66,22 +66,17 @@ export default function DesktopLeftContentTrips() {
                         />
                         <div className='flex max-w-md flex-col items-center justify-center gap-2 rounded-2xl bg-neutral-50 p-6'>
                             <WelcomeGreenBedIcon />
-                            <div className='text-lg font-semibold'>Members-Only Deals</div>
+                            <div className='text-lg font-semibold'>Plan a trip!</div>
                             <div className='text-center text-sm text-neutral-800'>
                                 Your membership includes members-only deals on hotels and flights, just message us your
                                 destination and we'll handle the rest!
                             </div>
-                            {/* <Link href='https://wa.me/14257280395' target='_blank'>
-                                <Button className='rounded-full bg-[#1DC167] !px-12 py-3'>Message Us</Button>
-                            </Link> */}
-                            <div className='flex max-w-md flex-row items-center justify-center gap-2 rounded-2xl bg-neutral-50 p-6'>
-                                <div className='rounded-full bg-[#006DBC] p-2'>
-                                    <IntercomIcon className='size-4 text-white' />
-                                </div>
-                                <div className='rounded-full py-3 text-left text-sm font-semibold text-neutral-700 drop-shadow-md'>
-                                    Touch the chat icon in the bottom right corner to message us!
-                                </div>
+
+                            <div className='mt-8 text-center text-sm font-semibold text-neutral-800'>
+                                Chat with us on WhatsApp to plan itineraries and book a trip!
                             </div>
+
+                            <MessageUsBtn />
                         </div>
 
                         <MobileMoreFooter />

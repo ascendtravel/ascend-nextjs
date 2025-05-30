@@ -106,13 +106,17 @@ export default function MobileContentMembership() {
                     <div className='flex w-full max-w-lg justify-center px-4 pb-36'>
                         <div className='flex w-full flex-col items-start justify-center gap-3 rounded-2xl bg-neutral-50 p-6'>
                             <span className='text-lg font-bold'>Ascend Membership</span>
-                            <div className='flex flex-row gap-3'>
+                            <div className='item flex w-full flex-row justify-between gap-3'>
                                 <div className='flex items-start justify-start gap-1'>
                                     <span className='font-figtree -mr-1 pt-2 text-xl font-bold text-neutral-900'>
                                         $
                                     </span>
-                                    <span className='text-3xl font-bold'>25</span>
+                                    <span className='text-3xl font-bold'>24⁹⁹</span>
                                     <span className='-ml-1 pt-2 text-xl font-bold'>/year</span>
+                                </div>
+
+                                <div className='flex h-6 items-center justify-center rounded-full border border-[#17AA59] px-4 text-sm font-bold text-[#17AA59]'>
+                                    First week free!
                                 </div>
                             </div>
                             <div className='text-neutral-1000 -mt-3 flex flex-row items-center gap-2 text-sm'>

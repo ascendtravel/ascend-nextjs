@@ -19,8 +19,8 @@ const ARC_OPACITY = 0.22;
 // Camera Animation Parameters
 const START_CAMERA_POV = { lat: 0, lng: 0, altitude: 3.5 }; // Zoomed out, centered view
 const TARGET_CAMERA_POV = { lat: 39.6, lng: -98.5, altitude: 1.5 }; // Focused on continental US
-const POV_ANIMATION_DURATION_MS = 2500;
-const INITIAL_ANIMATION_DELAY_MS = 500;
+const POV_ANIMATION_DURATION_MS = 1500;
+const INITIAL_ANIMATION_DELAY_MS = 0;
 
 const SLOW_ROTATION_SPEED = 0.3; // Degrees per second (adjust as needed)
 
@@ -251,7 +251,7 @@ export default function DesktopRightContent({ skipInitialGlobeAnimation = false 
                     arcDashLength={0.25}
                     arcDashGap={1}
                     arcDashInitialGap={() => Math.random()}
-                    arcDashAnimateTime={4000}
+                    arcDashAnimateTime={2000}
                     arcColor={(d: any) => [`rgba(0, 255, 0, ${ARC_OPACITY})`, `rgba(255, 0, 0, ${ARC_OPACITY})`]}
                     arcsTransitionDuration={0}
                 />

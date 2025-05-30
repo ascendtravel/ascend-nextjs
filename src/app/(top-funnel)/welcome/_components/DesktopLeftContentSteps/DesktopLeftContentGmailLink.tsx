@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import OnboardingFooterWithLock from '@/app/(top-funnel)/welcome/_components/OnboardingFooterWithLock';
 import OnboardingGmailCheckCta from '@/app/(top-funnel)/welcome/_components/OnboardingGmailCheckCta';
 import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
+import { urls } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../../_types';
@@ -34,8 +35,8 @@ export default function DesktopLeftContentGmailLink() {
 
     const HeadersContent = {
         [OnboardingSteps.Step1]: {
-            title: 'Use Gmail to automatically import your reservations',
-            description: "We'll only import your existing and upcoming travel reservations"
+            title: 'Connect Gmail to automatically import your reservations',
+            description: "We’ll only pull existing and upcoming travel bookings (nothing else.)"
         },
         [LINK_FAILURE_PARAM]: {
             title: 'Looks like something went wrong!',
@@ -153,7 +154,7 @@ export default function DesktopLeftContentGmailLink() {
                             <OnboardingGmailCheckCta />
                         </div>
 
-                        <Link href={`https://gmail.heyascend.com/gmail/import/start/${state_id || localStateId || ''}`}>
+                        <Link href={urls.gmailLinkStartUrl(state_id || localStateId || '')}>
                             <div
                                 onClick={() => {
                                     trackLuckyOrangeEvent(EventLists.gmail_layover.name, {
