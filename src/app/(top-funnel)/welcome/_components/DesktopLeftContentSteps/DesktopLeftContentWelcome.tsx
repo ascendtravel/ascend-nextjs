@@ -116,7 +116,7 @@ export default function DesktopLeftContentWelcome() {
                 stiffness: 60,
                 damping: 20,
                 duration: 0.7,
-                delay: 3
+                delay: 0
             }
         }
     };
