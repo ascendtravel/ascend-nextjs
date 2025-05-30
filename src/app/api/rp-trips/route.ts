@@ -64,6 +64,7 @@ export interface FlightPayload extends CommonBookingPayload {
     arrival_airport_name: string;
     arrival_airport_terminal: string | null;
     arrival_airport_timezone: string;
+    airline_logo_url: string;
     arrival_city: string;
     departure_date: string;
     departure_time: string | null;
