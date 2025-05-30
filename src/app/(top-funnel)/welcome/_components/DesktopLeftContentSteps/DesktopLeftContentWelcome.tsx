@@ -209,7 +209,7 @@ export default function DesktopLeftContentWelcome() {
                                 });
                             }}
                             className='text-md gap-6 rounded-full bg-white px-8 py-3 text-center font-bold text-neutral-700 shadow-lg drop-shadow-md transition-all hover:scale-105 active:scale-95'>
-                            Import my travel bookings
+                            Get started free!
                         </div>
                     </Link>
                 </div>

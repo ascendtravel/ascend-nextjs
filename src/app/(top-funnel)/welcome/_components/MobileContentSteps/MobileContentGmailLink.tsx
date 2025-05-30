@@ -23,8 +23,8 @@ export default function MobileContentGmailLink() {
 
     const HeadersContent = {
         [OnboardingSteps.Step1]: {
-            title: 'Use Gmail to automatically import your reservations',
-            description: "We'll only import your existing and upcoming travel reservations"
+            title: 'Connect Gmail to automatically import your reservations',
+            description: "We’ll only pull existing and upcoming travel bookings (nothing else.)"
         },
         [LINK_FAILURE_PARAM]: {
             title: 'Looks like something went wrong!',
