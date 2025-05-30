@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 
 import { LINK_FAILURE_PARAM, PERMISSIONS_FAILURE_PARAM } from './app/(top-funnel)/welcome/_types';
+import { FRAMER_LINKS } from './config/navigation';
 
 export function middleware(request: NextRequest) {
     // Initialize Sentry
@@ -141,6 +142,26 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(newUrl);
     }
 
+    if (pathname === '/terms') {
+        return redirectWithParams(`${FRAMER_LINKS.terms}`);
+    }
+
+    if (pathname === '/privacy') {
+        return redirectWithParams(`${FRAMER_LINKS.privacy}`);
+    }
+
+    if (pathname === '/support') {
+        return redirectWithParams(`${FRAMER_LINKS.support}`);
+    }
+
+    if (pathname === '/about') {
+        return redirectWithParams(`${FRAMER_LINKS.about}`);
+    }
+
+    if (pathname === '/careers') {
+        return redirectWithParams(`${FRAMER_LINKS.careers}`);
+    }
+
     return NextResponse.next();
 }
 
@@ -160,7 +181,13 @@ export const config = {
 
         // Failure paths
         '/gmail-link_b/failure',
-        '/gmail-link_b/permissions-failure'
+        '/gmail-link_b/permissions-failure',
+
+        '/terms',
+        '/privacy',
+        '/support',
+        '/about',
+        '/careers'
     ]
 };
 // http://localhost:3003/gmail-link_b/permissions-failure?state_id=state_id=5d252757-fe8d-48f6-a777-1fe6ec401256
