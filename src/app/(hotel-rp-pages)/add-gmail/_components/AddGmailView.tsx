@@ -8,6 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { FRAMER_LINKS } from '@/config/navigation';
 import { useUser } from '@/contexts/UserContext';
+import { identifyUserByStateId } from '@/lib/analytics';
 import { urls } from '@/lib/urls';
 
 import AddGmailCheckboxCTA from './AddGmailCheckboxCTA';
@@ -34,6 +35,8 @@ function AddGmailView() {
 
                 if (!response.ok) throw new Error('Failed to get state ID');
                 const data = await response.json();
+                // IDENTIFY USER BY STATE ID
+                identifyUserByStateId(data.state_id);
                 setStateId(data.state_id);
             } catch (err) {
                 setError('Failed to initialize. Please try again.');

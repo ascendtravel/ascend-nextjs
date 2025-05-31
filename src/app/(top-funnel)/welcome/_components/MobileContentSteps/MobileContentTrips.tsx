@@ -29,12 +29,6 @@ export default function MobileContentTrips() {
         });
     }, [user]);
 
-    useEffect(() => {
-        trackLuckyOrangeEvent(EventLists.landed.name, {
-            description: EventLists.landed.description
-        });
-    }, []);
-
     return (
         <div className='relative h-screen overflow-hidden bg-[#006DBC] text-center'>
             <div className='fixed top-0 right-0 left-0 z-30 flex h-16 w-full flex-row items-center justify-between bg-[#006DBC]/60 px-4 backdrop-blur-md'>

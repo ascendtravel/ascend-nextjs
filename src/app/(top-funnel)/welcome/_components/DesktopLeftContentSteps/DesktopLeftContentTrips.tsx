@@ -25,12 +25,6 @@ export default function DesktopLeftContentTrips() {
         });
     }, [user]);
 
-    useEffect(() => {
-        trackLuckyOrangeEvent(EventLists.landed.name, {
-            description: EventLists.landed.description
-        });
-    }, []);
-
     // useEffect(() => {
     //     if (!user?.id) {
     //         // redirect to

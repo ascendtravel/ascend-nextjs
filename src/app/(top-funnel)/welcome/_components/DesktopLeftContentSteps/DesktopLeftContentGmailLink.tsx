@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import OnboardingFooterWithLock from '@/app/(top-funnel)/welcome/_components/OnboardingFooterWithLock';
 import OnboardingGmailCheckCta from '@/app/(top-funnel)/welcome/_components/OnboardingGmailCheckCta';
-import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
+import { EventLists, identifyUserByStateId, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { urls } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 
@@ -36,7 +36,7 @@ export default function DesktopLeftContentGmailLink() {
     const HeadersContent = {
         [OnboardingSteps.Step1]: {
             title: 'Connect Gmail to automatically import your reservations',
-            description: "We’ll only pull existing and upcoming travel bookings (nothing else.)"
+            description: 'We’ll only pull existing and upcoming travel bookings (nothing else.)'
         },
         [LINK_FAILURE_PARAM]: {
             title: 'Looks like something went wrong!',
@@ -111,6 +111,10 @@ export default function DesktopLeftContentGmailLink() {
 
             if (!response.ok) throw new Error('Failed to get state ID');
             const data = await response.json();
+
+            // IDENTIFY USER BY STATE ID
+            identifyUserByStateId(data.state_id);
+
             setLocalStateId(data.state_id);
         } catch (err) {
             setLocalStateId(null); // Clear stateId on error

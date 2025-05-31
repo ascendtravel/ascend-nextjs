@@ -31,6 +31,23 @@ declare global {
     }
 }
 
+export function identifyUserByStateId(stateId: string) {
+    if (typeof window === 'undefined') return;
+
+    window.LOQ.push([
+        'ready',
+        async (LO: any) => {
+            // Ensure visitor module is ready
+            await LO.$internal.ready('visitor');
+
+            // Identify the visitor to Lucky Orange using state id (visitor identification, not full user profile)
+            LO.visitor.identify(stateId);
+
+            console.log('[LuckyOrange] Visitor identified by state id', stateId);
+        }
+    ]);
+}
+
 export const EventLists = {
     takeoff: { name: 'takeoff', description: 'Loaded landing page' },
     began_boarding: { name: 'began_boarding', description: 'Clicked CTA on landing page' },

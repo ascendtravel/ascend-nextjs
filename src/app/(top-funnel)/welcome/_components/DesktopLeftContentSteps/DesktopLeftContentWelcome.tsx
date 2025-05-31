@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 
 import IconNewWhite from '@/components/Icon/IconNewWhite';
 import { FRAMER_LINKS } from '@/config/navigation';
-import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
+import { EventLists, identifyUserByStateId, trackLuckyOrangeEvent } from '@/lib/analytics';
 
 import { REFERRAL_CODE_KEY, pushReferralCode } from '../../_utils/onboarding.ultis';
 import { format } from 'date-fns';
@@ -85,8 +85,14 @@ export default function DesktopLeftContentWelcome() {
                     })
                 });
 
+                // IDENTIFY USER BY STATE ID
+
                 if (!response.ok) throw new Error('Failed to get state ID');
                 const data = await response.json();
+                // IDENTIFY USER BY STATE ID
+
+                // IDENTIFY USER BY STATE ID
+                identifyUserByStateId(data.state_id);
                 setStateId(data.state_id);
             } catch (err) {
                 setError('Failed to initialize. Please try again.');

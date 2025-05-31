@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { YcombBanner } from '@/components/YcombBanner/YcombBanner';
-import { EventLists, trackLuckyOrangeEvent } from '@/lib/analytics';
+import { EventLists, identifyUserByStateId, trackLuckyOrangeEvent } from '@/lib/analytics';
 import { urls } from '@/lib/urls';
 
 import { LINK_FAILURE_PARAM, OnboardingSteps, PERMISSIONS_FAILURE_PARAM } from '../_types';
@@ -83,6 +83,9 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
 
             if (!response.ok) throw new Error('Failed to get state ID');
             const data = await response.json();
+            // IDENTIFY USER BY STATE ID
+            identifyUserByStateId(data.state_id);
+
             setStateId(data.state_id);
         } catch (err) {
             setError('Failed to initialize. Please try again.');
@@ -109,7 +112,7 @@ const MobileSheetStep0Content = ({ onNext }: { onNext?: (stateId: string) => voi
     };
 
     return (
-        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center '>
+        <div className='flex h-fit min-w-[311px] flex-col items-center justify-center rounded-full text-center'>
             <div
                 className='w-full max-w-xs rounded-full bg-[#17AA59] px-12 py-3 text-base font-medium text-white shadow-[0px_4px_4px_0px_#0000000D] transition-colors hover:bg-[#17AA59]/80 disabled:cursor-not-allowed disabled:opacity-50'
                 role='button'
@@ -173,6 +176,10 @@ const MobileSheetStep1Content = ({ onNext, stateId }: { onNext?: () => void; sta
 
             if (!response.ok) throw new Error('Failed to get state ID');
             const data = await response.json();
+
+            // IDENTIFY USER BY STATE ID
+            identifyUserByStateId(data.state_id);
+
             setLocalStateId(data.state_id);
         } catch (err) {
             setError('Failed to initialize. Please try again.');

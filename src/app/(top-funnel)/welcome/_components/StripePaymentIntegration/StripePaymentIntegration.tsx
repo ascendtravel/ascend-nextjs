@@ -61,6 +61,9 @@ const PaymentForm = ({
                 setError(result.error.message);
                 onPaymentError?.(result.error);
             } else {
+                trackLuckyOrangeEvent(EventLists.landed.name, {
+                    description: EventLists.landed.description
+                });
                 onPaymentSuccess?.();
             }
         } catch (err: any) {
