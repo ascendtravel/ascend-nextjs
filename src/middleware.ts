@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs';
 import { LINK_FAILURE_PARAM, PERMISSIONS_FAILURE_PARAM } from './app/(top-funnel)/welcome/_types';
 import { FRAMER_LINKS } from './config/navigation';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     // Initialize Sentry
     Sentry.init({
         dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -112,7 +112,39 @@ export function middleware(request: NextRequest) {
     }
 
     if (pathname === '/gmail-link_b/failure') {
-        // Redirect to /welcome?step=2&failure=true, preserving other query parameters
+        // Check if it's actually a failure by calling our check API
+        const stateId = searchParams.get('state_id');
+
+        if (stateId) {
+            try {
+                const checkResponse = await fetch(
+                    `${baseAppUrl}/api/gmail/check?state_id=${stateId}&baseUrl=${baseAppUrl}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'X-API-KEY': process.env.PICKS_BACKEND_API_KEY!
+                        }
+                    }
+                );
+
+                const checkData = await checkResponse.json();
+                console.log('Check data:', checkData);
+
+                // If check returns a redirect (meaning Gmail linking was successful)
+                if (checkData.redirect) {
+                    console.log(`Gmail linking was actually successful, redirecting to: ${checkData.redirect}`);
+
+                    return NextResponse.redirect(checkData.redirect);
+                }
+
+                console.log('[Middleware] Confirmed Gmail linking failure, proceeding with failure flow');
+            } catch (error) {
+                console.error('[Middleware] Error checking Gmail status, assuming failure:', error);
+                // Continue with failure flow if check fails
+            }
+        }
+
+        // Redirect to /welcome?step=1&failure=true, preserving other query parameters
         const newUrl = new URL(`${baseAppUrl}/welcome`);
         newUrl.searchParams.append('step', '1');
         newUrl.searchParams.append(LINK_FAILURE_PARAM, 'true');
