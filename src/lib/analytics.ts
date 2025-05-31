@@ -41,7 +41,11 @@ export function identifyUserByStateId(stateId: string) {
             await LO.$internal.ready('visitor');
 
             // Identify the visitor to Lucky Orange using state id (visitor identification, not full user profile)
-            LO.visitor.identify(stateId);
+            LO.visitor.identify(`user_${stateId}`, {
+                name: 'unnamedUser',
+                customer_id: stateId,
+                state_id: stateId
+            });
 
             console.log('[LuckyOrange] Visitor identified by state id', stateId);
         }
